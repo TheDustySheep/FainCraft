@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FainEngine_v2\FainEngine_v2.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Resources\Voxels\Voxels.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
