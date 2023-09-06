@@ -1,0 +1,23 @@
+[
+  {
+    "Name": "Air",
+    "Draw_Self": false,
+    "Draw_Solid": false,
+    "TexIDs": [ 160, 160, 160, 160, 160, 160 ],
+    "Physics_Solid" : false
+  },
+  {
+    "Name": "Grass",
+    "Draw_Self": true,
+    "Draw_Solid": true,
+    "TexIDs": [ 243, 243, 242, 240, 243, 243 ],
+    "Physics_Solid": true
+  },
+  {
+    "Name": "Dirt",
+    "Draw_Self": true,
+    "Draw_Solid": true,
+    "TexIDs": [ 242, 242, 242, 242, 242, 242 ],
+    "Physics_Solid": true
+  }
+]
