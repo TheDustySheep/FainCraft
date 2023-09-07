@@ -8,17 +8,17 @@ using System.Collections.Concurrent;
 namespace FainCraft.Gameplay.WorldScripts.Systems.MeshGeneration;
 internal class ThreadedMeshGenerationSystem : IMeshGenerationSystem
 {
-    IWorldData worldData;
-    IRenderSystem renderSystem;
-    IMeshGenerator generator;
+    readonly IWorldData worldData;
+    readonly IRenderSystem renderSystem;
+    readonly IMeshGenerator generator;
 
     const int MAX_UPDATES_PER_TICK = 16;
-    WorkerThread workerThread;
+    readonly WorkerThread workerThread;
 
-    Queue<ChunkDataCluster> clusterPool = new Queue<ChunkDataCluster>();
-    HashQueue<ChunkCoord> toGenerate = new();
-    ConcurrentQueue<(ChunkCoord coord, ChunkDataCluster cluster)> buffer = new();
-    ConcurrentQueue<(ChunkCoord coord, ChunkDataCluster cluster, VoxelMeshData data)> complete = new();
+    readonly Queue<ChunkDataCluster> clusterPool = new Queue<ChunkDataCluster>();
+    readonly HashQueue<ChunkCoord> toGenerate = new();
+    readonly ConcurrentQueue<(ChunkCoord coord, ChunkDataCluster cluster)> buffer = new();
+    readonly ConcurrentQueue<(ChunkCoord coord, ChunkDataCluster cluster, VoxelMeshData data)> complete = new();
 
     public ThreadedMeshGenerationSystem(IWorldData worldData, IRenderSystem renderSystem, IMeshGenerator generator)
     {

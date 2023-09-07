@@ -8,7 +8,7 @@ using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration;
 internal class BasicTerrainGenerator : ITerrainGenerator
 {
-    VoxelIndexer indexer;
+    readonly VoxelIndexer indexer;
 
     public BasicTerrainGenerator(VoxelIndexer indexer)
     {

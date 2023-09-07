@@ -6,7 +6,7 @@ internal class WorldData : IWorldData
 {
     public VoxelIndexer Indexer { get; init; }
     public event Action<ChunkCoord>? OnChunkUpdate;
-    private Dictionary<RegionCoord, RegionData> regions = new();
+    private readonly Dictionary<RegionCoord, RegionData> regions = new();
 
     public WorldData(VoxelIndexer indexer)
     {

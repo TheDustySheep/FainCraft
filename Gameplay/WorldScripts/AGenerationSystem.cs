@@ -9,12 +9,12 @@ internal abstract class AGenerationSystem<T_Item, T_Gen>
     Action<ChunkCoord, T_Item>? onComplete;
 
     // Generators
-    Queue<T_Gen> freeGenerators = new();
-    Dictionary<ChunkCoord, T_Gen> activeGenerators = new();
+    readonly Queue<T_Gen> freeGenerators = new();
+    readonly Dictionary<ChunkCoord, T_Gen> activeGenerators = new();
 
     // Requests
-    HashQueue<ChunkCoord> requests = new();
-    ConcurrentQueue<(ChunkCoord, T_Item, T_Gen)> results = new();
+    readonly HashQueue<ChunkCoord> requests = new();
+    readonly ConcurrentQueue<(ChunkCoord, T_Item, T_Gen)> results = new();
 
     public AGenerationSystem(IEnumerable<T_Gen> generators, Action<ChunkCoord, T_Item>? onComplete)
     {

@@ -1,17 +1,14 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Chunking;
 using FainCraft.Gameplay.WorldScripts.Voxels;
-using Silk.NET.Assimp;
-using System;
 using System.Diagnostics;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.MeshGeneration;
 internal class MeshGenerator : IMeshGenerator
 {
-    VoxelIndexer voxelIndexer;
-    VoxelData[] nVoxelDatas = new VoxelData[27];
-    VoxelType[] nVoxelTypes = new VoxelType[27];
+    readonly VoxelIndexer voxelIndexer;
+    readonly VoxelData[] nVoxelDatas = new VoxelData[27];
+    readonly VoxelType[] nVoxelTypes = new VoxelType[27];
 
     public MeshGenerator(VoxelIndexer voxelIndexer)
     {

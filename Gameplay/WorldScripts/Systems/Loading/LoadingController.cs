@@ -1,17 +1,16 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Chunking;
 using FainCraft.Gameplay.WorldScripts.Core;
 using FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration;
-using FainEngine_v2.Collections;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.Loading;
 
 internal class LoadingController : ILoadingController
 {
-    IWorldData world;
-    ITerrainGenerationSystem terrainSystem;
+    readonly IWorldData world;
+    readonly ITerrainGenerationSystem terrainSystem;
 
-    HashSet<RegionCoord> regionsToLoad = new();
-    HashSet<RegionCoord> regionsToUnload = new();
+    readonly HashSet<RegionCoord> regionsToLoad = new();
+    readonly HashSet<RegionCoord> regionsToUnload = new();
 
     public LoadingController(IWorldData world, ITerrainGenerationSystem terrainSystem)
     {

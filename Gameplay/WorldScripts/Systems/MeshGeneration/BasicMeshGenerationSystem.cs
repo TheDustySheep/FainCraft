@@ -2,22 +2,19 @@
 using FainCraft.Gameplay.WorldScripts.Core;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering;
 using FainEngine_v2.Collections;
-using FainEngine_v2.Utils;
-using System.Collections.Concurrent;
-using System.Diagnostics.Metrics;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.MeshGeneration;
 internal class BasicMeshGenerationSystem : IMeshGenerationSystem
 {
-    IWorldData worldData;
-    IRenderSystem renderSystem;
-    IMeshGenerator generator;
+    readonly IWorldData worldData;
+    readonly IRenderSystem renderSystem;
+    readonly IMeshGenerator generator;
 
     const int MAX_UPDATES_PER_TICK = 1;
 
-    ChunkDataCluster cluster = new();
+    readonly ChunkDataCluster cluster = new();
 
-    HashQueue<ChunkCoord> toGenerate = new();
+    readonly HashQueue<ChunkCoord> toGenerate = new();
 
     public BasicMeshGenerationSystem(IWorldData worldData, IRenderSystem renderSystem, IMeshGenerator generator)
     {

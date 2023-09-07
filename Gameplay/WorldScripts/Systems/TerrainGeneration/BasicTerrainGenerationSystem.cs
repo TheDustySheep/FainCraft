@@ -1,19 +1,15 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Chunking;
 using FainCraft.Gameplay.WorldScripts.Core;
-using FainEngine_v2.Utils;
-using System.Collections.Concurrent;
-using System.Numerics;
-using System.Reflection.Emit;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration;
 internal class BasicTerrainGenerationSystem : ITerrainGenerationSystem
 {
     const int MAX_UPDATES_PER_TICK = 4;
 
-    IWorldData worldData;
-    ITerrainGenerator generator;
+    readonly IWorldData worldData;
+    readonly ITerrainGenerator generator;
 
-    Queue<RegionCoord> toGenerate = new();
+    readonly Queue<RegionCoord> toGenerate = new();
 
     public BasicTerrainGenerationSystem(IWorldData worldData, ITerrainGenerator generator)
     {

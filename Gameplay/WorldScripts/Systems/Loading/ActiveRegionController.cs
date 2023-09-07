@@ -5,8 +5,8 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Loading;
 
 internal class ActiveRegionController : IActiveRegionController
 {
-    ILoadingController loadingController;
-    HashSet<RegionCoord> ActiveRegions = new();
+    readonly ILoadingController loadingController;
+    readonly HashSet<RegionCoord> ActiveRegions = new();
     bool hasInit = false;
 
     public ActiveRegionController(ILoadingController loadingController)

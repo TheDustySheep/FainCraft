@@ -7,14 +7,14 @@ using System.Numerics;
 namespace FainCraft.Gameplay.PlayerScripts;
 internal class PlayerEntity : GameObject
 {
-    Transform camTransform = new Transform();
-    Camera3D camera;
-    CameraController controller;
-    PlayerMotor Motor;
+    readonly Transform camTransform = new Transform();
+    readonly Camera3D camera;
+    readonly PlayerCharacterController controller;
+    readonly PlayerMotor Motor;
 
     public PlayerEntity(IWorldData worldData)
     {
-        Transform.Position = new Vector3(0, 33, 0);
+        Transform.Position = new Vector3(0, 35, 0);
         camTransform.Position = new Vector3(0, 1.8f, 0);
         camTransform.SetParent(Transform);
 
@@ -23,7 +23,7 @@ internal class PlayerEntity : GameObject
 
         Motor = new PlayerMotor(Transform, worldData);
 
-        controller = new CameraController(camera, camTransform, Transform);
+        controller = new PlayerCharacterController(camera, camTransform, Motor);
     }
 
     public override void Update()

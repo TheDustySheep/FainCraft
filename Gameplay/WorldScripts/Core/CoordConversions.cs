@@ -28,17 +28,17 @@ public static class CoordConversions
     public static int ConvertToArrayIndex(int x, int y, int z)
     {
         return
-            (z & CHUNK_SIZE - 1) << CHUNK_SIZE_POWER * 2 |
-            (y & CHUNK_SIZE - 1) << CHUNK_SIZE_POWER |
-            x & CHUNK_SIZE - 1;
+            (z & CHUNK_SIZE_MASK) << CHUNK_SIZE_POWER * 2 |
+            (y & CHUNK_SIZE_MASK) << CHUNK_SIZE_POWER |
+            (x & CHUNK_SIZE_MASK);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int ConvertToArrayIndex(uint x, uint y, uint z)
     {
         return
-            ((int)z & CHUNK_SIZE - 1) << CHUNK_SIZE_POWER * 2 |
-            ((int)y & CHUNK_SIZE - 1) << CHUNK_SIZE_POWER |
-            ((int)x & CHUNK_SIZE - 1);
+            ((int)z & CHUNK_SIZE_MASK) << CHUNK_SIZE_POWER * 2 |
+            ((int)y & CHUNK_SIZE_MASK) << CHUNK_SIZE_POWER |
+            ((int)x & CHUNK_SIZE_MASK);
     }
 }

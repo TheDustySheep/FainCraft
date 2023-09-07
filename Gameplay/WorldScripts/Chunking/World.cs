@@ -11,14 +11,14 @@ namespace FainCraft.Gameplay.WorldScripts.Chunking;
 internal class World : GameObject, IEntity
 {
 
-    IRenderSystem renderSystem;
+    readonly IRenderSystem renderSystem;
 
     public IWorldData WorldData;
 
-    IMeshGenerationSystem meshSystem;
-    ITerrainGenerationSystem terrainSystem;
-    ILoadingController loadingController;
-    IActiveRegionController activeRegionController;
+    readonly IMeshGenerationSystem meshSystem;
+    readonly ITerrainGenerationSystem terrainSystem;
+    readonly ILoadingController loadingController;
+    readonly IActiveRegionController activeRegionController;
 
     public World()
     {

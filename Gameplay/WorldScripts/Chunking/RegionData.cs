@@ -4,7 +4,7 @@ using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 internal class RegionData
 {
-    ChunkData[] chunks;
+    readonly ChunkData[] chunks;
 
     public RegionData()
     {

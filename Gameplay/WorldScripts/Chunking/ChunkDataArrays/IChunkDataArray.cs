@@ -1,6 +1,4 @@
-﻿using FainCraft.Gameplay.WorldScripts.Core;
-
-namespace FainCraft.Gameplay.WorldScripts.Chunking.ChunkDataArrays;
+﻿namespace FainCraft.Gameplay.WorldScripts.Chunking.ChunkDataArrays;
 internal interface IChunkDataArray
 {
     public bool IsEmpty { get; }

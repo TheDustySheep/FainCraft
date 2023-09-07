@@ -7,8 +7,8 @@ using System.Numerics;
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering;
 internal class RenderSystem : IRenderSystem
 {
-    Dictionary<ChunkCoord, VoxelMesh> chunks = new();
-    Material material;
+    readonly Dictionary<ChunkCoord, VoxelMesh> chunks = new();
+    readonly Material material;
 
     public RenderSystem(Material material)
     {

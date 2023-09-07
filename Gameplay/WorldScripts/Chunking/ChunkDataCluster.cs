@@ -1,16 +1,9 @@
-﻿using FainCraft.Gameplay.WorldScripts.Core;
-using FainCraft.Gameplay.WorldScripts.Voxels;
-using Silk.NET.SDL;
-using System;
-using System.Diagnostics.Metrics;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
+﻿using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Chunking;
 internal class ChunkDataCluster
 {
-    ChunkData[] nChunks = new ChunkData[27];
+    readonly ChunkData[] nChunks = new ChunkData[27];
 
     public ChunkDataCluster()
     {
@@ -50,7 +43,7 @@ internal class ChunkDataCluster
                 {
                     int x_local = x + x_off - 1;
 
-                    int chunkIndex = 13 + 
+                    int chunkIndex = 13 +
                         (x_local >> CHUNK_SIZE_POWER) +
                         (y_local >> CHUNK_SIZE_POWER) * 3 +
                         (z_local >> CHUNK_SIZE_POWER) * 9;
@@ -63,7 +56,7 @@ internal class ChunkDataCluster
                     );
 
                     var chunkData = nChunks[chunkIndex];
-                    
+
                     data[index] = chunkData.VoxelData[localIndex];
 
                     index++;

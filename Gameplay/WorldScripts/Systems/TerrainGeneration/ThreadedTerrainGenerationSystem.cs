@@ -8,12 +8,12 @@ internal class ThreadedTerrainGenerationSystem : ITerrainGenerationSystem
 {
     const int MAX_UPDATES_PER_TICK = 16;
 
-    IWorldData worldData;
+    readonly IWorldData worldData;
 
-    WorkerThread workerThread;
+    readonly WorkerThread workerThread;
 
-    ConcurrentQueue<RegionCoord> toGenerate = new();
-    ConcurrentQueue<(RegionCoord coord, RegionData data)> complete = new();
+    readonly ConcurrentQueue<RegionCoord> toGenerate = new();
+    readonly ConcurrentQueue<(RegionCoord coord, RegionData data)> complete = new();
 
     public ThreadedTerrainGenerationSystem(IWorldData worldData, ITerrainGenerator generator)
     {

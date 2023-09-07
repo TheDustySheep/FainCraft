@@ -6,8 +6,8 @@ internal class VoxelIndexer
 {
     VoxelType[] Voxels = Array.Empty<VoxelType>();
 
-    Dictionary<VoxelType, uint> TypeToIndex = new();
-    Dictionary<string, uint> NameToIndex = new();
+    readonly Dictionary<VoxelType, uint> TypeToIndex = new();
+    readonly Dictionary<string, uint> NameToIndex = new();
 
     public void LoadVoxels()
     {

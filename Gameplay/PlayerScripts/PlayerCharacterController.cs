@@ -7,21 +7,21 @@ using Silk.NET.Input;
 using System.Numerics;
 
 namespace FainCraft.Gameplay.PlayerScripts;
-internal class CameraController
+internal class PlayerCharacterController
 {
-    Camera3D camera;
-    Transform camTransform;
-    Transform playerTransform;
+    readonly Camera3D camera;
+    readonly Transform camTransform;
+    readonly PlayerMotor motor;
 
     private float moveSpeed = 10f;
-    private float lookSensitivity = 0.1f;
+    private readonly float lookSensitivity = 0.1f;
     private Vector2 CameraRotation;
 
-    public CameraController(Camera3D camera, Transform camTransform, Transform playerTransform)
+    public PlayerCharacterController(Camera3D camera, Transform camTransform, PlayerMotor motor)
     {
         this.camera = camera;
         this.camTransform = camTransform;
-        this.playerTransform = playerTransform;
+        this.motor = motor;
     }
 
     public void Update()
@@ -67,19 +67,34 @@ internal class CameraController
         targetDelta.Y = 0f;
         if (targetDelta != default)
         {
-            targetDelta = targetDelta.Normalize();
+            targetDelta = targetDelta.Normalized();
         }
+
+
+        Vector3 targetVelocity = motor.Velocity;
 
         if (GameInputs.IsKeyHeld(Key.Space))
         {
-            targetDelta += Vector3.UnitY;
+            targetVelocity.Y = 1f;
+            // v = sqrt(2as) = 2 * gravity * 1 block
+            //float force = MathF.Sqrt(2 * 30 * 1.2f);
+            //motor.AddVelocity(Vector3.UnitY * force);
         }
-        if (GameInputs.IsKeyHeld(Key.ControlLeft))
+        else if (GameInputs.IsKeyHeld(Key.ControlLeft))
         {
-            targetDelta -= Vector3.UnitY;
+            targetVelocity.Y = -1f;
+            // v = sqrt(2as) = 2 * gravity * 1 block
+            //float force = MathF.Sqrt(2 * 30 * 1.2f);
+            //motor.AddVelocity(Vector3.UnitY * force);
+        }
+        else
+        {
+            targetVelocity.Y = 0f;
         }
 
-        playerTransform.Position += targetDelta * moveSpeed * GameTime.DeltaTime;
+        targetVelocity.X = targetDelta.X * moveSpeed;
+        targetVelocity.Z = targetDelta.Z * moveSpeed;
+        motor.Velocity = targetVelocity;
 
         if (GameInputs.IsKeyDown(Key.Escape))
             GameInputs.ExitProgram();
@@ -96,8 +111,8 @@ internal class CameraController
             CameraRotation.Y = Math.Clamp(CameraRotation.Y, -89.0f, 89.0f);
             camTransform.Rotation = Quaternion.CreateFromYawPitchRoll
             (
-                MathHelper.DegreesToRadians(CameraRotation.X),
-                MathHelper.DegreesToRadians(CameraRotation.Y), 
+                MathUtils.DegreesToRadians(CameraRotation.X),
+                MathUtils.DegreesToRadians(CameraRotation.Y),
                 0
             );
         }

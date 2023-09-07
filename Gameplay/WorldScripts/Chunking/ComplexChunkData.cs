@@ -6,10 +6,10 @@ using static FainCraft.Gameplay.WorldScripts.Core.CoordConversions;
 namespace FainCraft.Gameplay.WorldScripts.Chunking;
 internal class ComplexChunkData
 {
-    IChunkDataArray dataArray = new EmptyChunkDataArray();
+    readonly IChunkDataArray dataArray = new EmptyChunkDataArray();
     uint indexedCount = 1;
-    Dictionary<uint, ushort> remap1 = new Dictionary<uint, ushort>() { { 0, 0 } };
-    Dictionary<ushort, uint> remap2 = new Dictionary<ushort, uint>() { { 0, 0 } };
+    readonly Dictionary<uint, ushort> remap1 = new Dictionary<uint, ushort>() { { 0, 0 } };
+    readonly Dictionary<ushort, uint> remap2 = new Dictionary<ushort, uint>() { { 0, 0 } };
 
     public bool IsOnlyAir()
     {
