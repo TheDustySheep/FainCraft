@@ -58,6 +58,44 @@ internal class WorldData : IWorldData
         return true;
     }
 
+    public bool EditVoxelData(GlobalVoxelCoord globalCoord, Func<VoxelData, VoxelData> editFunc)
+    {
+        ChunkCoord chunkCoord = (ChunkCoord)globalCoord;
+
+        var chunk = GetChunk(chunkCoord);
+
+        if (chunk is null)
+        {
+            return false;
+        }
+
+        var oldVoxelData = chunk[(LocalVoxelCoord)globalCoord];
+
+        var newVoxelData = editFunc.Invoke(oldVoxelData);
+
+        // If nothing changed then return early
+        if (newVoxelData == oldVoxelData)
+            return true;
+
+        chunk[(LocalVoxelCoord)globalCoord] = newVoxelData;
+
+        if (OnChunkUpdate is null)
+            return true;
+
+        for (int x = -1; x < 2; x++)
+        {
+            for (int y = -1; y < 2; y++)
+            {
+                for (int z = -1; z < 2; z++)
+                {
+                    OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord(x, y, z));
+                }
+            }
+        }
+
+        return true;
+    }
+
     // Chunk
     public ChunkData? GetChunk(ChunkCoord coord)
     {

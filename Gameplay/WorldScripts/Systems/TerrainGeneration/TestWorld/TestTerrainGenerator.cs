@@ -2,7 +2,7 @@
 using FainCraft.Gameplay.WorldScripts.Core;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
-namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration;
+namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.TestWorld;
 internal class TestTerrainGenerator : ITerrainGenerator
 {
     public RegionData Generate(RegionCoord regionCoord)

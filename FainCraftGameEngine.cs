@@ -11,11 +11,7 @@ internal class FainCraftGameEngine : FainGameEngine
 
     protected override void Load()
     {
-        //var cam = EntityManager.SpawnEntity<CameraEntity>();
-        //ICamera.SetMainCamera(cam);
-        //var testModel = EntityManager.SpawnEntity<TestModel>();
-        //EntityManager.SpawnEntity<SystemDiagnostics>();
         var world = EntityManager.SpawnEntity<World>();
-        EntityManager.SpawnEntity(new PlayerEntity(world.WorldData));
+        var player = EntityManager.SpawnEntity(new PlayerEntity(world.WorldData));
     }
 }

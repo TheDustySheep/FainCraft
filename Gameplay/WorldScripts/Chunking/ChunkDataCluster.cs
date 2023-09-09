@@ -28,20 +28,20 @@ internal class ChunkDataCluster
         }
     }
 
-    public void GetVoxels(int x, int y, int z, VoxelData[] data)
+    public void GetVoxels(uint x, uint y, uint z, VoxelData[] data)
     {
         int index = 0;
         for (int z_off = 0; z_off < 3; z_off++)
         {
-            int z_local = z + z_off - 1;
+            int z_local = (int)z + z_off - 1;
 
             for (int y_off = 0; y_off < 3; y_off++)
             {
-                int y_local = y + y_off - 1;
+                int y_local = (int)y + y_off - 1;
 
                 for (int x_off = 0; x_off < 3; x_off++)
                 {
-                    int x_local = x + x_off - 1;
+                    int x_local = (int)x + x_off - 1;
 
                     int chunkIndex = 13 +
                         (x_local >> CHUNK_SIZE_POWER) +

@@ -1,13 +1,17 @@
 ﻿namespace FainCraft.Gameplay.WorldScripts.Systems.MeshGeneration;
 internal struct VoxelVertex
 {
-    static readonly uint MASK_XPOS = 0b_0000_0000_0000_0000_0000_0000_0011_1111;
-    static readonly uint MASK_YPOS = 0b_0000_0000_0000_0000_0000_1111_1100_0000;
-    static readonly uint MASK_ZPOS = 0b_0000_0000_0000_0011_1111_0000_0000_0000;
-    static readonly uint MASK_CORNER = 0b_0000_0000_0000_1100_0000_0000_0000_0000;
-    static readonly uint MASK_NORMAL = 0b_0000_0000_0111_0000_0000_0000_0000_0000;
-
+    /// <summary>
+    /// Data 1
+    /// </summary>
     public uint Data1;
+
+    static readonly uint MASK_XPOS     = 0b_0000_0000_0000_0000_0000_0000_0011_1111;
+    static readonly uint MASK_YPOS     = 0b_0000_0000_0000_0000_0000_1111_1100_0000;
+    static readonly uint MASK_ZPOS     = 0b_0000_0000_0000_0011_1111_0000_0000_0000;
+    static readonly uint MASK_CORNER   = 0b_0000_0000_0000_1100_0000_0000_0000_0000;
+    static readonly uint MASK_NORMAL   = 0b_0000_0000_0111_0000_0000_0000_0000_0000;
+    static readonly uint MASK_IS_FLUID = 0b_0000_0000_1000_0000_0000_0000_0000_0000;
 
     public uint XPos
     {
@@ -39,9 +43,18 @@ internal struct VoxelVertex
         set => Data1 = Data1 & ~MASK_NORMAL | (value & 7u) << 20;
     }
 
-    static readonly uint MASK_TEXID = 0b_0000_0000_0000_0000_1111_1111_1111_1111;
+    public uint SurfaceFluid
+    {
+        readonly get => (Data1 & MASK_IS_FLUID) >> 23;
+        set => Data1 = Data1 & ~MASK_IS_FLUID | (value & 1u) << 23;
+    }
 
+    /// <summary>
+    /// Data 2
+    /// </summary>
     public uint Data2;
+
+    static readonly uint MASK_TEXID = 0b_0000_0000_0000_0000_1111_1111_1111_1111;
 
     public uint TexIndex
     {

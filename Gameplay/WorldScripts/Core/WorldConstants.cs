@@ -19,4 +19,10 @@ internal class WorldConstants
     {
         return z * CHUNK_SIZE * CHUNK_SIZE + y * CHUNK_SIZE + x;
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint ConvertToClusterIndex(uint x, uint y, uint z)
+    {
+        return z * 9 + y * 3 + x;
+    }
 }

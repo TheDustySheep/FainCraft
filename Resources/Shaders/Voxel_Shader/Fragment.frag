@@ -36,7 +36,7 @@ void main()
     // Vertex Color
     vec4 vertexColor = texture(albedoTexture, texCoord).rgba;
 
-    if (vertexColor.a < 1)
+    if (vertexColor.a < 0.1)
         discard;
 
     // Result

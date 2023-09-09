@@ -1,4 +1,5 @@
-﻿using FainEngine_v2.Core;
+﻿using FainCraft.Gameplay.Motors;
+using FainEngine_v2.Core;
 using FainEngine_v2.Core.GameObjects;
 using FainEngine_v2.Extensions;
 using FainEngine_v2.Rendering.Cameras;
@@ -9,17 +10,17 @@ using System.Numerics;
 namespace FainCraft.Gameplay.PlayerScripts;
 internal class PlayerCharacterController
 {
-    readonly Camera3D camera;
     readonly Transform camTransform;
-    readonly PlayerMotor motor;
+    readonly EntityMotor motor;
 
-    private float moveSpeed = 10f;
-    private readonly float lookSensitivity = 0.1f;
-    private Vector2 CameraRotation;
+    float jumpPeriod = 0.5f;
+    float jumpCooldown = 0f;
+    float moveSpeed = 10f;
+    readonly float lookSensitivity = 0.1f;
+    Vector2 CameraRotation;
 
-    public PlayerCharacterController(Camera3D camera, Transform camTransform, PlayerMotor motor)
+    public PlayerCharacterController(Transform camTransform, EntityMotor motor)
     {
-        this.camera = camera;
         this.camTransform = camTransform;
         this.motor = motor;
     }
@@ -28,15 +29,45 @@ internal class PlayerCharacterController
     {
         UpdatePosition();
         UpdateRotation();
-        UpdateZoom();
-        UpdateMatrix();
-    }
-
-    private void UpdateMatrix()
-    {
     }
 
     private void UpdatePosition()
+    {
+        Vector3 targetDelta = MovementInputs();
+
+        targetDelta.Y = 0f;
+        if (targetDelta != default)
+        {
+            targetDelta = targetDelta.Normalized();
+        }
+
+        Vector3 velocity = motor.Velocity;
+
+        if (GameInputs.IsKeyHeld(Key.Space) && motor.groundedState.IsGrounded && jumpCooldown == 0f)
+        {
+            float force = MathF.Sqrt(2 * motor.Gravity * 1.25f);
+            velocity.Y = force;
+            jumpCooldown = jumpPeriod;
+        }
+
+        if (GameInputs.IsKeyDown(Key.F))
+        {
+            velocity.Y = 0f;
+            float force = MathF.Sqrt(2 * motor.Gravity * 20f);
+            velocity.Y = force;
+        }
+
+        velocity.X = targetDelta.X * moveSpeed;
+        velocity.Z = targetDelta.Z * moveSpeed;
+
+        motor.Velocity = velocity;
+        jumpCooldown = MathUtils.Max(0f, jumpCooldown - GameTime.DeltaTime);
+
+        if (GameInputs.IsKeyDown(Key.Escape))
+            GameInputs.ExitProgram();
+    }
+
+    private Vector3 MovementInputs()
     {
         Vector3 targetDelta = Vector3.Zero;
 
@@ -64,40 +95,7 @@ internal class PlayerCharacterController
             targetDelta += Vector3.Normalize(cameraRight);
         }
 
-        targetDelta.Y = 0f;
-        if (targetDelta != default)
-        {
-            targetDelta = targetDelta.Normalized();
-        }
-
-
-        Vector3 targetVelocity = motor.Velocity;
-
-        if (GameInputs.IsKeyHeld(Key.Space))
-        {
-            targetVelocity.Y = 1f;
-            // v = sqrt(2as) = 2 * gravity * 1 block
-            //float force = MathF.Sqrt(2 * 30 * 1.2f);
-            //motor.AddVelocity(Vector3.UnitY * force);
-        }
-        else if (GameInputs.IsKeyHeld(Key.ControlLeft))
-        {
-            targetVelocity.Y = -1f;
-            // v = sqrt(2as) = 2 * gravity * 1 block
-            //float force = MathF.Sqrt(2 * 30 * 1.2f);
-            //motor.AddVelocity(Vector3.UnitY * force);
-        }
-        else
-        {
-            targetVelocity.Y = 0f;
-        }
-
-        targetVelocity.X = targetDelta.X * moveSpeed;
-        targetVelocity.Z = targetDelta.Z * moveSpeed;
-        motor.Velocity = targetVelocity;
-
-        if (GameInputs.IsKeyDown(Key.Escape))
-            GameInputs.ExitProgram();
+        return targetDelta;
     }
 
     private void UpdateRotation()
@@ -109,18 +107,12 @@ internal class PlayerCharacterController
             CameraRotation += mouseDelta * lookSensitivity;
 
             CameraRotation.Y = Math.Clamp(CameraRotation.Y, -89.0f, 89.0f);
-            camTransform.Rotation = Quaternion.CreateFromYawPitchRoll
+            camTransform.LocalRotation = Quaternion.CreateFromYawPitchRoll
             (
                 MathUtils.DegreesToRadians(CameraRotation.X),
                 MathUtils.DegreesToRadians(CameraRotation.Y),
                 0
             );
         }
-    }
-
-    private void UpdateZoom()
-    {
-        //We don't want to be able to zoom in too close or too far away so clamp to these values
-        moveSpeed = Math.Clamp(moveSpeed - GameInputs.ScrollDelta.Y * 0.1f, 1.0f, 20f);
     }
 }

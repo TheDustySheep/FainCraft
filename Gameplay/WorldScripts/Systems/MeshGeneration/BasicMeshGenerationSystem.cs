@@ -14,7 +14,7 @@ internal class BasicMeshGenerationSystem : IMeshGenerationSystem
 
     readonly ChunkDataCluster cluster = new();
 
-    readonly HashQueue<ChunkCoord> toGenerate = new();
+    readonly OrderedSet<ChunkCoord> toGenerate = new();
 
     public BasicMeshGenerationSystem(IWorldData worldData, IRenderSystem renderSystem, IMeshGenerator generator)
     {
@@ -27,7 +27,7 @@ internal class BasicMeshGenerationSystem : IMeshGenerationSystem
 
     public void Generate(ChunkCoord coord)
     {
-        toGenerate.Enqueue(coord);
+        toGenerate.AddLast(coord);
     }
 
     public void Tick()

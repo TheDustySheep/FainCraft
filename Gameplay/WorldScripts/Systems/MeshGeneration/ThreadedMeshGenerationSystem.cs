@@ -16,7 +16,7 @@ internal class ThreadedMeshGenerationSystem : IMeshGenerationSystem
     readonly WorkerThread workerThread;
 
     readonly Queue<ChunkDataCluster> clusterPool = new Queue<ChunkDataCluster>();
-    readonly HashQueue<ChunkCoord> toGenerate = new();
+    readonly OrderedSet<ChunkCoord> toGenerate = new();
     readonly ConcurrentQueue<(ChunkCoord coord, ChunkDataCluster cluster)> buffer = new();
     readonly ConcurrentQueue<(ChunkCoord coord, ChunkDataCluster cluster, VoxelMeshData data)> complete = new();
 
@@ -45,7 +45,7 @@ internal class ThreadedMeshGenerationSystem : IMeshGenerationSystem
 
     public void Generate(ChunkCoord coord)
     {
-        toGenerate.Enqueue(coord);
+        toGenerate.AddLast(coord);
     }
 
     public void Tick()

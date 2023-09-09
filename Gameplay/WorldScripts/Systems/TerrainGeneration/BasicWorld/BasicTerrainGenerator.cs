@@ -5,7 +5,7 @@ using FainEngine_v2.Utils;
 using System.Diagnostics;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
-namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration;
+namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.BasicWorld;
 internal class BasicTerrainGenerator : ITerrainGenerator
 {
     readonly VoxelIndexer indexer;
@@ -64,6 +64,9 @@ internal class BasicTerrainGenerator : ITerrainGenerator
                         data = Grass;
                     else
                         data = Air;
+
+                    if (coord.X == 5 && coord.Z == 5)
+                        data = Dirt;
 
                     chunkData[c_x, c_y, c_z] = data;
                 }

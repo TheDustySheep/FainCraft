@@ -33,7 +33,7 @@ internal class MeshGenerator : IMeshGenerator
                 {
                     for (uint x = 0; x < CHUNK_SIZE; x++)
                     {
-                        GetNeighbourVoxels((int)x, (int)y, (int)z, cluster);
+                        GetNeighbourVoxels(x, y, z, cluster);
 
                         var voxelData = nVoxelDatas[13];
                         var voxelType = nVoxelTypes[13];
@@ -41,13 +41,19 @@ internal class MeshGenerator : IMeshGenerator
                         if (!voxelType.DrawSelf)
                             continue;
 
+                        uint surfaceFluid = Convert.ToUInt32(voxelType.Is_Fluid && !nVoxelTypes[17].Is_Fluid);
+
                         for (int face = 0; face < 6; face++)
                         {
                             uint faceIndex = FACE_N_INDEX[face];
                             var faceVoxelData = nVoxelDatas[faceIndex];
                             var faceVoxelType = nVoxelTypes[faceIndex];
 
-                            if (faceVoxelType.DrawSolid)
+                            // If the face voxel is see through then draw
+                            if (!faceVoxelType.SeeThrough)
+                                continue;
+
+                            if (voxelType.Skip_Draw_Similar && voxelData.Index == faceVoxelData.Index)
                                 continue;
 
                             for (uint i = 0; i < 4; i++)
@@ -56,6 +62,7 @@ internal class MeshGenerator : IMeshGenerator
                                 vert.XPos += x;
                                 vert.YPos += y;
                                 vert.ZPos += z;
+                                vert.SurfaceFluid = surfaceFluid;
 
                                 vert.TexIndex = voxelType.TexIDs[face];
                                 verts.Add(vert);
@@ -87,26 +94,24 @@ internal class MeshGenerator : IMeshGenerator
         return meshData;
     }
 
-    private void GetNeighbourVoxels(int x, int y, int z, ChunkDataCluster cluster)
+    private void GetNeighbourVoxels(uint x, uint y, uint z, ChunkDataCluster cluster)
     {
         cluster.GetVoxels(x, y, z, nVoxelDatas);
 
         for (int i = 0; i < 27; i++)
         {
-            var data = nVoxelDatas[i];
-            var type = voxelIndexer.GetVoxelType(data.Index);
-            nVoxelTypes[i] = type;
+            nVoxelTypes[i] = voxelIndexer.GetVoxelType(nVoxelDatas[i].Index);
         }
     }
 
     static readonly uint[] FACE_N_INDEX =
     {
-        0 * 1 + 1 * 3 + 1 * 9,
-        2 * 1 + 1 * 3 + 1 * 9,
-        1 * 1 + 0 * 3 + 1 * 9,
-        1 * 1 + 2 * 3 + 1 * 9,
-        1 * 1 + 1 * 3 + 0 * 9,
-        1 * 1 + 1 * 3 + 2 * 9,
+        ConvertToClusterIndex(0, 1, 1),
+        ConvertToClusterIndex(2, 1, 1),
+        ConvertToClusterIndex(1, 0, 1),
+        ConvertToClusterIndex(1, 2, 1),
+        ConvertToClusterIndex(1, 1, 0),
+        ConvertToClusterIndex(1, 1, 2)
     };
 
     static readonly VoxelVertex[] VERTICES =
@@ -152,14 +157,4 @@ internal class MeshGenerator : IMeshGenerator
     {
           0,  1,  2,  2,  3,  0,
     };
-
-    //static readonly uint[] TRIANGLES =
-    //{
-    //      0,  1,  2,  2,  3,  0,
-    //      4,  5,  6,  6,  7,  4,
-    //      8,  9, 10, 10, 11,  8,
-    //     12, 13, 14, 14, 15, 12,
-    //     16, 17, 18, 18, 19, 16,
-    //     20, 21, 22, 22, 23, 20,
-    //};
 }

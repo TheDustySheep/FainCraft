@@ -2,22 +2,82 @@
   {
     "Name": "Air",
     "Draw_Self": false,
-    "Draw_Solid": false,
+    "See_Through": true,
     "TexIDs": [ 160, 160, 160, 160, 160, 160 ],
-    "Physics_Solid" : false
+    "Physics_Solid": false
   },
   {
     "Name": "Grass",
     "Draw_Self": true,
-    "Draw_Solid": true,
+    "See_Through": false,
     "TexIDs": [ 243, 243, 242, 240, 243, 243 ],
     "Physics_Solid": true
   },
   {
     "Name": "Dirt",
     "Draw_Self": true,
-    "Draw_Solid": true,
+    "See_Through": false,
     "TexIDs": [ 242, 242, 242, 242, 242, 242 ],
     "Physics_Solid": true
+  },
+  {
+    "Name": "Sand",
+    "Draw_Self": true,
+    "See_Through": false,
+    "TexIDs": [ 226, 226, 226, 226, 226, 226 ],
+    "Physics_Solid": true
+  },
+  {
+    "Name": "Stone",
+    "Draw_Self": true,
+    "See_Through": false,
+    "TexIDs": [ 241, 241, 241, 241, 241, 241 ],
+    "Physics_Solid": true
+  },
+  {
+    "Name": "Cobblestone",
+    "Draw_Self": true,
+    "See_Through": false,
+    "TexIDs": [ 224, 224, 224, 224, 224, 224 ],
+    "Physics_Solid": true
+  },
+  {
+    "Name": "Planks",
+    "Draw_Self": true,
+    "See_Through": false,
+    "TexIDs": [ 244, 244, 244, 244, 244, 244 ],
+    "Physics_Solid": true
+  },
+  {
+    "Name": "Log",
+    "Draw_Self": true,
+    "See_Through": false,
+    "TexIDs": [ 228, 228, 229, 229, 228, 228 ],
+    "Physics_Solid": true
+  },
+  {
+    "Name": "Leaves",
+    "Draw_Self": true,
+    "See_Through": false,
+    "TexIDs": [ 249, 249, 249, 249, 249, 249 ],
+    "Physics_Solid": true
+  },
+  {
+    "Name": "Water",
+    "Draw_Self": true,
+    "See_Through": true,
+    "TexIDs": [ 179, 179, 179, 179, 179, 179 ],
+    "Physics_Solid": false,
+    "Skip_Draw_Similar": true,
+    "Is_Fluid": true,
+    "Is_Transparent": true
+  },
+  {
+    "Name": "Glass",
+    "Draw_Self": true,
+    "See_Through": true,
+    "TexIDs": [ 193, 193, 193, 193, 193, 193 ],
+    "Physics_Solid": true,
+    "Skip_Draw_Similar": true
   }
 ]

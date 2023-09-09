@@ -11,6 +11,7 @@ internal interface IWorldData
     // Voxel
     public bool GetVoxelData(GlobalVoxelCoord coord, out VoxelData voxelData);
     public bool SetVoxelData(GlobalVoxelCoord coord, VoxelData voxelData);
+    public bool EditVoxelData(GlobalVoxelCoord coord, Func<VoxelData, VoxelData> editFunc);
 
     // Chunk
     public ChunkData? GetChunk(ChunkCoord coord);

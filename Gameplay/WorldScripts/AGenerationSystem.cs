@@ -13,7 +13,7 @@ internal abstract class AGenerationSystem<T_Item, T_Gen>
     readonly Dictionary<ChunkCoord, T_Gen> activeGenerators = new();
 
     // Requests
-    readonly HashQueue<ChunkCoord> requests = new();
+    readonly OrderedSet<ChunkCoord> requests = new();
     readonly ConcurrentQueue<(ChunkCoord, T_Item, T_Gen)> results = new();
 
     public AGenerationSystem(IEnumerable<T_Gen> generators, Action<ChunkCoord, T_Item>? onComplete)
@@ -33,7 +33,7 @@ internal abstract class AGenerationSystem<T_Item, T_Gen>
 
     public void Request(ChunkCoord coord)
     {
-        requests.Enqueue(coord);
+        requests.AddLast(coord);
     }
 
     public void Cancel(ChunkCoord coord)
