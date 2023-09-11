@@ -1,4 +1,4 @@
-﻿using FainCraft.Gameplay.WorldScripts.Chunking;
+﻿using FainCraft.Gameplay.WorldScripts.Data;
 using FainEngine_v2.Core.GameObjects;
 using FainEngine_v2.Physics.AABB;
 using System.Numerics;
@@ -15,10 +15,10 @@ internal class EntityMotor
         set => _internalMotor.Gravity = value;
     }
 
-    public Vector3 PlayerSize 
-    { 
-        get; 
-        set; 
+    public Vector3 PlayerSize
+    {
+        get;
+        set;
     } = new Vector3(0.4f, 1.8f, 0.4f);
 
     public Vector3 PositionStart
@@ -26,7 +26,7 @@ internal class EntityMotor
         get => _transform.LocalPosition - (PlayerSize / 2);
         set => _transform.LocalPosition = (PlayerSize / 2) + value;
     }
-    
+
     public Vector3 Velocity
     {
         get => _internalMotor.Velocity;
@@ -34,8 +34,8 @@ internal class EntityMotor
     }
     #endregion
 
-    EntityMotorInternal _internalMotor;
-    Transform _transform;
+    readonly EntityMotorInternal _internalMotor;
+    readonly Transform _transform;
 
     public EntityMotor(Transform transform, IWorldData worldData)
     {

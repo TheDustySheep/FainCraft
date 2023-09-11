@@ -19,7 +19,7 @@ internal class ActiveRegionController : IActiveRegionController
         if (hasInit)
             return;
 
-        foreach (var point in GetSpiral(8))
+        foreach (var point in GetSpiral(16))
         {
             var coord = new RegionCoord(point.X, point.Y);
             ActiveRegions.Add(coord);

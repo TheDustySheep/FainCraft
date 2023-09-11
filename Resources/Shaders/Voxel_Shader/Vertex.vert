@@ -2,9 +2,10 @@
 layout (location = 0) in int aData1;
 layout (location = 1) in int aData2;
 
-out vec2 texCoord;
-out vec3 vertexNormal;
-out vec3 fragPos;
+out vec3 oTexCoord;
+out vec3 oVertexNormal;
+out vec3 oFragPos;
+out float oAO;
 
 uniform mat4 normalMat;
 uniform mat4 uModel;
@@ -18,8 +19,9 @@ struct Vertex_Data
     vec3 Normal;
     int corner;
     int texID;
-    vec2 TexCoord;
+    vec3 TexCoord;
     bool isFluid;
+    int AO;
 };
 
 const vec3 NORMAL_LOOKUP[6] = vec3[]
@@ -40,30 +42,30 @@ const vec2 TEX_LOOKUP[4] = vec2[]
    vec2(0, 0)
 );
 
-vec2 DecodeTexCoord(int index, int corner)
+vec3 DecodeTexCoord(int index, int corner)
 {
-    int xIdx = (index & 15);
-    int yIdx = (index >> 4) & 15;
+    //int xIdx = (index & 15);
+    //int yIdx = (index >> 4) & 15;
     
-    vec2 coord = vec2(xIdx, yIdx);
+    vec3 coord = vec3(0, 0, index);
 
     switch (corner) 
     {
         case 0:
-            coord += vec2(0, 0);
+            coord.xy = vec2(0, 0);
             break;
         case 1:
-            coord += vec2(0, 1);
+            coord.xy = vec2(0, 1);
             break;
         case 2:
-            coord += vec2(1, 1);
+            coord.xy = vec2(1, 1);
             break;
         default:
-            coord += vec2(1, 0);
+            coord.xy = vec2(1, 0);
             break;
     }
 
-    return coord / 16;
+    return coord;
 }
 
 float GetSumOfCoSins(float t, float frequency)
@@ -122,6 +124,11 @@ Vertex_Data ApplyFluid(Vertex_Data vertex_data)
     return vertex_data;
 }
 
+float DecodeAO(int ao)
+{
+    return (float(ao) + 1.0) * 0.25;
+}
+
 Vertex_Data DecodeVertex()
 {
     Vertex_Data vertex_data;
@@ -141,6 +148,7 @@ Vertex_Data DecodeVertex()
     vertex_data.texID = aData2 & 65535;
 
     vertex_data.TexCoord = DecodeTexCoord(vertex_data.texID ,vertex_data.corner);
+    vertex_data.AO = (aData1 >> 24) & 3;
 
     vertex_data = ApplyFluid(vertex_data);
 
@@ -153,11 +161,12 @@ void main()
 
     vec3 aPosition = vertex_data.Position;
     vec3 aNormal   = vertex_data.Normal;
-    vec2 aTexCoord = vertex_data.TexCoord;
+    vec3 aTexCoord = vertex_data.TexCoord;
 
     // Outputs
     gl_Position = uProjection * uView * uModel * vec4(aPosition, 1.0);
-    fragPos = vec3(uModel * vec4(aPosition, 1.0));
-    vertexNormal = mat3(normalMat) * aNormal;
-    texCoord = aTexCoord;
+    oFragPos = vec3(uModel * vec4(aPosition, 1.0));
+    oVertexNormal = mat3(normalMat) * aNormal;
+    oTexCoord = aTexCoord;
+    oAO = DecodeAO(vertex_data.AO);
 }

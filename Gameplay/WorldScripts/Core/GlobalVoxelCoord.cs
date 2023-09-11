@@ -17,6 +17,13 @@ public struct GlobalVoxelCoord
         Z = ConvertToGlobalFromChunk(chunk.Z) + local.Z;
     }
 
+    public GlobalVoxelCoord(RegionCoord regionCoord)
+    {
+        X = ConvertToGlobalFromChunk(regionCoord.X);
+        Y = 0;
+        Z = ConvertToGlobalFromChunk(regionCoord.Z);
+    }
+
     public GlobalVoxelCoord(int x, int y, int z)
     {
         X = x;

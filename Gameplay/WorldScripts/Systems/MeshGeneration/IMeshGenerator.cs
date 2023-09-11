@@ -1,7 +1,7 @@
-﻿using FainCraft.Gameplay.WorldScripts.Chunking;
+﻿using FainCraft.Gameplay.WorldScripts.Data;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.MeshGeneration;
-internal interface IMeshGenerator
+public interface IMeshGenerator
 {
     public VoxelMeshData GenerateMesh(ChunkDataCluster cluster);
 }

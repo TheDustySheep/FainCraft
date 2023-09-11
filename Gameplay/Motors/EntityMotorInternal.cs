@@ -2,18 +2,18 @@
 using FainEngine_v2.Extensions;
 using FainEngine_v2.Physics.AABB;
 using FainEngine_v2.Utils;
-using System.Diagnostics;
 using System.Numerics;
 
 namespace FainCraft.Gameplay.Motors;
 internal class EntityMotorInternal
 {
+    public float MaxStableSpeed = 100f;
     public GroundedState groundedState => _groundedState;
 
-    public float Gravity = 50f;
+    public float Gravity = 32f;
     public Vector3 Velocity;
 
-    CollisionHandler collisionHandler;
+    readonly CollisionHandler collisionHandler;
 
     Vector3? _setPositionRequest;
 
@@ -39,7 +39,8 @@ internal class EntityMotorInternal
     public Vector3 InterpolatePosition()
     {
         float t = MathUtils.InvLerp(_startTime, _nextTime, GameTime.TotalTime);
-        return Vector3Extensions.Lerp(_startPosition, _nextPosition, MathUtils.Clamp01(t));
+        t = MathUtils.Clamp01(t);
+        return Vector3Extensions.Lerp(_startPosition, _nextPosition, t);
     }
 
     public void SetPosition(Vector3 newPosition) => _setPositionRequest = newPosition;
@@ -99,6 +100,12 @@ internal class EntityMotorInternal
     private void UpdateVelocity()
     {
         Velocity.Y -= GameTime.FixedDeltaTime * Gravity;
+
+        if (Velocity.LengthSquared() > MaxStableSpeed * MaxStableSpeed)
+            Velocity = Velocity.Normalized() * MaxStableSpeed;
+
+
+
         //Velocity.Y = MathUtils.MoveTowards(Velocity.Y, -Gravity, GameTime.FixedDeltaTime * Gravity);
     }
 

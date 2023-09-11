@@ -1,25 +1,30 @@
-﻿using FainCraft.Gameplay.WorldScripts.Chunking;
+﻿using FainCraft.Gameplay.WorldEntities;
+using FainCraft.Gameplay.WorldScripts;
+using FainCraft.Gameplay.WorldScripts.Data;
 using FainCraft.Gameplay.WorldScripts.Core;
 using FainCraft.Gameplay.WorldScripts.Voxels;
 using FainEngine_v2.Core;
 using FainEngine_v2.Core.GameObjects;
 using FainEngine_v2.Physics;
+using FainEngine_v2.Physics.AABB;
 using FainEngine_v2.Utils;
 using Silk.NET.Input;
-using System.Numerics;
+using Silk.NET.Maths;
 
 namespace FainCraft.Gameplay.PlayerScripts;
 
 internal class WorldEditor
 {
-    VoxelIndexer indexer;
-    IWorldData worldData;
-    Transform camTransform;
+    readonly VoxelIndexer indexer;
+    readonly IWorldData worldData;
+    readonly Transform camTransform;
+    readonly IWorldEntityController entityController;
 
-    public WorldEditor(Transform camTransform, IWorldData worldData)
+    public WorldEditor(Transform camTransform, World world)
     {
+        this.worldData = world.WorldData;
+        this.entityController = world.WorldEntityController;
         this.camTransform = camTransform;
-        this.worldData = worldData;
         indexer = worldData.Indexer;
     }
 
@@ -27,24 +32,36 @@ internal class WorldEditor
     {
         if (RaycastVoxel(out var hit))
         {
+            Gizmos.DrawVoxel(hit.VoxelPosition, System.Drawing.Color.Red);
+
             if (GameInputs.IsMouseDown(MouseButton.Left))
             {
-                EditVoxel(hit, new VoxelData() { Index = 0 });
+                EditVoxel(hit.VoxelPosition, new VoxelData() { Index = 0 });
             }
             else if (GameInputs.IsMouseDown(MouseButton.Right))
             {
-                EditVoxel(hit, new VoxelData() { Index = 5 });
+                var faceVox = hit.VoxelPosition + hit.VoxelNormal;
+
+                var voxelAABB = new StaticAABB(faceVox);
+
+                foreach (var entity in entityController.Entities)
+                {
+                    if (AABBResolver.IsOverlapping(voxelAABB, entity.Bounds))
+                        return;
+                }
+
+                EditVoxel(faceVox, new VoxelData() { Index = 5 });
             }
         }
     }
 
-    private void EditVoxel(VoxelHit hit, VoxelData newVoxel)
+    private void EditVoxel(Vector3D<int> coord, VoxelData newVoxel)
     {
-        GlobalVoxelCoord coord = new GlobalVoxelCoord(hit.VoxelPosition);
-        worldData.EditVoxelData(coord, oldVoxel =>
+        GlobalVoxelCoord voxCoord = new GlobalVoxelCoord(coord);
+        worldData.EditVoxelData(voxCoord, oldVoxel =>
         {
             return newVoxel;
-        });
+        }, true);
     }
 
     private bool RaycastVoxel(out VoxelHit hit)

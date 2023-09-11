@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace FainCraft.Gameplay.WorldScripts.Voxels;
-internal class VoxelType
+public class VoxelType
 {
     [JsonProperty("Name")]
     public required string Name { get; set; }
@@ -9,8 +9,8 @@ internal class VoxelType
     [JsonProperty("Draw_Self")]
     public required bool DrawSelf { get; set; }
 
-    [JsonProperty("See_Through")]
-    public required bool SeeThrough { get; set; }
+    [JsonProperty("Fully_Opaque")]
+    public required bool Fully_Opaque { get; set; }
 
     [JsonProperty("TexIDs")]
     public required uint[] TexIDs { get; set; }

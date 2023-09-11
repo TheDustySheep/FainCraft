@@ -1,4 +1,4 @@
-﻿using FainCraft.Gameplay.WorldScripts.Chunking;
+﻿using FainCraft.Gameplay.WorldScripts.Data;
 using FainCraft.Gameplay.WorldScripts.Core;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering;
 using FainEngine_v2.Collections;
@@ -10,29 +10,39 @@ internal class ThreadedMeshGenerationSystem : IMeshGenerationSystem
 {
     readonly IWorldData worldData;
     readonly IRenderSystem renderSystem;
-    readonly IMeshGenerator generator;
 
     const int MAX_UPDATES_PER_TICK = 16;
-    readonly WorkerThread workerThread;
+    readonly WorkerThread workerThread1;
+    readonly WorkerThread workerThread2;
 
     readonly Queue<ChunkDataCluster> clusterPool = new Queue<ChunkDataCluster>();
     readonly OrderedSet<ChunkCoord> toGenerate = new();
     readonly ConcurrentQueue<(ChunkCoord coord, ChunkDataCluster cluster)> buffer = new();
     readonly ConcurrentQueue<(ChunkCoord coord, ChunkDataCluster cluster, VoxelMeshData data)> complete = new();
 
-    public ThreadedMeshGenerationSystem(IWorldData worldData, IRenderSystem renderSystem, IMeshGenerator generator)
+    public ThreadedMeshGenerationSystem(IWorldData worldData, IRenderSystem renderSystem, Func<IMeshGenerator> generatorFactory)
     {
         this.worldData = worldData;
         this.renderSystem = renderSystem;
-        this.generator = generator;
 
         for (int i = 0; i < MAX_UPDATES_PER_TICK; i++)
         {
             clusterPool.Enqueue(new ChunkDataCluster());
         }
 
-        workerThread = new WorkerThread(() =>
+        workerThread1 = new WorkerThread(() =>
         {
+            var generator = generatorFactory.Invoke();
+            while (buffer.TryDequeue(out var pair))
+            {
+                var data = generator.GenerateMesh(pair.cluster);
+                complete.Enqueue((pair.coord, pair.cluster, data));
+            }
+        });
+
+        workerThread2 = new WorkerThread(() =>
+        {
+            var generator = generatorFactory.Invoke();
             while (buffer.TryDequeue(out var pair))
             {
                 var data = generator.GenerateMesh(pair.cluster);
@@ -43,9 +53,12 @@ internal class ThreadedMeshGenerationSystem : IMeshGenerationSystem
         worldData.OnChunkUpdate += Generate;
     }
 
-    public void Generate(ChunkCoord coord)
+    public void Generate(ChunkCoord coord, bool immediate = false)
     {
-        toGenerate.AddLast(coord);
+        if (immediate)
+            toGenerate.AddFirst(coord);
+        else
+            toGenerate.AddLast(coord);
     }
 
     public void Tick()

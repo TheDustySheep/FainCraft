@@ -1,5 +1,4 @@
-﻿#if DEBUG
-using FainEngine_v2.Entities;
+﻿using FainEngine_v2.Entities;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems;
 internal class SystemDiagnostics : IEntity
@@ -36,7 +35,6 @@ internal class SystemDiagnostics : IEntity
 
     public static void ReportMeshGeneration()
     {
-        Console.WriteLine($"Mesh Generation Total Time: {totalMeshTime.TotalMilliseconds:N} ms Total Count: {totalMeshGenerations:N} Average: {totalMeshTime.TotalMilliseconds / totalMeshGenerations:N} ms");
+        Console.WriteLine($"Mesh Generation    Total Time: {totalMeshTime.TotalMilliseconds:N} ms Total Count: {totalMeshGenerations:N} Average: {totalMeshTime.TotalMilliseconds / totalMeshGenerations:N} ms");
     }
 }
-#endif

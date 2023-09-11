@@ -1,9 +1,9 @@
-﻿using FainCraft.Gameplay.WorldScripts.Chunking.ChunkDataArrays;
+﻿using FainCraft.Gameplay.WorldScripts.Data.ChunkDataArrays;
 using FainCraft.Gameplay.WorldScripts.Core;
 using System.Runtime.CompilerServices;
 using static FainCraft.Gameplay.WorldScripts.Core.CoordConversions;
 
-namespace FainCraft.Gameplay.WorldScripts.Chunking;
+namespace FainCraft.Gameplay.WorldScripts.Data;
 internal class ComplexChunkData
 {
     readonly IChunkDataArray dataArray = new EmptyChunkDataArray();

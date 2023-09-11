@@ -1,4 +1,4 @@
-﻿namespace FainCraft.Gameplay.WorldScripts.Chunking;
+﻿namespace FainCraft.Gameplay.WorldScripts.Data;
 public struct VoxelData
 {
     public uint Index;

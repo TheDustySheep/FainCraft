@@ -1,7 +1,6 @@
-﻿using FainCraft.Gameplay.WorldScripts.Chunking;
+﻿using FainCraft.Gameplay.WorldScripts.Data;
 using FainCraft.Gameplay.WorldScripts.Core;
 using FainCraft.Gameplay.WorldScripts.Voxels;
-using FainEngine_v2.Core;
 using FainEngine_v2.Extensions;
 using FainEngine_v2.Physics.AABB;
 using System.Numerics;
@@ -11,8 +10,8 @@ internal class CollisionHandler
 {
     const int _physicsIterations = 1;
 
-    VoxelIndexer indexer;
-    IWorldData worldData;
+    readonly VoxelIndexer indexer;
+    readonly IWorldData worldData;
 
     public CollisionHandler(IWorldData worldData)
     {
@@ -54,10 +53,10 @@ internal class CollisionHandler
                         Size = Vector3.One
                     };
 
-                    if (CollisionResolver.IsOverlapping(entity, voxel))
+                    if (AABBResolver.IsOverlapping(entity, voxel))
                     {
-                        var overlap = CollisionResolver.CalculateOverlap(entity, voxel);
-                        var resolve = CollisionResolver.ResolveOverlap(entity, overlap);
+                        var overlap = AABBResolver.CalculateOverlap(entity, voxel);
+                        var resolve = AABBResolver.ResolveOverlap(entity, overlap);
                         var normal = resolve.Normalized();
                         var dotProd = Vector3.Dot(normal, Vector3.UnitY);
 
@@ -99,7 +98,7 @@ internal class CollisionHandler
         entity.Delta *= _physicsIterations;
     }
 
-    List<StaticAABB> colliders = new();
+    readonly List<StaticAABB> colliders = new();
     private void PhysicsStep(ref DynamicAABB playerAABB, VoxelIndexer indexer)
     {
         GlobalVoxelCoord playerCoord = new GlobalVoxelCoord(playerAABB.Position);
@@ -132,7 +131,7 @@ internal class CollisionHandler
             }
         }
 
-        playerAABB = CollisionResolver.ResolveCollision(playerAABB, colliders, CollisionMode.Slide);
+        playerAABB = AABBResolver.ResolveCollision(playerAABB, colliders, CollisionMode.Slide);
 
         playerAABB.Position += playerAABB.Delta;
     }

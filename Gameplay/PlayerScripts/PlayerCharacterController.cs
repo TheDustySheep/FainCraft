@@ -2,7 +2,6 @@
 using FainEngine_v2.Core;
 using FainEngine_v2.Core.GameObjects;
 using FainEngine_v2.Extensions;
-using FainEngine_v2.Rendering.Cameras;
 using FainEngine_v2.Utils;
 using Silk.NET.Input;
 using System.Numerics;
@@ -13,9 +12,11 @@ internal class PlayerCharacterController
     readonly Transform camTransform;
     readonly EntityMotor motor;
 
-    float jumpPeriod = 0.5f;
+    bool _isSprinting;
+    readonly float jumpPeriod = 0.5f;
     float jumpCooldown = 0f;
-    float moveSpeed = 10f;
+    readonly float moveSpeed = 4.3f;
+    readonly float sprintSpeed = 7.1f;
     readonly float lookSensitivity = 0.1f;
     Vector2 CameraRotation;
 
@@ -33,69 +34,88 @@ internal class PlayerCharacterController
 
     private void UpdatePosition()
     {
-        Vector3 targetDelta = MovementInputs();
-
-        targetDelta.Y = 0f;
-        if (targetDelta != default)
-        {
-            targetDelta = targetDelta.Normalized();
-        }
-
         Vector3 velocity = motor.Velocity;
 
+        // Movement
+        Vector3 movements = Movement();
+        velocity.X = movements.X;
+        velocity.Z = movements.Z;
+
+        if (GameInputs.IsKeyHeld(Key.ControlLeft))
+            _isSprinting = true;
+
+        // Jumping
         if (GameInputs.IsKeyHeld(Key.Space) && motor.groundedState.IsGrounded && jumpCooldown == 0f)
         {
             float force = MathF.Sqrt(2 * motor.Gravity * 1.25f);
             velocity.Y = force;
             jumpCooldown = jumpPeriod;
         }
+        jumpCooldown = MathUtils.Max(0f, jumpCooldown - GameTime.DeltaTime);
 
-        if (GameInputs.IsKeyDown(Key.F))
+        // Flying
+        if (GameInputs.IsKeyHeld(Key.F))
         {
-            velocity.Y = 0f;
-            float force = MathF.Sqrt(2 * motor.Gravity * 20f);
-            velocity.Y = force;
+            velocity = camTransform.Forward * 100f;
         }
 
-        velocity.X = targetDelta.X * moveSpeed;
-        velocity.Z = targetDelta.Z * moveSpeed;
-
         motor.Velocity = velocity;
-        jumpCooldown = MathUtils.Max(0f, jumpCooldown - GameTime.DeltaTime);
 
         if (GameInputs.IsKeyDown(Key.Escape))
             GameInputs.ExitProgram();
     }
 
-    private Vector3 MovementInputs()
+    private Vector3 Movement()
     {
-        Vector3 targetDelta = Vector3.Zero;
+        Vector2 inputs = MovementInputs();
 
-        var cameraForward = camTransform.Forward;
-        var cameraRight = camTransform.Right;
+        Vector2 forward = camTransform.Forward.ToXZ().Normalized();
+        Vector2 right = camTransform.Right.ToXZ().Normalized();
+
+        if (_isSprinting)
+        {
+            inputs.Y *= sprintSpeed;
+            inputs.X *= moveSpeed;
+        }
+        else
+        {
+            inputs *= moveSpeed;
+        }
+
+        Vector2 moveVector = Vector2.Zero;
+        moveVector += inputs.Y * forward;
+        moveVector += inputs.X * right;
+        return moveVector.FromXZ();
+    }
+
+    private Vector2 MovementInputs()
+    {
+        Vector2 input = Vector2.Zero;
 
         if (GameInputs.IsKeyHeld(Key.W))
         {
-            //Move forwards
-            targetDelta += cameraForward;
+            input.Y += 1f;
         }
-        if (GameInputs.IsKeyHeld(Key.S))
+        else if (GameInputs.IsKeyHeld(Key.S))
         {
-            //Move backwards
-            targetDelta -= cameraForward;
+            input.Y -= 1f;
+            _isSprinting = false;
         }
+        else
+        {
+            _isSprinting = false;
+        }
+
         if (GameInputs.IsKeyHeld(Key.A))
         {
-            //Move left
-            targetDelta -= Vector3.Normalize(cameraRight);
+            input.X -= 1f;
         }
         if (GameInputs.IsKeyHeld(Key.D))
         {
-            //Move right
-            targetDelta += Vector3.Normalize(cameraRight);
+            input.X += 1f;
         }
 
-        return targetDelta;
+        return input.Normalized();
     }
 
     private void UpdateRotation()

@@ -2,8 +2,8 @@
 using static FainCraft.Gameplay.WorldScripts.Core.CoordConversions;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
-namespace FainCraft.Gameplay.WorldScripts.Chunking;
-internal class ChunkData
+namespace FainCraft.Gameplay.WorldScripts.Data;
+public class ChunkData
 {
     public VoxelData[] VoxelData { get; private set; } = new VoxelData[CHUNK_VOLUME];
 

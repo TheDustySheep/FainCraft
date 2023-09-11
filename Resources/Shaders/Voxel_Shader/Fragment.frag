@@ -1,4 +1,6 @@
 #version 330 core
+#extension GL_EXT_texture_array: enable
+
 struct Lighting {
     vec3 direction;
 	
@@ -8,23 +10,24 @@ struct Lighting {
 
 out vec4 FragColor;
 
-in vec2 texCoord;
-in vec3 vertexNormal;
-in vec3 fragPos;  
+in vec3 oTexCoord;
+in vec3 oVertexNormal;
+in vec3 oFragPos;
+in float oAO;
 
 uniform vec3 viewPos;
-uniform sampler2D albedoTexture;
+uniform sampler2DArray albedoTexture;
 uniform Lighting lighting;
 
 vec3 CalcLighting(Lighting light, vec3 baseDiffColor)
 {
-    vec3 viewDir = normalize(viewPos - fragPos);
+    vec3 viewDir = normalize(viewPos - oFragPos);
 
     vec3 lightDir = normalize(-light.direction);
     // diffuse shading
-    float diff = max(dot(vertexNormal, lightDir), 0.0);
+    float diff = max(dot(oVertexNormal, lightDir), 0.0);
     // specular shading
-    vec3 reflectDir = reflect(-lightDir, vertexNormal);
+    vec3 reflectDir = reflect(-lightDir, oVertexNormal);
     // combine results
     vec3 ambient = light.ambient * baseDiffColor;
     vec3 diffuse = light.diffuse * diff * baseDiffColor;
@@ -34,10 +37,12 @@ vec3 CalcLighting(Lighting light, vec3 baseDiffColor)
 void main() 
 {
     // Vertex Color
-    vec4 vertexColor = texture(albedoTexture, texCoord).rgba;
+    vec4 vertexColor = texture2DArray(albedoTexture, oTexCoord).rgba;
 
     if (vertexColor.a < 0.1)
         discard;
+
+    vertexColor.rgb *= oAO;
 
     // Result
     vec3 result = vertexColor.rgb;

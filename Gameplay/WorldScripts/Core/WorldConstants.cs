@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 
 namespace FainCraft.Gameplay.WorldScripts.Core;
-internal class WorldConstants
+public class WorldConstants
 {
     public const int CHUNK_SIZE_POWER = 5;
 
@@ -15,13 +15,19 @@ internal class WorldConstants
     public const int REGION_Y_TOTAL_COUNT = REGION_Y_POS_COUNT + REGION_Y_NEG_COUNT;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int ConvertToIndex(int x, int y, int z)
+    public static int ChunkIndex(int x, int y, int z)
     {
         return z * CHUNK_SIZE * CHUNK_SIZE + y * CHUNK_SIZE + x;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint ConvertToClusterIndex(uint x, uint y, uint z)
+    public static uint ChunkIndex(uint x, uint y, uint z)
+    {
+        return z * CHUNK_SIZE * CHUNK_SIZE + y * CHUNK_SIZE + x;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint ClusterIndex(uint x, uint y, uint z)
     {
         return z * 9 + y * 3 + x;
     }

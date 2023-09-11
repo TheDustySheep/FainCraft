@@ -1,4 +1,4 @@
-﻿namespace FainCraft.Gameplay.WorldScripts.Chunking.ChunkDataArrays;
+﻿namespace FainCraft.Gameplay.WorldScripts.Data.ChunkDataArrays;
 internal class EmptyChunkDataArray : IChunkDataArray
 {
     public bool IsEmpty => true;

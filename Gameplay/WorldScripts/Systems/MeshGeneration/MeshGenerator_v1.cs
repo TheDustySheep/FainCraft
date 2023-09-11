@@ -1,25 +1,25 @@
-﻿using FainCraft.Gameplay.WorldScripts.Chunking;
+﻿using FainCraft.Gameplay.WorldScripts.Data;
 using FainCraft.Gameplay.WorldScripts.Voxels;
 using System.Diagnostics;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.MeshGeneration;
-internal class MeshGenerator : IMeshGenerator
+[Obsolete]
+public class MeshGenerator_v1 : IMeshGenerator
 {
     readonly VoxelIndexer voxelIndexer;
     readonly VoxelData[] nVoxelDatas = new VoxelData[27];
     readonly VoxelType[] nVoxelTypes = new VoxelType[27];
 
-    public MeshGenerator(VoxelIndexer voxelIndexer)
+    public MeshGenerator_v1(VoxelIndexer voxelIndexer)
     {
         this.voxelIndexer = voxelIndexer;
     }
 
     public VoxelMeshData GenerateMesh(ChunkDataCluster cluster)
     {
-#if DEBUG
         Stopwatch sw = Stopwatch.StartNew();
-#endif
+
         List<VoxelVertex> verts = new();
         List<uint> tris = new();
 
@@ -33,13 +33,13 @@ internal class MeshGenerator : IMeshGenerator
                 {
                     for (uint x = 0; x < CHUNK_SIZE; x++)
                     {
-                        GetNeighbourVoxels(x, y, z, cluster);
-
-                        var voxelData = nVoxelDatas[13];
-                        var voxelType = nVoxelTypes[13];
+                        var voxelData = cluster.GetVoxel(x, y, z);
+                        var voxelType = voxelIndexer.GetVoxelType(voxelData.Index);
 
                         if (!voxelType.DrawSelf)
                             continue;
+
+                        GetNeighbourVoxels(x, y, z, cluster);
 
                         uint surfaceFluid = Convert.ToUInt32(voxelType.Is_Fluid && !nVoxelTypes[17].Is_Fluid);
 
@@ -50,7 +50,7 @@ internal class MeshGenerator : IMeshGenerator
                             var faceVoxelType = nVoxelTypes[faceIndex];
 
                             // If the face voxel is see through then draw
-                            if (!faceVoxelType.SeeThrough)
+                            if (faceVoxelType.Fully_Opaque)
                                 continue;
 
                             if (voxelType.Skip_Draw_Similar && voxelData.Index == faceVoxelData.Index)
@@ -65,6 +65,12 @@ internal class MeshGenerator : IMeshGenerator
                                 vert.SurfaceFluid = surfaceFluid;
 
                                 vert.TexIndex = voxelType.TexIDs[face];
+
+                                uint side1 = Convert.ToUInt32(nVoxelTypes[AO_LOOKUP[face * 12 + i * 3 + 0]].Fully_Opaque);
+                                uint cornr = Convert.ToUInt32(nVoxelTypes[AO_LOOKUP[face * 12 + i * 3 + 1]].Fully_Opaque);
+                                uint side2 = Convert.ToUInt32(nVoxelTypes[AO_LOOKUP[face * 12 + i * 3 + 2]].Fully_Opaque);
+                                vert.AO = GetVertexAO(side1, side2, cornr);
+
                                 verts.Add(vert);
                             }
 
@@ -86,12 +92,18 @@ internal class MeshGenerator : IMeshGenerator
             Triangles = tris.ToArray(),
         };
 
-#if DEBUG
         sw.Stop();
         SystemDiagnostics.SubmitMeshGeneration(sw.Elapsed);
-#endif
 
         return meshData;
+    }
+
+    private uint GetVertexAO(uint side1, uint side2, uint corner)
+    {
+        if ((side1 & side2) == 1)
+            return 0;
+
+        return 3 - (side1 + side2 + corner);
     }
 
     private void GetNeighbourVoxels(uint x, uint y, uint z, ChunkDataCluster cluster)
@@ -106,12 +118,51 @@ internal class MeshGenerator : IMeshGenerator
 
     static readonly uint[] FACE_N_INDEX =
     {
-        ConvertToClusterIndex(0, 1, 1),
-        ConvertToClusterIndex(2, 1, 1),
-        ConvertToClusterIndex(1, 0, 1),
-        ConvertToClusterIndex(1, 2, 1),
-        ConvertToClusterIndex(1, 1, 0),
-        ConvertToClusterIndex(1, 1, 2)
+        ClusterIndex(0, 1, 1),
+        ClusterIndex(2, 1, 1),
+        ClusterIndex(1, 0, 1),
+        ClusterIndex(1, 2, 1),
+        ClusterIndex(1, 1, 0),
+        ClusterIndex(1, 1, 2)
+    };
+
+    static readonly uint[] AO_LOOKUP =
+    {
+        // X-
+        ClusterIndex(0, 0, 1), ClusterIndex(0, 0, 2), ClusterIndex(0, 1, 2),
+        ClusterIndex(0, 1, 2), ClusterIndex(0, 2, 2), ClusterIndex(0, 2, 1),
+        ClusterIndex(0, 2, 1), ClusterIndex(0, 2, 0), ClusterIndex(0, 1, 0),
+        ClusterIndex(0, 1, 0), ClusterIndex(0, 0, 0), ClusterIndex(0, 0, 1),
+        
+        // X+
+        ClusterIndex(2, 0, 1), ClusterIndex(2, 0, 0), ClusterIndex(2, 1, 0),
+        ClusterIndex(2, 1, 0), ClusterIndex(2, 2, 0), ClusterIndex(2, 2, 1),
+        ClusterIndex(2, 2, 1), ClusterIndex(2, 2, 2), ClusterIndex(2, 1, 2),
+        ClusterIndex(2, 1, 2), ClusterIndex(2, 0, 2), ClusterIndex(2, 0, 1),
+
+        // Y- 
+        ClusterIndex(1, 0, 0), ClusterIndex(2, 0, 0), ClusterIndex(2, 0, 1),
+        ClusterIndex(2, 0, 1), ClusterIndex(2, 0, 2), ClusterIndex(1, 0, 2),
+        ClusterIndex(1, 0, 2), ClusterIndex(0, 0, 2), ClusterIndex(0, 0, 1),
+        ClusterIndex(0, 0, 1), ClusterIndex(0, 0, 0), ClusterIndex(1, 0, 0),
+
+        // Y+
+        ClusterIndex(1, 2, 0), ClusterIndex(0, 2, 0), ClusterIndex(0, 2, 1),
+        ClusterIndex(0, 2, 1), ClusterIndex(0, 2, 2), ClusterIndex(1, 2, 2),
+        ClusterIndex(1, 2, 2), ClusterIndex(2, 2, 2), ClusterIndex(2, 2, 1),
+        ClusterIndex(2, 2, 1), ClusterIndex(2, 2, 0), ClusterIndex(1, 2, 0),
+
+        // Z- 
+        ClusterIndex(1, 0, 0), ClusterIndex(0, 0, 0), ClusterIndex(0, 1, 0),
+        ClusterIndex(0, 1, 0), ClusterIndex(0, 2, 0), ClusterIndex(1, 2, 0),
+        ClusterIndex(1, 2, 0), ClusterIndex(2, 2, 0), ClusterIndex(2, 1, 0),
+        ClusterIndex(2, 1, 0), ClusterIndex(2, 0, 0), ClusterIndex(1, 0, 0),
+
+        // Z+
+        ClusterIndex(1, 0, 2), ClusterIndex(2, 0, 2), ClusterIndex(2, 1, 2),
+        ClusterIndex(2, 1, 2), ClusterIndex(2, 2, 2), ClusterIndex(1, 2, 2),
+        ClusterIndex(1, 2, 2), ClusterIndex(0, 2, 2), ClusterIndex(0, 1, 2),
+        ClusterIndex(0, 1, 2), ClusterIndex(0, 0, 2), ClusterIndex(1, 0, 2),
     };
 
     static readonly VoxelVertex[] VERTICES =

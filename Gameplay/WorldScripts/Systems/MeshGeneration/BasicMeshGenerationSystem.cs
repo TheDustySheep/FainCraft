@@ -1,4 +1,4 @@
-﻿using FainCraft.Gameplay.WorldScripts.Chunking;
+﻿using FainCraft.Gameplay.WorldScripts.Data;
 using FainCraft.Gameplay.WorldScripts.Core;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering;
 using FainEngine_v2.Collections;
@@ -25,9 +25,12 @@ internal class BasicMeshGenerationSystem : IMeshGenerationSystem
         worldData.OnChunkUpdate += Generate;
     }
 
-    public void Generate(ChunkCoord coord)
+    public void Generate(ChunkCoord coord, bool immediate = false)
     {
-        toGenerate.AddLast(coord);
+        if (immediate)
+            toGenerate.AddFirst(coord);
+        else
+            toGenerate.AddLast(coord);
     }
 
     public void Tick()

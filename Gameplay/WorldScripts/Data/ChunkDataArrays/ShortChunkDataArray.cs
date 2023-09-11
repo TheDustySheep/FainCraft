@@ -1,15 +1,15 @@
 ﻿using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
-namespace FainCraft.Gameplay.WorldScripts.Chunking.ChunkDataArrays;
-internal class ByteChunkDataArray : IChunkDataArray
+namespace FainCraft.Gameplay.WorldScripts.Data.ChunkDataArrays;
+internal class ShortChunkDataArray : IChunkDataArray
 {
-    readonly byte[] ids = new byte[CHUNK_VOLUME];
+    readonly ushort[] ids = new ushort[CHUNK_VOLUME];
 
     public bool IsEmpty => false;
 
     public bool ContainsID(ushort id)
     {
-        return ids.Contains((byte)id);
+        return ids.Contains(id);
     }
 
     public ushort GetID(uint index)
@@ -19,6 +19,6 @@ internal class ByteChunkDataArray : IChunkDataArray
 
     public void SetID(uint index, ushort newID)
     {
-        ids[index] = (byte)newID;
+        ids[index] = newID;
     }
 }

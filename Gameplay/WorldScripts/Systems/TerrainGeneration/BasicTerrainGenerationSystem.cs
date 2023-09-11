@@ -1,4 +1,4 @@
-﻿using FainCraft.Gameplay.WorldScripts.Chunking;
+﻿using FainCraft.Gameplay.WorldScripts.Data;
 using FainCraft.Gameplay.WorldScripts.Core;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration;
@@ -8,6 +8,7 @@ internal class BasicTerrainGenerationSystem : ITerrainGenerationSystem
 
     readonly IWorldData worldData;
     readonly ITerrainGenerator generator;
+
 
     readonly Queue<RegionCoord> toGenerate = new();
 
@@ -27,7 +28,12 @@ internal class BasicTerrainGenerationSystem : ITerrainGenerationSystem
         for (int i = 0; i < MAX_UPDATES_PER_TICK && toGenerate.TryDequeue(out RegionCoord coord); i++)
         {
             var data = generator.Generate(coord);
-            worldData.SetRegion(coord, data);
+            worldData.SetRegion(coord, data.RegionData);
+
+            foreach (var edit in data.VoxelEdits)
+            {
+                edit.Execute(worldData);
+            }
         }
     }
 }

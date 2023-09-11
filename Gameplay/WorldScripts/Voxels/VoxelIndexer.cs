@@ -1,8 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using FainCraft.Gameplay.WorldScripts.Data;
+using Newtonsoft.Json;
 using System.Runtime.CompilerServices;
 
 namespace FainCraft.Gameplay.WorldScripts.Voxels;
-internal class VoxelIndexer
+public class VoxelIndexer
 {
     VoxelType[] Voxels = Array.Empty<VoxelType>();
 
@@ -19,6 +20,11 @@ internal class VoxelIndexer
             return;
         }
 
+        LoadVoxels(voxels);
+    }
+
+    public void LoadVoxels(VoxelType[] voxels)
+    {
         Voxels = voxels;
 
         for (uint i = 0; i < Voxels.Length; i++)
@@ -33,6 +39,17 @@ internal class VoxelIndexer
     public VoxelType GetVoxelType(uint index)
     {
         return Voxels[index];
+    }
+    public VoxelData GetVoxel(string name)
+    {
+        NameToIndex.TryGetValue(name, out var index);
+        return new VoxelData() { Index = index };
+    }
+
+    public VoxelData GetVoxel(VoxelType type)
+    {
+        TypeToIndex.TryGetValue(type, out var index);
+        return new VoxelData() { Index = index };
     }
 
     public uint GetIndex(VoxelType type)
