@@ -85,7 +85,7 @@ internal class PlayerCharacterController
         Vector2 moveVector = Vector2.Zero;
         moveVector += inputs.Y * forward;
         moveVector += inputs.X * right;
-        return moveVector.FromXZ();
+        return moveVector.ToXZ();
     }
 
     private Vector2 MovementInputs()

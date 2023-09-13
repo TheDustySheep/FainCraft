@@ -1,13 +1,12 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Data;
 using FainEngine_v2.Core.GameObjects;
-using FainEngine_v2.Physics.AABB;
 using System.Numerics;
 
 namespace FainCraft.Gameplay.Motors;
 internal class EntityMotor
 {
     #region Public Properties
-    public GroundedState groundedState => _internalMotor.groundedState;
+    public GroundedState groundedState => _internalMotor.GroundedState;
 
     public float Gravity
     {
@@ -15,11 +14,16 @@ internal class EntityMotor
         set => _internalMotor.Gravity = value;
     }
 
+    private Vector3 _playerSize = new Vector3(0.4f, 1.8f, 0.4f);
     public Vector3 PlayerSize
     {
-        get;
-        set;
-    } = new Vector3(0.4f, 1.8f, 0.4f);
+        get => _playerSize;
+        set 
+        {
+            _playerSize = value;
+            _internalMotor.Size = value; 
+        }
+    }
 
     public Vector3 PositionStart
     {
@@ -32,6 +36,7 @@ internal class EntityMotor
         get => _internalMotor.Velocity;
         set => _internalMotor.Velocity = value;
     }
+
     #endregion
 
     readonly EntityMotorInternal _internalMotor;
@@ -41,17 +46,12 @@ internal class EntityMotor
     {
         _transform = transform;
         _internalMotor = new EntityMotorInternal(new CollisionHandler(worldData), PositionStart);
+        _internalMotor.Size = _playerSize;
     }
-
-    public void SetPosition(Vector3 position) => _internalMotor.SetPosition(position);
 
     public void FixedUpdate()
     {
-        _internalMotor.FixedUpdate(new StaticAABB()
-        {
-            Position = PositionStart,
-            Size = PlayerSize
-        });
+        _internalMotor.FixedUpdate();
     }
 
     public void Update()

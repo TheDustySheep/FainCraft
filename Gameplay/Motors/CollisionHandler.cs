@@ -8,7 +8,7 @@ using System.Numerics;
 namespace FainCraft.Gameplay.Motors;
 internal class CollisionHandler
 {
-    const int _physicsIterations = 1;
+    public const int IterationCount = 10;
 
     readonly VoxelIndexer indexer;
     readonly IWorldData worldData;
@@ -90,12 +90,12 @@ internal class CollisionHandler
 
     public void VoxelCollisionsDynamic(ref DynamicAABB entity)
     {
-        entity.Delta /= _physicsIterations;
+        entity.Delta /= IterationCount;
 
-        for (int i = 0; i < _physicsIterations; i++)
+        for (int i = 0; i < IterationCount; i++)
             PhysicsStep(ref entity, indexer);
 
-        entity.Delta *= _physicsIterations;
+        entity.Delta *= IterationCount;
     }
 
     readonly List<StaticAABB> colliders = new();

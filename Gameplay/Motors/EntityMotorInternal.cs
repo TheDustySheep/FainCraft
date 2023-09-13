@@ -7,113 +7,93 @@ using System.Numerics;
 namespace FainCraft.Gameplay.Motors;
 internal class EntityMotorInternal
 {
-    public float MaxStableSpeed = 100f;
-    public GroundedState groundedState => _groundedState;
+    public Vector3 Velocity
+    {
+        get => _currentVelocity;
+        set => _currentVelocity = value;
+    }
 
+    public GroundedState GroundedState;
+    public Vector3 Size;
     public float Gravity = 32f;
-    public Vector3 Velocity;
 
-    readonly CollisionHandler collisionHandler;
+    private const float MAX_STABLE_MOVE_SPEED = CollisionHandler.IterationCount / GameTime.FixedDeltaTime;
 
-    Vector3? _setPositionRequest;
+    CollisionHandler _collisionHandler;
 
-    Vector3 _nextPosition;
-    Vector3 _startPosition;
-    float _startTime;
-    float _nextTime;
+    float _lastTime;
 
-    Vector3 _playerSize;
+    Vector3 _currentPosition;
+    Vector3 _lastPosition;
+    Vector3 _currentVelocity;
 
-    GroundedState _groundedState;
 
     public EntityMotorInternal(CollisionHandler collisionHandler, Vector3 startPosition)
     {
-        this.collisionHandler = collisionHandler;
-        _startPosition = startPosition;
-        _nextPosition = startPosition;
-        _startTime = GameTime.TotalTime;
-        _nextTime = _startTime + GameTime.FixedDeltaTime;
+        _collisionHandler = collisionHandler;
+        _currentPosition = startPosition;
+        _lastPosition = startPosition;
+        _lastTime = GameTime.TotalTime;
     }
 
     #region Public Functions
     public Vector3 InterpolatePosition()
     {
-        float t = MathUtils.InvLerp(_startTime, _nextTime, GameTime.TotalTime);
+        // One frame in the past
+        float t = MathUtils.InvLerp(_lastTime, _lastTime + GameTime.FixedDeltaTime, GameTime.TotalTime);
         t = MathUtils.Clamp01(t);
-        return Vector3Extensions.Lerp(_startPosition, _nextPosition, t);
+        return Vector3.Lerp(_lastPosition, _currentPosition, t);
     }
 
-    public void SetPosition(Vector3 newPosition) => _setPositionRequest = newPosition;
-
-    public void FixedUpdate(StaticAABB player)
+    public void FixedUpdate()
     {
-        // Phase 1 setup and initial collisions
-        UpdateInitialInternals(player);
-        ProcessRequests();
+        // Initial collisions
+        UpdateInitialInternals();
+
+        // Collisions
         HandleCollisions();
 
-        // Phase 2 setting state for next frame
+        // Next velocity
         UpdateGrounded();
         UpdateVelocity();
-        UpdateFinalInternals();
     }
     #endregion
 
-    private void UpdateInitialInternals(StaticAABB player)
+    private void UpdateInitialInternals()
     {
-        _playerSize = player.Size;
-        _startPosition = player.Position;
-        _startTime = GameTime.TotalTime;
+        _lastPosition = _currentPosition;
+        _lastTime = GameTime.TotalTime;
     }
 
-    private void ProcessRequests()
-    {
-        if (_setPositionRequest is not null)
-            _startPosition = _setPositionRequest.Value;
-    }
-
-    private void HandleCollisions()
+    public void HandleCollisions()
     {
         DynamicAABB playerAABB = new DynamicAABB()
         {
-            Position = _startPosition,
-            Size = _playerSize,
-            Delta = Velocity * GameTime.FixedDeltaTime,
+            Position = _currentPosition,
+            Size = Size,
+            Delta = _currentVelocity * GameTime.FixedDeltaTime,
         };
 
-        collisionHandler.VoxelCollisionsDynamic(ref playerAABB);
+        _collisionHandler.VoxelCollisionsDynamic(ref playerAABB);
 
-        _startPosition = playerAABB.Position;
-        Velocity = playerAABB.Delta / GameTime.FixedDeltaTime;
+        _currentPosition = playerAABB.Position;
+        _currentVelocity = playerAABB.Delta / GameTime.FixedDeltaTime;
     }
 
-    private void UpdateGrounded()
+    public void UpdateGrounded()
     {
         StaticAABB playerAABB = new StaticAABB()
         {
-            Position = _startPosition,
-            Size = _playerSize,
+            Position = _currentPosition,
+            Size = Size,
         };
-        _groundedState = collisionHandler.UpdateGrounded(playerAABB);
+        GroundedState = _collisionHandler.UpdateGrounded(playerAABB);
     }
 
     private void UpdateVelocity()
     {
-        Velocity.Y -= GameTime.FixedDeltaTime * Gravity;
+        _currentVelocity.Y -= GameTime.FixedDeltaTime * Gravity;
 
-        if (Velocity.LengthSquared() > MaxStableSpeed * MaxStableSpeed)
-            Velocity = Velocity.Normalized() * MaxStableSpeed;
-
-
-
-        //Velocity.Y = MathUtils.MoveTowards(Velocity.Y, -Gravity, GameTime.FixedDeltaTime * Gravity);
-    }
-
-    private void UpdateFinalInternals()
-    {
-        _nextPosition = _startPosition + (Velocity * GameTime.FixedDeltaTime);
-        _nextTime = _startTime + GameTime.FixedDeltaTime;
-
-        _setPositionRequest = null;
+        _currentVelocity = _currentVelocity.ClampMagnitude(MAX_STABLE_MOVE_SPEED);
     }
 }
