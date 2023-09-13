@@ -1,7 +1,6 @@
 ﻿using Silk.NET.Maths;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using static FainCraft.Gameplay.WorldScripts.Core.CoordConversions;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Core;
@@ -20,34 +19,29 @@ public struct ChunkCoord
         Z = z;
     }
 
-    public readonly Vector3 GlobalCorner => new(
-        ConvertToGlobalFromChunk(X),
-        ConvertToGlobalFromChunk(Y),
-        ConvertToGlobalFromChunk(Z));
+    public Vector3 GlobalCenter => GlobalMin + Extents;
+    public readonly Vector3 GlobalMin => 
+        new
+        (
+            ConvertToGlobalFromChunk(X),
+            ConvertToGlobalFromChunk(Y),
+            ConvertToGlobalFromChunk(Z)
+        );
 
-    public Vector3 GlobalCenter => GlobalCorner + Vector3.One * CHUNK_SIZE * 0.5f;
-    public Vector2D<int> XZPosition => new(X, Z);
+    public Vector3 Size = Vector3.One * CHUNK_SIZE;
+    public Vector3 Extents = Vector3.One * CHUNK_SIZE * 0.5f;
 
-    public static ChunkCoord CreateFromGlobalVoxel(int x, int y, int z)
+    #region Conversions
+    public static explicit operator GlobalVoxelCoord(ChunkCoord chunkCoord)
     {
-        return new ChunkCoord(
-            ConvertToChunkFromGlobal(x),
-            ConvertToChunkFromGlobal(y),
-            ConvertToChunkFromGlobal(z));
+        return ConvertToGlobalCoord(chunkCoord);
     }
 
-    public static explicit operator RegionCoord(ChunkCoord coord)
+    public static explicit operator RegionCoord(ChunkCoord chunkCoord)
     {
-        return new RegionCoord(coord.X, coord.Z);
+        return ConvertToRegionCoord(chunkCoord);
     }
-
-    public static explicit operator GlobalVoxelCoord(ChunkCoord coord)
-    {
-        return new GlobalVoxelCoord(
-            ConvertToGlobalFromChunk(coord.X),
-            ConvertToGlobalFromChunk(coord.Y),
-            ConvertToGlobalFromChunk(coord.Z));
-    }
+    #endregion
 
     public static explicit operator Vector3D<int>(ChunkCoord coord)
     {

@@ -1,5 +1,5 @@
 ﻿using Silk.NET.Maths;
-using static FainCraft.Gameplay.WorldScripts.Core.CoordConversions;
+using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Core;
 public struct RegionCoord
@@ -11,25 +11,25 @@ public struct RegionCoord
         coord = new Vector2D<int>(x, z);
     }
 
-    public RegionCoord(GlobalVoxelCoord globalCoord)
-    {
-        ChunkCoord chunkCoord = (ChunkCoord)globalCoord;
-        coord.X = chunkCoord.X;
-        coord.Y = chunkCoord.Z;
-    }
-
-    public RegionCoord(ChunkCoord chunkCoord)
-    {
-        coord.X = chunkCoord.X;
-        coord.Y = chunkCoord.Z;
-    }
-
     public int X { readonly get => coord.X; set => coord.X = value; }
     public int Z { readonly get => coord.Y; set => coord.Y = value; }
 
     public readonly int Global_Voxel_X => ConvertToGlobalFromChunk(coord.X);
     public readonly int Global_Voxel_Z => ConvertToGlobalFromChunk(coord.Y);
 
+    #region Conversions
+    public static explicit operator GlobalVoxelCoord(RegionCoord chunkCoord)
+    {
+        return ConvertToGlobalCoord(chunkCoord);
+    }
+
+    public static explicit operator ChunkCoord(RegionCoord chunkCoord)
+    {
+        return ConvertToChunkCoord(chunkCoord);
+    }
+    #endregion
+
+    #region Operators
     public static bool operator ==(RegionCoord a, RegionCoord b)
     {
         return a.coord == b.coord;
@@ -49,7 +49,9 @@ public struct RegionCoord
     {
         return new RegionCoord(a.X - b.X, a.Z - b.Z);
     }
+    #endregion
 
+    #region Overrides
     public override readonly string ToString()
     {
         return coord.ToString();
@@ -65,4 +67,5 @@ public struct RegionCoord
         return obj is RegionCoord other &&
                coord.Equals(other.coord);
     }
+    #endregion
 }

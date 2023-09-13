@@ -1,5 +1,4 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Core;
-using static FainCraft.Gameplay.WorldScripts.Core.CoordConversions;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Data;
@@ -39,14 +38,14 @@ public class ChunkData
 
     public VoxelData this[int x, int y, int z]
     {
-        get => VoxelData[ConvertToArrayIndex(x, y, z)];
-        set => VoxelData[ConvertToArrayIndex(x, y, z)] = value;
+        get => VoxelData[ChunkIndex(x, y, z)];
+        set => VoxelData[ChunkIndex(x, y, z)] = value;
     }
 
     public VoxelData this[uint x, uint y, uint z]
     {
-        get => VoxelData[ConvertToArrayIndex(x, y, z)];
-        set => VoxelData[ConvertToArrayIndex(x, y, z)] = value;
+        get => VoxelData[ChunkIndex(x, y, z)];
+        set => VoxelData[ChunkIndex(x, y, z)] = value;
     }
 
     public VoxelData this[LocalVoxelCoord localVoxelCoord]

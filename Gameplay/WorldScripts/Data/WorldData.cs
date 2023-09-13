@@ -22,7 +22,7 @@ internal class WorldData : IWorldData
     {
         foreach (var edit in edits)
         {
-            RegionCoord regionCoord = new RegionCoord(edit.GlobalCoord);
+            RegionCoord regionCoord = (RegionCoord)edit.GlobalCoord;
 
             if (regions.ContainsKey(regionCoord))
             {

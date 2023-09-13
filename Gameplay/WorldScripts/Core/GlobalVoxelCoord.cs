@@ -1,6 +1,6 @@
 ﻿using Silk.NET.Maths;
 using System.Numerics;
-using static FainCraft.Gameplay.WorldScripts.Core.CoordConversions;
+using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Core;
 
@@ -9,20 +9,6 @@ public struct GlobalVoxelCoord
     public int X;
     public int Y;
     public int Z;
-
-    public GlobalVoxelCoord(LocalVoxelCoord local, ChunkCoord chunk)
-    {
-        X = ConvertToGlobalFromChunk(chunk.X) + local.X;
-        Y = ConvertToGlobalFromChunk(chunk.Y) + local.Y;
-        Z = ConvertToGlobalFromChunk(chunk.Z) + local.Z;
-    }
-
-    public GlobalVoxelCoord(RegionCoord regionCoord)
-    {
-        X = ConvertToGlobalFromChunk(regionCoord.X);
-        Y = 0;
-        Z = ConvertToGlobalFromChunk(regionCoord.Z);
-    }
 
     public GlobalVoxelCoord(int x, int y, int z)
     {
@@ -52,31 +38,34 @@ public struct GlobalVoxelCoord
         Z = position.Z;
     }
 
-    public static explicit operator ChunkCoord(GlobalVoxelCoord pos)
+    #region Conversions
+    public static explicit operator LocalVoxelCoord(GlobalVoxelCoord globalCoord)
     {
-        return ChunkCoord.CreateFromGlobalVoxel(pos.X, pos.Y, pos.Z);
+        return ConvertToLocalCoord(globalCoord);
     }
 
-    public static explicit operator LocalVoxelCoord(GlobalVoxelCoord pos)
+    public static explicit operator ChunkCoord(GlobalVoxelCoord globalCoord)
     {
-        return LocalVoxelCoord.CreateFromGlobalVoxel(pos.X, pos.Y, pos.Z);
+        return ConvertToChunkCoord(globalCoord);
     }
 
-    public static explicit operator GlobalVoxelCoord(Vector3D<int> pos)
+    public static explicit operator RegionCoord(GlobalVoxelCoord globalCoord)
     {
-        return new GlobalVoxelCoord(pos.X, pos.Y, pos.Z);
+        return ConvertToRegionCoord(globalCoord);
     }
 
-    public static explicit operator Vector3D<int>(GlobalVoxelCoord pos)
+    public static explicit operator Vector3D<int>(GlobalVoxelCoord globalCoord)
     {
-        return new Vector3D<int>(pos.X, pos.Y, pos.Z);
+        return new Vector3D<int>(globalCoord.X, globalCoord.Y, globalCoord.Z);
     }
 
     public static explicit operator Vector3(GlobalVoxelCoord pos)
     {
         return new Vector3(pos.X, pos.Y, pos.Z);
     }
+    #endregion
 
+    #region Operators
     public static GlobalVoxelCoord operator +(GlobalVoxelCoord a, ChunkCoord b)
     {
         var c = (GlobalVoxelCoord)b;
@@ -118,7 +107,9 @@ public struct GlobalVoxelCoord
             a.Y != b.Y ||
             a.Z != b.Z;
     }
+    #endregion
 
+    #region Overrides
     public override readonly string ToString()
     {
         return $"X: {X} Y: {Y} Z:{Z}";
@@ -133,4 +124,5 @@ public struct GlobalVoxelCoord
     {
         return X.GetHashCode() ^ Y.GetHashCode() ^ Z.GetHashCode();
     }
+    #endregion
 }

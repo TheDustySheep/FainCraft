@@ -43,12 +43,12 @@ internal class GenerationData : IVoxelEditable
         return HeightMap[z * MAP_SIZE + x];
     }
 
-    public bool VoxelExists(GlobalVoxelCoord coord)
+    public bool VoxelExists(GlobalVoxelCoord globalCoord)
     {
-        ChunkCoord chunkCoord = (ChunkCoord)coord;
+        ChunkCoord chunkCoord = (ChunkCoord)globalCoord;
 
         return
-            new RegionCoord(coord) == RegionCoord &&
+            (RegionCoord)globalCoord == RegionCoord &&
             regionData.GetChunk(chunkCoord.Y) is not null;
     }
 
@@ -56,7 +56,7 @@ internal class GenerationData : IVoxelEditable
     {
         ChunkCoord chunkCoord = (ChunkCoord)edit.GlobalCoord;
 
-        if (new RegionCoord(chunkCoord) != RegionCoord)
+        if ((RegionCoord)chunkCoord != RegionCoord)
         {
             outstandingEdits.Add(edit);
             return;
@@ -75,7 +75,7 @@ internal class GenerationData : IVoxelEditable
     {
         ChunkCoord chunkCoord = (ChunkCoord)globalCoord;
 
-        if (new RegionCoord(chunkCoord) != RegionCoord)
+        if ((RegionCoord)chunkCoord != RegionCoord)
         {
             voxel = default;
             return false;
@@ -97,7 +97,7 @@ internal class GenerationData : IVoxelEditable
     {
         ChunkCoord chunkCoord = (ChunkCoord)globalCoord;
 
-        if (new RegionCoord(chunkCoord) != RegionCoord)
+        if ((RegionCoord)chunkCoord != RegionCoord)
             return false;
 
         var chunk = regionData.GetChunk(chunkCoord.Y);
@@ -113,7 +113,7 @@ internal class GenerationData : IVoxelEditable
     {
         ChunkCoord chunkCoord = (ChunkCoord)globalCoord;
 
-        if (new RegionCoord(chunkCoord) != RegionCoord)
+        if ((RegionCoord)chunkCoord != RegionCoord)
             return false;
 
         var chunk = regionData.GetChunk(chunkCoord.Y);

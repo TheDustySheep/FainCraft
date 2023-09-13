@@ -1,10 +1,19 @@
-﻿using FainEngine_v2.Entities;
+﻿using FainEngine_v2.Core;
+using FainEngine_v2.Entities;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems;
 internal class SystemDiagnostics : IEntity
 {
+    float lastUpdate = 0f;
+    float updateFrequency = 1f;
+
     public void Update()
     {
+        if (GameTime.TotalTime < lastUpdate + updateFrequency)
+            return;
+
+        lastUpdate = GameTime.TotalTime;
+
         Console.WriteLine("");
         Console.WriteLine("System Diagnostics");
         ReportTerrainGeneration();

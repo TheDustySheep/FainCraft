@@ -12,7 +12,7 @@ internal class FainCraftGameEngine : FainGameEngine
 
     protected override void Load()
     {
-        EntityManager.SpawnEntity<SystemDiagnostics>();
+        //EntityManager.SpawnEntity<SystemDiagnostics>();
         var world = EntityManager.SpawnEntity<World>();
         var player = EntityManager.SpawnEntity(new PlayerEntity(world));
     }

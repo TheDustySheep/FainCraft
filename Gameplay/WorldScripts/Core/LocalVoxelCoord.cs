@@ -1,4 +1,6 @@
-﻿using static FainCraft.Gameplay.WorldScripts.Core.CoordConversions;
+﻿using Silk.NET.Maths;
+using System.Numerics;
+using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Core;
 
@@ -28,7 +30,7 @@ public struct LocalVoxelCoord
 
     public LocalVoxelCoord(int x, int y, int z)
     {
-        LocalIndex = (ushort)ConvertToArrayIndex(x, y, z);
+        LocalIndex = (ushort)ChunkIndex(x, y, z);
     }
 
     public LocalVoxelCoord(int index)
@@ -36,13 +38,22 @@ public struct LocalVoxelCoord
         LocalIndex = (ushort)index;
     }
 
-    public static LocalVoxelCoord CreateFromGlobalVoxel(int x, int y, int z)
+    #region Conversions
+    public static explicit operator GlobalVoxelCoord(LocalVoxelCoord localCoord)
     {
-        return new LocalVoxelCoord(
-            ConvertToLocalFromGlobal(x),
-            ConvertToLocalFromGlobal(y),
-            ConvertToLocalFromGlobal(z));
+        return ConvertToGlobalCoord(localCoord);
     }
+
+    public static explicit operator Vector3D<int>(LocalVoxelCoord localCoord)
+    {
+        return new Vector3D<int>(localCoord.X, localCoord.Y, localCoord.Z);
+    }
+
+    public static explicit operator Vector3(LocalVoxelCoord localCoord)
+    {
+        return new Vector3(localCoord.X, localCoord.Y, localCoord.Z);
+    }
+    #endregion
 
     public override string ToString()
     {
