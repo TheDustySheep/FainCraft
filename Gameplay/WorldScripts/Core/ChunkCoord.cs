@@ -20,7 +20,7 @@ public struct ChunkCoord
     }
 
     public Vector3 GlobalCenter => GlobalMin + Extents;
-    public readonly Vector3 GlobalMin => 
+    public readonly Vector3 GlobalMin =>
         new
         (
             ConvertToGlobalFromChunk(X),

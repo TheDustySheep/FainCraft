@@ -8,6 +8,7 @@ internal class HeightMapGenerator
 {
     readonly FastNoiseLite cellularNoise;
     readonly FastNoiseLite simplexNoise;
+    readonly FastNoiseLite smallpeaksNoise;
 
     const int groundHeight = 32;
 
@@ -32,21 +33,25 @@ internal class HeightMapGenerator
         simplexNoise.SetFractalType(FastNoiseLite.FractalType.Ridged);
         simplexNoise.SetFractalOctaves(4);
         simplexNoise.SetFractalWeightedStrength(0.5f);
+
+        smallpeaksNoise = new FastNoiseLite();
+        smallpeaksNoise.SetFrequency(0.03f);
     }
 
-    public void GenerateHeightMap(GenerationData data, RegionCoord region)
+    public void GenerateHeightMap(GenerationData data)
     {
-        var img = data.Image;
-        Span<ushort> heightMap = data.HeightMap;
+        var img = data.Continentalness.Image;
+        Span<ushort> heightMap = data.Continentalness.Heights;
 
-        int start_x = region.Global_Voxel_X - GenerationData.BORDER;
-        int start_z = region.Global_Voxel_Z - GenerationData.BORDER;
+        RegionCoord regionCoord = data.RegionCoord;
+        int start_x = regionCoord.Global_Voxel_X - HeightMap.BORDER;
+        int start_z = regionCoord.Global_Voxel_Z - HeightMap.BORDER;
 
-        for (int x = 0; x < GenerationData.MAP_SIZE; x++)
+        for (int x = 0; x < HeightMap.MAP_SIZE; x++)
         {
             int g_x = start_x + x;
 
-            for (int z = 0; z < GenerationData.MAP_SIZE; z++)
+            for (int z = 0; z < HeightMap.MAP_SIZE; z++)
             {
                 int g_z = start_z + z;
 
@@ -54,17 +59,17 @@ internal class HeightMapGenerator
             }
         }
 
-        img.Mutate(i => i.BoxBlur(4));
+        img.Mutate(i => i.BoxBlur(HeightMap.BORDER));
 
-        for (int x = 0; x < GenerationData.MAP_SIZE; x++)
+        for (int x = 0; x < HeightMap.MAP_SIZE; x++)
         {
             int g_x = start_x + x;
 
-            for (int z = 0; z < GenerationData.MAP_SIZE; z++)
+            for (int z = 0; z < HeightMap.MAP_SIZE; z++)
             {
                 int g_z = start_z + z;
 
-                heightMap[z * GenerationData.MAP_SIZE + x] = (ushort)(short)img[x, z].ToSingle();
+                heightMap[z * HeightMap.MAP_SIZE + x] = (ushort)(short)(img[x, z].ToSingle() + smallpeaksNoise.GetNoise(g_x, g_z));
             }
         }
     }

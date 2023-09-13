@@ -1,6 +1,4 @@
-﻿using FainCraft.Gameplay.WorldScripts.Core;
-using FainCraft.Gameplay.WorldScripts.Systems.MeshGeneration;
-using FainEngine_v2.Core;
+﻿using FainEngine_v2.Core;
 using FainEngine_v2.Rendering.BoundingShapes;
 using FainEngine_v2.Rendering.Meshing;
 using System.Numerics;

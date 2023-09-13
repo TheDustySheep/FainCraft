@@ -14,6 +14,7 @@ in vec3 oTexCoord;
 in vec3 oVertexNormal;
 in vec3 oFragPos;
 in float oAO;
+in vec3 oBlendColor;
 
 uniform vec3 viewPos;
 uniform sampler2DArray albedoTexture;
@@ -43,6 +44,7 @@ void main()
         discard;
 
     vertexColor.rgb *= oAO;
+    vertexColor.rgb *= oBlendColor;
 
     // Result
     vec3 result = vertexColor.rgb;

@@ -5,7 +5,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems;
 internal class SystemDiagnostics : IEntity
 {
     float lastUpdate = 0f;
-    float updateFrequency = 1f;
+    readonly float updateFrequency = 1f;
 
     public void Update()
     {

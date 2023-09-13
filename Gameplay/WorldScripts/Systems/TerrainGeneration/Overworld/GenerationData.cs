@@ -1,25 +1,16 @@
-﻿using FainCraft.Gameplay.WorldScripts.Data;
-using FainCraft.Gameplay.WorldScripts.Core;
+﻿using FainCraft.Gameplay.WorldScripts.Core;
+using FainCraft.Gameplay.WorldScripts.Data;
 using FainCraft.Gameplay.WorldScripts.Editing;
 using FainCraft.Gameplay.WorldScripts.Voxels;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld;
 internal class GenerationData : IVoxelEditable
 {
     public List<IVoxelEdit> outstandingEdits = new();
-
-    public const int BORDER = 8;
-    public const int MAP_SIZE = BORDER + CHUNK_SIZE + BORDER;
-    public Image<HalfSingle> Image = new(MAP_SIZE, MAP_SIZE);
-    public ushort[] HeightMap = new ushort[MAP_SIZE * MAP_SIZE];
-
     public VoxelIndexer Indexer;
-
     public RegionCoord RegionCoord;
     public RegionData regionData = new();
+    public HeightMap Continentalness = new();
 
     public GenerationData(VoxelIndexer indexer)
     {
@@ -33,14 +24,6 @@ internal class GenerationData : IVoxelEditable
         RegionCoord = regionCoord;
         regionData = new();
         outstandingEdits.Clear();
-    }
-
-    public ushort GetHeight(int x, int z)
-    {
-        x += BORDER;
-        z += BORDER;
-
-        return HeightMap[z * MAP_SIZE + x];
     }
 
     public bool VoxelExists(GlobalVoxelCoord globalCoord)

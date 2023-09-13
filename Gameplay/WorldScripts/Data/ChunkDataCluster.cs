@@ -1,5 +1,4 @@
-﻿using System;
-using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
+﻿using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Data;
 public class ChunkDataCluster
@@ -29,7 +28,7 @@ public class ChunkDataCluster
         }
     }
 
-    public VoxelData GetVoxel(uint x,  uint y, uint z)
+    public VoxelData GetVoxel(uint x, uint y, uint z)
     {
         uint localIndex = ChunkIndex(x, y, z);
 

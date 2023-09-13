@@ -1,5 +1,5 @@
-﻿using FainCraft.Gameplay.WorldScripts.Data;
-using FainCraft.Gameplay.WorldScripts.Core;
+﻿using FainCraft.Gameplay.WorldScripts.Core;
+using FainCraft.Gameplay.WorldScripts.Data;
 using FainCraft.Gameplay.WorldScripts.Voxels;
 using System.Diagnostics;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
@@ -11,9 +11,10 @@ internal class OverworldGenerator : ITerrainGenerator
     const int waterHeight = 36;
 
     readonly VoxelIndexer indexer;
-    readonly HeightMapGenerator heightMapGenerator = new();
     readonly TreeGenerator treeGenerator = new();
     readonly GenerationData data;
+    readonly TerrainShaper terrainShaper = new();
+    readonly SurfaceDecorator surfaceDecorator = new();
 
     public OverworldGenerator(VoxelIndexer indexer)
     {
@@ -26,22 +27,8 @@ internal class OverworldGenerator : ITerrainGenerator
         Stopwatch sw = Stopwatch.StartNew();
         data.Initalize(regionCoord);
 
-        heightMapGenerator.GenerateHeightMap(data, regionCoord);
-
-        for (int y = 0; y < REGION_Y_TOTAL_COUNT; y++)
-        {
-            data.Chunks[y] = GenerateChunk
-            (
-                data,
-                new ChunkCoord()
-                {
-                    X = regionCoord.X,
-                    Y = y - REGION_Y_NEG_COUNT,
-                    Z = regionCoord.Z,
-                }
-            );
-        }
-
+        terrainShaper.ShapeTerrain(data);
+        surfaceDecorator.DecorateSurface(data);
         treeGenerator.GenerateTrees(data);
 
         sw.Stop();
@@ -71,7 +58,7 @@ internal class OverworldGenerator : ITerrainGenerator
             {
                 int global_x = c_x + chunkVoxelCoord.X;
 
-                int groundHeight = data.GetHeight(c_x, c_z);
+                int groundHeight = data.Continentalness.GetHeight(c_x, c_z);
 
                 for (int c_y = 0; c_y < CHUNK_SIZE; c_y++)
                 {

@@ -45,7 +45,7 @@ internal class PlayerCharacterController
             _isSprinting = true;
 
         // Jumping
-        if (GameInputs.IsKeyHeld(Key.Space) && motor.groundedState.IsGrounded && jumpCooldown == 0f)
+        if (GameInputs.IsKeyHeld(Key.Space) && motor.GroundedState.IsGrounded && jumpCooldown == 0f)
         {
             float force = MathF.Sqrt(2 * motor.Gravity * 1.25f);
             velocity.Y = force;

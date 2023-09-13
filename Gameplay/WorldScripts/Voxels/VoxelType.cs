@@ -26,4 +26,10 @@ public class VoxelType
 
     [JsonProperty("Skip_Draw_Similar")]
     public required bool Skip_Draw_Similar { get; set; }
+
+    [JsonProperty("Animate_Foliage")]
+    public required bool Animate_Foliage { get; set; }
+
+    [JsonProperty("Biome_Blend")]
+    public required bool[] Biome_Blend { get; set; }
 }

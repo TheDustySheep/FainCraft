@@ -1,7 +1,4 @@
 ﻿using FainEngine_v2.Extensions;
-using Silk.NET.Maths;
-using Silk.NET.SDL;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace FainCraft.Gameplay.WorldScripts.Core;
@@ -17,6 +14,9 @@ public class WorldConstants
     public const int REGION_Y_POS_COUNT = 4;
     public const int REGION_Y_NEG_COUNT = 2;
     public const int REGION_Y_TOTAL_COUNT = REGION_Y_POS_COUNT + REGION_Y_NEG_COUNT;
+
+    public const int VOXEL_MAX_Y = REGION_Y_POS_COUNT * CHUNK_SIZE - 1;
+    public const int VOXEL_MIN_Y = -REGION_Y_NEG_COUNT * CHUNK_SIZE;
 
     #region Indexes
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

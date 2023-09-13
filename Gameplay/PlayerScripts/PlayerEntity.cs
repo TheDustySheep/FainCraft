@@ -18,24 +18,30 @@ internal class PlayerEntity : GameObject, IWorldEntity
 
     public StaticAABB Bounds => new StaticAABB()
     {
-        Position = Motor.PositionStart,
+        Position = Motor.TransformPosition,
         Size = Motor.PlayerSize,
     };
 
     public PlayerEntity(World world)
     {
-        Transform.LocalPosition = new Vector3(32, 44, 32);
+        Transform.LocalPosition = new Vector3(32, 130, 32);
         camTransform.LocalPosition = new Vector3(0, 0.85f, 0);
         camTransform.SetParent(Transform);
 
         camera = new Camera3D(camTransform);
         camera.SetMainCamera();
 
-        Motor = new EntityMotor(Transform, world.WorldData);
+        Motor = new EntityMotor(new CollisionHandler(world.WorldData), Transform);
         worldEditor = new WorldEditor(camTransform, world);
         controller = new PlayerCharacterController(camTransform, Motor);
-
+        Motor.EnableGravity = false;
         world.WorldEntityController.RegisterEntity(this);
+
+        Task.Run(async () =>
+        {
+            await Task.Delay(500);
+            Motor.EnableGravity = true;
+        });
     }
 
     public override void Update()

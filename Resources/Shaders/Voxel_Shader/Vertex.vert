@@ -6,6 +6,7 @@ out vec3 oTexCoord;
 out vec3 oVertexNormal;
 out vec3 oFragPos;
 out float oAO;
+out vec3 oBlendColor;
 
 uniform mat4 normalMat;
 uniform mat4 uModel;
@@ -22,7 +23,17 @@ struct Vertex_Data
     vec3 TexCoord;
     bool isFluid;
     int AO;
+    int biomeIndex;
+    bool blendBiome;
+    bool animateFoliage;
 };
+
+const vec3 BIOME_COLORS[] = vec3[]
+(
+   vec3(142.0 / 255.0, 179.0 / 255.0, 97.0 / 255.0)
+);
+
+const vec3 FOLIAGE_COLOR = vec3(58.0 / 255.0, 95.0 / 255.0, 11.0 / 255.0);
 
 const vec3 NORMAL_LOOKUP[6] = vec3[]
 (
@@ -150,6 +161,10 @@ Vertex_Data DecodeVertex()
     vertex_data.TexCoord = DecodeTexCoord(vertex_data.texID ,vertex_data.corner);
     vertex_data.AO = (aData1 >> 24) & 3;
 
+    vertex_data.animateFoliage = bool((aData1 >> 26) & 1);
+    vertex_data.blendBiome = bool((aData1 >> 27) & 1);
+    vertex_data.biomeIndex = (aData1 >> 28) & 15;
+
     vertex_data = ApplyFluid(vertex_data);
 
     return vertex_data;
@@ -169,4 +184,21 @@ void main()
     oVertexNormal = mat3(normalMat) * aNormal;
     oTexCoord = aTexCoord;
     oAO = DecodeAO(vertex_data.AO);
+
+    vec3 blendCol = vec3(1, 1, 1);
+
+    if (vertex_data.animateFoliage && vertex_data.blendBiome)
+    {
+        blendCol = (FOLIAGE_COLOR + BIOME_COLORS[vertex_data.biomeIndex]) * 0.5;
+    }
+    else if (vertex_data.blendBiome)
+    {
+        blendCol = BIOME_COLORS[vertex_data.biomeIndex];
+    }    
+    else if (vertex_data.animateFoliage)
+    {
+        blendCol = FOLIAGE_COLOR;
+    }
+
+    oBlendColor = blendCol;
 }

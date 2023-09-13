@@ -8,6 +8,10 @@ internal class RegionData
     public RegionData()
     {
         Chunks = new ChunkData[REGION_Y_TOTAL_COUNT];
+        for (int y = 0; y < REGION_Y_TOTAL_COUNT; y++)
+        {
+            Chunks[y] = new ChunkData();
+        }
     }
 
     public RegionData(ChunkData[] _chunks)

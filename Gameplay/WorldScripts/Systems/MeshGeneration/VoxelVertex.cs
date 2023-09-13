@@ -13,6 +13,9 @@ public struct VoxelVertex
     static readonly uint MASK_NORMAL = 0b_0000_0000_0111_0000_0000_0000_0000_0000;
     static readonly uint MASK_IS_FLUID = 0b_0000_0000_1000_0000_0000_0000_0000_0000;
     static readonly uint MASK_AO = 0b_0000_0011_0000_0000_0000_0000_0000_0000;
+    static readonly uint MASK_IS_FOLIAGE = 0b_0000_0100_0000_0000_0000_0000_0000_0000;
+    static readonly uint MASK_BIOME_BLEND = 0b_0000_1000_0000_0000_0000_0000_0000_0000;
+    static readonly uint MASK_BIOME_INDEX = 0b_1111_0000_0000_0000_0000_0000_0000_0000;
 
     public uint XPos
     {
@@ -54,6 +57,24 @@ public struct VoxelVertex
     {
         readonly get => (Data1 & MASK_AO) >> 24;
         set => Data1 = Data1 & ~MASK_AO | (value & 3u) << 24;
+    }
+
+    public uint Animate_Foliage
+    {
+        readonly get => (Data1 & MASK_IS_FOLIAGE) >> 26;
+        set => Data1 = Data1 & ~MASK_IS_FOLIAGE | (value & 1u) << 26;
+    }
+
+    public uint Biome_Blend
+    {
+        readonly get => (Data1 & MASK_BIOME_BLEND) >> 27;
+        set => Data1 = Data1 & ~MASK_BIOME_BLEND | (value & 1u) << 27;
+    }
+
+    public uint Biome_Index
+    {
+        readonly get => (Data1 & MASK_BIOME_INDEX) >> 28;
+        set => Data1 = Data1 & ~MASK_BIOME_INDEX | (value & 15u) << 28;
     }
 
     /// <summary>

@@ -20,10 +20,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Resources\Textures\atlas.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Voxels\Voxels.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\Textures\atlas.png">
+    <None Update="Resources\Textures\atlas_old.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Textures\container.jpg">

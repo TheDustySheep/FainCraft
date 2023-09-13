@@ -60,6 +60,9 @@ public class MeshGenerator_v2 : IMeshGenerator
                             if (voxelType.Skip_Draw_Similar && voxelData.Index == faceVoxelData.Index)
                                 continue;
 
+                            uint animate_foliage = Convert.ToUInt32(voxelType.Animate_Foliage);
+                            uint blend_biome = Convert.ToUInt32(voxelType.Biome_Blend[face]);
+
                             for (uint i = 0; i < 4; i++)
                             {
                                 var vert = VERTICES[i + face * 4];
@@ -74,6 +77,9 @@ public class MeshGenerator_v2 : IMeshGenerator
                                 uint cornr = Convert.ToUInt32(nVoxelTypes[AO_LOOKUP[face * 12 + i * 3 + 1]].Fully_Opaque);
                                 uint side2 = Convert.ToUInt32(nVoxelTypes[AO_LOOKUP[face * 12 + i * 3 + 2]].Fully_Opaque);
                                 vert.AO = GetVertexAO(side1, side2, cornr);
+
+                                vert.Biome_Blend = blend_biome;
+                                vert.Animate_Foliage = animate_foliage;
 
                                 verts.Add(vert);
                             }

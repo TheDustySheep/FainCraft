@@ -1,5 +1,5 @@
-﻿using FainCraft.Gameplay.WorldScripts.Systems.MeshGeneration;
-using FainCraft.Gameplay.WorldScripts.Core;
+﻿using FainCraft.Gameplay.WorldScripts.Core;
+using FainCraft.Gameplay.WorldScripts.Systems.MeshGeneration;
 using FainEngine_v2.Core;
 using FainEngine_v2.Rendering.Materials;
 using System.Numerics;

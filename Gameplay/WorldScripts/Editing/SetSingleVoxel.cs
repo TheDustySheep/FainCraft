@@ -1,5 +1,5 @@
-﻿using FainCraft.Gameplay.WorldScripts.Data;
-using FainCraft.Gameplay.WorldScripts.Core;
+﻿using FainCraft.Gameplay.WorldScripts.Core;
+using FainCraft.Gameplay.WorldScripts.Data;
 
 namespace FainCraft.Gameplay.WorldScripts.Editing;
 internal struct SetSingleVoxel : IVoxelEdit

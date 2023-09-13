@@ -1,5 +1,5 @@
-﻿using FainCraft.Gameplay.WorldScripts.Data;
-using FainCraft.Gameplay.WorldScripts.Core;
+﻿using FainCraft.Gameplay.WorldScripts.Core;
+using FainCraft.Gameplay.WorldScripts.Data;
 using FainCraft.Gameplay.WorldScripts.Editing;
 using FainEngine_v2.Utils;
 using System.Collections.Concurrent;

@@ -4,63 +4,73 @@
     "Draw_Self": false,
     "Fully_Opaque": false,
     "TexIDs": [ 160, 160, 160, 160, 160, 160 ],
-    "Physics_Solid": false
+    "Physics_Solid": false,
+    "Biome_Blend": [ false, false, false, false, false, false ]
   },
   {
     "Name": "Grass",
     "Draw_Self": true,
     "Fully_Opaque": true,
     "TexIDs": [ 243, 243, 242, 240, 243, 243 ],
-    "Physics_Solid": true
+    "Physics_Solid": true,
+    "Biome_Blend": [ false, false, false, true, false, false ]
   },
   {
     "Name": "Dirt",
     "Draw_Self": true,
     "Fully_Opaque": true,
     "TexIDs": [ 242, 242, 242, 242, 242, 242 ],
-    "Physics_Solid": true
+    "Physics_Solid": true,
+    "Biome_Blend": [ false, false, false, false, false, false ]
   },
   {
     "Name": "Sand",
     "Draw_Self": true,
     "Fully_Opaque": true,
     "TexIDs": [ 226, 226, 226, 226, 226, 226 ],
-    "Physics_Solid": true
+    "Physics_Solid": true,
+    "Biome_Blend": [ false, false, false, false, false, false ]
   },
   {
     "Name": "Stone",
     "Draw_Self": true,
     "Fully_Opaque": true,
     "TexIDs": [ 241, 241, 241, 241, 241, 241 ],
-    "Physics_Solid": true
+    "Physics_Solid": true,
+    "Biome_Blend": [ false, false, false, false, false, false ]
   },
   {
     "Name": "Cobblestone",
     "Draw_Self": true,
     "Fully_Opaque": true,
     "TexIDs": [ 224, 224, 224, 224, 224, 224 ],
-    "Physics_Solid": true
+    "Physics_Solid": true,
+    "Biome_Blend": [ false, false, false, false, false, false ]
   },
   {
     "Name": "Planks",
     "Draw_Self": true,
     "Fully_Opaque": true,
     "TexIDs": [ 244, 244, 244, 244, 244, 244 ],
-    "Physics_Solid": true
+    "Physics_Solid": true,
+    "Biome_Blend": [ false, false, false, false, false, false ]
   },
   {
     "Name": "Log",
     "Draw_Self": true,
     "Fully_Opaque": true,
     "TexIDs": [ 228, 228, 229, 229, 228, 228 ],
-    "Physics_Solid": true
+    "Physics_Solid": true,
+    "Biome_Blend": [ false, false, false, false, false, false ]
   },
   {
     "Name": "Leaves",
     "Draw_Self": true,
     "Fully_Opaque": false,
     "TexIDs": [ 196, 196, 196, 196, 196, 196 ],
-    "Physics_Solid": true
+    "Physics_Solid": true,
+    "Animate_Foliage": true,
+    "Biome_Blend": [ true, true, true, true, true, true ]
   },
   {
     "Name": "Water",
@@ -70,7 +80,8 @@
     "Physics_Solid": false,
     "Skip_Draw_Similar": true,
     "Is_Fluid": true,
-    "Is_Transparent": true
+    "Is_Transparent": true,
+    "Biome_Blend": [ false, false, false, false, false, false ]
   },
   {
     "Name": "Glass",
@@ -78,6 +89,7 @@
     "Fully_Opaque": false,
     "TexIDs": [ 193, 193, 193, 193, 193, 193 ],
     "Physics_Solid": true,
-    "Skip_Draw_Similar": true
+    "Skip_Draw_Similar": true,
+    "Biome_Blend": [ false, false, false, false, false, false ]
   }
 ]

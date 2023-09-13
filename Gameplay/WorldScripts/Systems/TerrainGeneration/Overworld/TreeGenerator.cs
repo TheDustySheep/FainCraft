@@ -1,5 +1,5 @@
-﻿using FainCraft.Gameplay.WorldScripts.Data;
-using FainCraft.Gameplay.WorldScripts.Core;
+﻿using FainCraft.Gameplay.WorldScripts.Core;
+using FainCraft.Gameplay.WorldScripts.Data;
 using FainCraft.Gameplay.WorldScripts.Editing;
 using FainEngine_v2.Utils;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
@@ -40,7 +40,7 @@ internal class TreeGenerator
 
                 if (val > 0.4)
                 {
-                    int floorHeight = data.GetHeight(x, z);
+                    int floorHeight = data.Continentalness.GetHeight(x, z);
                     GlobalVoxelCoord floorCoord = new GlobalVoxelCoord(global_x, floorHeight, global_z);
 
                     if (!data.GetVoxelData(floorCoord, out var floorData) || floorData != grassData)

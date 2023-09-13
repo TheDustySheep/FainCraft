@@ -121,15 +121,15 @@ internal class WorldData : IWorldData
         if (localCoord.X == 0)
             OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord(-1, 0, 0), immediate);
         if (localCoord.X == CHUNK_SIZE - 1)
-            OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord( 1, 0, 0), immediate);
+            OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord(1, 0, 0), immediate);
         if (localCoord.Y == 0)
-            OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord( 0,-1, 0), immediate);
+            OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord(0, -1, 0), immediate);
         if (localCoord.Y == CHUNK_SIZE - 1)
-            OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord( 0, 1, 0), immediate);
+            OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord(0, 1, 0), immediate);
         if (localCoord.Z == 0)
-            OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord( 0, 0,-1), immediate);
+            OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord(0, 0, -1), immediate);
         if (localCoord.Z == CHUNK_SIZE - 1)
-            OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord( 0, 0, 1), immediate);
+            OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord(0, 0, 1), immediate);
 
         return true;
     }
@@ -157,12 +157,12 @@ internal class WorldData : IWorldData
             return true;
 
         OnChunkUpdate.Invoke(chunkCoord, immediate);
-        OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord(-1,  0,  0), immediate);
-        OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord( 1,  0,  0), immediate);
-        OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord( 0, -1,  0), immediate);
-        OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord( 0,  1,  0), immediate);
-        OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord( 0,  0, -1), immediate);
-        OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord( 0,  0,  1), immediate);
+        OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord(-1, 0, 0), immediate);
+        OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord(1, 0, 0), immediate);
+        OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord(0, -1, 0), immediate);
+        OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord(0, 1, 0), immediate);
+        OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord(0, 0, -1), immediate);
+        OnChunkUpdate.Invoke(chunkCoord + new ChunkCoord(0, 0, 1), immediate);
 
         return true;
     }
@@ -195,13 +195,13 @@ internal class WorldData : IWorldData
         return regionData;
     }
 
-    RegionCoord[] REGION_OFFSETS = new[]
+    readonly RegionCoord[] REGION_OFFSETS = new[]
     {
         new RegionCoord(-1, 0),
         new RegionCoord( 1, 0),
         new RegionCoord( 0,-1),
         new RegionCoord( 0, 1),
-    }; 
+    };
 
     public bool SetRegion(RegionCoord coord, RegionData data, bool immediate = false)
     {
