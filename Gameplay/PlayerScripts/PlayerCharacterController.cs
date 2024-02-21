@@ -16,7 +16,7 @@ internal class PlayerCharacterController
     readonly float jumpPeriod = 0.5f;
     float jumpCooldown = 0f;
     readonly float moveSpeed = 4.3f;
-    readonly float sprintSpeed = 7.1f;
+    readonly float sprintSpeed = 5.6f;
     readonly float lookSensitivity = 0.1f;
     Vector2 CameraRotation;
 

@@ -42,7 +42,7 @@ internal class EntityMotor
     readonly CollisionHandler _collisionHandler;
 
     float _lastTime;
-    float _gravity = 32f;
+    float _gravity = 27f;
 
     GroundedState _groundedState;
     Vector3 _currentPosition;

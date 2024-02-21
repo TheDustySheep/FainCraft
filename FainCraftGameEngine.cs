@@ -6,7 +6,7 @@ using FainEngine_v2.UI;
 namespace FainCraft;
 internal class FainCraftGameEngine : FainGameEngine
 {
-    public FainCraftGameEngine() : base(windowTitle: "FainCraft")
+    public FainCraftGameEngine() : base(1600*2, 900*2, windowTitle: "FainCraft")
     {
     }
 
