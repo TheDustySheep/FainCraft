@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Silk.NET.OpenGL.Extensions.INTEL" Version="2.20.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,6 +21,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Resources\Shaders\PostProcessing\postprocess.frag">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\PostProcessing\postprocess.vert">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Shaders\Voxel_Shader\voxels.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
