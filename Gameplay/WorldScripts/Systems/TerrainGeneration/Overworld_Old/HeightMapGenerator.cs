@@ -3,7 +3,7 @@ using FainEngine_v2.Utils;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
-namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld;
+namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld_Old;
 internal class HeightMapGenerator
 {
     readonly FastNoiseLite cellularNoise;

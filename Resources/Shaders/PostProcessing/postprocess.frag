@@ -6,12 +6,12 @@ in vec2 texCoords;
 uniform sampler2D colorTexture;
 uniform sampler2D depthTexture;
 
-uniform float fogStart = 128.0;
-uniform float fogEnd = 256.0;
 uniform vec4 fogColor = vec4(0.623, 0.734, 0.785, 0);
 
 uniform float zFar = 10000.0;
 uniform float zNear = 0.1;
+
+uniform float fogDensity = 0.0012;
 
 float linearize_depth(float d)
 {
@@ -31,8 +31,7 @@ float Remap(float iMin, float iMax, float oMin, float oMax, float v)
 
 float calculateFogFactor(float d) 
 {
-    float density = 0.002;
-    float result = 1.0 - exp(-pow(density * d, 2.0));
+    float result = 1.0 - exp(-pow(fogDensity * d, 2.0));
     return clamp(result, 0, 1);
 }
 

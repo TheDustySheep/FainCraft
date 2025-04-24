@@ -8,6 +8,8 @@ public class WorldConstants
 
     public const int CHUNK_SIZE_MASK = CHUNK_SIZE - 1;
     public const int CHUNK_SIZE = 1 << CHUNK_SIZE_POWER;
+    public const int CHUNK_SIZE_PAD = CHUNK_SIZE + 2;
+
     public const int CHUNK_AREA = CHUNK_SIZE * CHUNK_SIZE;
     public const int CHUNK_VOLUME = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
 

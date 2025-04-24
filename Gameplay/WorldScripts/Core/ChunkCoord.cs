@@ -19,6 +19,13 @@ public struct ChunkCoord
         Z = z;
     }
 
+    public ChunkCoord(RegionCoord regionCoord, int y)
+    {
+        X = regionCoord.X;
+        Y = y;
+        Z = regionCoord.Z;
+    }
+
     public Vector3 GlobalCenter => GlobalMin + Extents;
     public readonly Vector3 GlobalMin =>
         new

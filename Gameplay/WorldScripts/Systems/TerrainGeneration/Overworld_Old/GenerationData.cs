@@ -3,7 +3,7 @@ using FainCraft.Gameplay.WorldScripts.Data;
 using FainCraft.Gameplay.WorldScripts.Editing;
 using FainCraft.Gameplay.WorldScripts.Voxels;
 
-namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld;
+namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld_Old;
 internal class GenerationData : IVoxelEditable
 {
     public List<IVoxelEdit> outstandingEdits = new();

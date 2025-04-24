@@ -9,6 +9,8 @@ internal class ActiveRegionController : IActiveRegionController
     readonly HashSet<RegionCoord> ActiveRegions = new();
     bool hasInit = false;
 
+    int LOAD_RADIUS = 32;
+
     public ActiveRegionController(ILoadingController loadingController)
     {
         this.loadingController = loadingController;
@@ -19,7 +21,7 @@ internal class ActiveRegionController : IActiveRegionController
         if (hasInit)
             return;
 
-        foreach (var point in GetSpiral(16))
+        foreach (var point in GetSpiral(LOAD_RADIUS))
         {
             var coord = new RegionCoord(point.X, point.Y);
             ActiveRegions.Add(coord);

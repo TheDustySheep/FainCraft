@@ -4,7 +4,7 @@ using FainCraft.Gameplay.WorldScripts.Editing;
 using FainEngine_v2.Utils;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
-namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld;
+namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld_Old;
 internal class TreeGenerator
 {
     readonly FastNoiseLite treeNoise = new FastNoiseLite();

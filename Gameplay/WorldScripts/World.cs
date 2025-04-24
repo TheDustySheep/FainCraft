@@ -38,6 +38,7 @@ internal class World : GameObject
         WorldData = new WorldData(indexer);
         renderSystem = new RenderSystem(voxel_material);
         meshSystem = new ThreadedMeshGenerationSystem(WorldData, renderSystem, () => new MeshGenerator_v2(indexer));
+        //meshSystem = new BasicMeshGenerationSystem(WorldData, renderSystem, new MeshGenerator_Bitwise(_indexer));
         terrainSystem = new ThreadedTerrainGenerationSystem(WorldData, new OverworldGenerator(indexer));
         loadingController = new LoadingController(WorldData, terrainSystem);
         activeRegionController = new ActiveRegionController(loadingController);

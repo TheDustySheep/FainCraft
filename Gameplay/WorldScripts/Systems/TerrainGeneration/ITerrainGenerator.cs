@@ -3,5 +3,5 @@
 namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration;
 internal interface ITerrainGenerator
 {
-    public RegionGenerationResult Generate(RegionCoord coord);
+    internal RegionGenerationResult Generate(RegionCoord coord);
 }

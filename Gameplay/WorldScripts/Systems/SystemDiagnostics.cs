@@ -1,49 +1,70 @@
-﻿using FainEngine_v2.Core;
-using FainEngine_v2.Entities;
+﻿using FainEngine_v2.Entities;
+using FainEngine_v2.Utils;
+using CsvHelper;
+using System.Globalization;
+using FainCraft.Gameplay.WorldScripts.Core;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems;
 internal class SystemDiagnostics : IEntity
 {
-    float lastUpdate = 0f;
-    readonly float updateFrequency = 1f;
+    static readonly WriteOverQueue<MeshGenDebugData> MeshData     = new(10_000);
+    static readonly WriteOverQueue<TerrainDebugData> TerrainTimes = new(10_000);
 
-    public void Update()
+    Timer timer;
+
+    public SystemDiagnostics()
     {
-        if (GameTime.TotalTime < lastUpdate + updateFrequency)
-            return;
-
-        lastUpdate = GameTime.TotalTime;
-
-        Console.WriteLine("");
-        Console.WriteLine("System Diagnostics");
-        ReportTerrainGeneration();
-        ReportMeshGeneration();
-        Console.WriteLine("");
+        timer = new Timer(PrintStats, null, 0, 1000);
     }
 
-    private static TimeSpan totalTerrainTime = TimeSpan.Zero;
-    private static int totalTerrainGenerations = 0;
-    public static void SubmitTerrainGeneration(TimeSpan timeSpan)
+    public static void SubmitMeshGeneration(MeshGenDebugData data)
     {
-        totalTerrainTime += timeSpan;
-        totalTerrainGenerations++;
+        MeshData.Add(data);
     }
 
-    public static void ReportTerrainGeneration()
+    public static void SubmitTerrainGeneration(TerrainDebugData data)
     {
-        Console.WriteLine($"Terrain Generation Total Time: {totalTerrainTime.TotalMilliseconds:N} ms Total Count: {totalTerrainGenerations:N} Average: {totalTerrainTime.TotalMilliseconds / totalTerrainGenerations:N} ms");
+        TerrainTimes.Add(data);
     }
 
-    private static TimeSpan totalMeshTime = TimeSpan.Zero;
-    private static int totalMeshGenerations = 0;
-    public static void SubmitMeshGeneration(TimeSpan timeSpan)
+    private void PrintStats(object? state)
     {
-        totalMeshTime += timeSpan;
-        totalMeshGenerations++;
+        Console.WriteLine($"=== Generation Stats ===");
+        if (TerrainTimes.Count > 0)
+        {
+            var values = TerrainTimes.ToArray();
+            var avg = values.Average(i => i.ChunkTime.TotalMilliseconds);
+            Console.WriteLine($" - Terrain Generation   {avg:F4}ms - {1d / avg:00000} C/ms");
+        }
+        if (MeshData.Count > 0)
+        {
+            var values = MeshData.ToArray();
+            var avg = values.Average(i => i.TotalTime.TotalMilliseconds);
+            Console.WriteLine($" - Mesh Data Generation {avg:F4}ms - {1d/avg:00000} C/ms");
+        }
     }
 
-    public static void ReportMeshGeneration()
+    public void Dispose()
     {
-        Console.WriteLine($"Mesh Generation    Total Time: {totalMeshTime.TotalMilliseconds:N} ms Total Count: {totalMeshGenerations:N} Average: {totalMeshTime.TotalMilliseconds / totalMeshGenerations:N} ms");
+        timer.Dispose();
+
+        try
+        {
+            using var writer = new StreamWriter("Resources\\Debug\\mesh_times.csv");
+            using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+            csv.WriteRecords(MeshData.ToArray());
+        }
+        catch { }
     }
+}
+
+internal struct MeshGenDebugData
+{
+    public TimeSpan TotalTime;
+}
+
+internal struct TerrainDebugData
+{
+    public TimeSpan TotalTime;
+    public TimeSpan ChunkTime => TotalTime / WorldConstants.REGION_Y_TOTAL_COUNT;
 }

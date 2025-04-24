@@ -37,7 +37,7 @@ public class MeshGenerator_v2 : IMeshGenerator
                 {
                     for (uint x = 0; x < CHUNK_SIZE; x++)
                     {
-                        var voxelData = cluster.GetVoxel(x, y, z);
+                        var voxelData = cluster.GetCenterChunkVoxel(x, y, z);
                         var voxelType = voxelIndexer.GetVoxelType(voxelData.Index);
 
                         if (!voxelType.DrawSelf)
@@ -106,7 +106,7 @@ public class MeshGenerator_v2 : IMeshGenerator
         };
 
         sw.Stop();
-        SystemDiagnostics.SubmitMeshGeneration(sw.Elapsed);
+        SystemDiagnostics.SubmitMeshGeneration(new MeshGenDebugData() { TotalTime = sw.Elapsed });
 
         return meshData;
     }

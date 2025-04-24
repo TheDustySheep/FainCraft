@@ -1,7 +1,7 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Core;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
-namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld;
+namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld_Old;
 internal class SurfaceDecorator
 {
     readonly HeightMapGenerator heightMapGenerator = new();

@@ -38,6 +38,16 @@ public struct GlobalVoxelCoord
         Z = position.Z;
     }
 
+    public GlobalVoxelCoord(ChunkCoord chunkCoord, LocalVoxelCoord localCoord)
+    {
+        this = (GlobalVoxelCoord)localCoord + chunkCoord;
+    }
+
+    public GlobalVoxelCoord(RegionCoord regionCoord, LocalVoxelCoord localCoord)
+    {
+        this = (GlobalVoxelCoord)localCoord + (GlobalVoxelCoord)regionCoord;
+    }
+
     #region Conversions
     public static explicit operator LocalVoxelCoord(GlobalVoxelCoord globalCoord)
     {

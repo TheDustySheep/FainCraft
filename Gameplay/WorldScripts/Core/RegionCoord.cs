@@ -4,18 +4,17 @@ using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 namespace FainCraft.Gameplay.WorldScripts.Core;
 public struct RegionCoord
 {
-    Vector2D<int> coord;
+    public int X;
+    public int Z;
 
     public RegionCoord(int x, int z)
     {
-        coord = new Vector2D<int>(x, z);
+        X = x;
+        Z = z;
     }
 
-    public int X { readonly get => coord.X; set => coord.X = value; }
-    public int Z { readonly get => coord.Y; set => coord.Y = value; }
-
-    public readonly int Global_Voxel_X => ConvertToGlobalFromChunk(coord.X);
-    public readonly int Global_Voxel_Z => ConvertToGlobalFromChunk(coord.Y);
+    public readonly int Global_Voxel_X => ConvertToGlobalFromChunk(X);
+    public readonly int Global_Voxel_Z => ConvertToGlobalFromChunk(Z);
 
     #region Conversions
     public static explicit operator GlobalVoxelCoord(RegionCoord chunkCoord)
@@ -32,12 +31,12 @@ public struct RegionCoord
     #region Operators
     public static bool operator ==(RegionCoord a, RegionCoord b)
     {
-        return a.coord == b.coord;
+        return a.X == b.X && a.Z == b.Z;
     }
 
     public static bool operator !=(RegionCoord a, RegionCoord b)
     {
-        return a.coord != b.coord;
+        return a.X != b.X || a.Z != b.Z;
     }
 
     public static RegionCoord operator +(RegionCoord a, RegionCoord b)
@@ -54,18 +53,17 @@ public struct RegionCoord
     #region Overrides
     public override readonly string ToString()
     {
-        return coord.ToString();
+        return $"X:{X} Z:{Z}";
     }
 
     public override readonly int GetHashCode()
     {
-        return coord.GetHashCode();
+        return ((X & 0xFFFF) << 16) | (Z & 0xFFFF); // Second half of the bits
     }
 
     public override readonly bool Equals(object? obj)
     {
-        return obj is RegionCoord other &&
-               coord.Equals(other.coord);
+        return obj is RegionCoord other && other == this;
     }
     #endregion
 }

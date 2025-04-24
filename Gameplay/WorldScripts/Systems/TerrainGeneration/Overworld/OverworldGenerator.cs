@@ -1,99 +1,88 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Core;
 using FainCraft.Gameplay.WorldScripts.Data;
+using FainCraft.Gameplay.WorldScripts.Editing;
+using FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.HeightMaps;
 using FainCraft.Gameplay.WorldScripts.Voxels;
+using FainEngine_v2.Utils;
+using System;
 using System.Diagnostics;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
-namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld;
-internal class OverworldGenerator : ITerrainGenerator
+namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld
 {
-    const int stoneDepth = 4;
-    const int waterHeight = 36;
-
-    readonly VoxelIndexer indexer;
-    readonly TreeGenerator treeGenerator = new();
-    readonly GenerationData data;
-    readonly TerrainShaper terrainShaper = new();
-    readonly SurfaceDecorator surfaceDecorator = new();
-
-    public OverworldGenerator(VoxelIndexer indexer)
+    internal class OverworldGenerator : ITerrainGenerator
     {
-        this.indexer = indexer;
-        data = new GenerationData(indexer);
-    }
+        readonly VoxelIndexer _indexer;
 
-    public RegionGenerationResult Generate(RegionCoord regionCoord)
-    {
-        Stopwatch sw = Stopwatch.StartNew();
-        data.Initalize(regionCoord);
+        readonly HeightMapGenerator heightMapGenerator;
 
-        terrainShaper.ShapeTerrain(data);
-        surfaceDecorator.DecorateSurface(data);
-        treeGenerator.GenerateTrees(data);
+        readonly VoxelData Air;
+        readonly VoxelData Grass;
+        readonly VoxelData Dirt;
+        readonly VoxelData Sand;
+        readonly VoxelData Stone;
+        readonly VoxelData Water;
 
-        sw.Stop();
-        SystemDiagnostics.SubmitTerrainGeneration(sw.Elapsed);
-
-        return new RegionGenerationResult(data);
-    }
-
-    private ChunkData GenerateChunk(GenerationData data, ChunkCoord chunkCoord)
-    {
-        VoxelData Air = new() { Index = indexer.GetIndex("Air") };
-        VoxelData Grass = new() { Index = indexer.GetIndex("Grass") };
-        VoxelData Dirt = new() { Index = indexer.GetIndex("Dirt") };
-        VoxelData Sand = new() { Index = indexer.GetIndex("Sand") };
-        VoxelData Stone = new() { Index = indexer.GetIndex("Stone") };
-        VoxelData Water = new() { Index = indexer.GetIndex("Water") };
-
-        GlobalVoxelCoord chunkVoxelCoord = (GlobalVoxelCoord)chunkCoord;
-
-        var chunkData = new ChunkData();
-
-        for (int c_z = 0; c_z < CHUNK_SIZE; c_z++)
+        public OverworldGenerator(VoxelIndexer indexer, int seed=1337)
         {
-            int global_z = c_z + chunkVoxelCoord.Z;
+            _indexer = indexer;
 
-            for (int c_x = 0; c_x < CHUNK_SIZE; c_x++)
+            heightMapGenerator = new HeightMapGenerator(seed);
+
+            Air   = new() { Index = indexer.GetIndex("Air")   };
+            Grass = new() { Index = indexer.GetIndex("Grass") };
+            Dirt  = new() { Index = indexer.GetIndex("Dirt")  };
+            Sand  = new() { Index = indexer.GetIndex("Sand")  };
+            Stone = new() { Index = indexer.GetIndex("Stone") };
+            Water = new() { Index = indexer.GetIndex("Water") };
+        }
+
+        public RegionGenerationResult Generate(RegionCoord regionCoord)
+        {
+            Stopwatch sw = Stopwatch.StartNew();
+            GlobalVoxelCoord regionGlobal = (GlobalVoxelCoord)regionCoord;
+
+            var regionData = new RegionData();
+
+            heightMapGenerator.Generate(regionCoord);
+
+            for (int y = 0; y < REGION_Y_TOTAL_COUNT; y++)
             {
-                int global_x = c_x + chunkVoxelCoord.X;
+                var chunkCoord = new ChunkCoord(regionCoord, y - REGION_Y_NEG_COUNT);
 
-                int groundHeight = data.Continentalness.GetHeight(c_x, c_z);
+                GenerateChunk(regionData.Chunks[y], chunkCoord);
+            }
 
-                for (int c_y = 0; c_y < CHUNK_SIZE; c_y++)
+            sw.Stop();
+            SystemDiagnostics.SubmitTerrainGeneration(new TerrainDebugData() { TotalTime = sw.Elapsed });
+
+            return new RegionGenerationResult(regionData, new List<IVoxelEdit>());
+        }
+
+        private void GenerateChunk(ChunkData data, ChunkCoord chunkCoord)
+        {
+            for (int l_x = 0; l_x < CHUNK_SIZE; l_x++)
+            {
+                for (int l_z = 0; l_z < CHUNK_SIZE; l_z++)
                 {
-                    int global_y = c_y + chunkVoxelCoord.Y;
+                    int height = heightMapGenerator.GetHeight(l_x, l_z);
 
-                    VoxelData voxData;
+                    for (int l_y = 0; l_y < CHUNK_SIZE; l_y++)
+                    {
+                        LocalVoxelCoord  localCoord  = new(l_x, l_y, l_z);
+                        GlobalVoxelCoord globalCoord = new(chunkCoord, localCoord);
 
-                    if (global_y > groundHeight)
-                    {
-                        if (global_y <= waterHeight)
-                            voxData = Water;
-                        else
-                            voxData = Air;
-                    }
-                    else if (global_y == groundHeight)
-                    {
-                        if (global_y <= waterHeight + 2)
-                            voxData = Sand;
-                        else
-                            voxData = Grass;
-                    }
-                    else if (global_y > groundHeight - stoneDepth)
-                    {
-                        if (global_y <= waterHeight)
-                            voxData = Sand;
-                        else
-                            voxData = Dirt;
-                    }
-                    else
-                        voxData = Stone;
+                        VoxelData voxel;
 
-                    chunkData[c_x, c_y, c_z] = voxData;
+                        if (globalCoord.Y > height)
+                            voxel = Air;
+                        else
+                            voxel = Stone;
+
+                        data[localCoord] = voxel;
+                    }
                 }
             }
         }
-        return chunkData;
     }
 }
