@@ -1,24 +1,24 @@
 ﻿namespace FainCraft.Gameplay.WorldScripts.Data;
-public struct VoxelData
+public struct VoxelState
 {
     public uint Index;
-
-    public static bool operator ==(VoxelData a, VoxelData b)
+    
+    public static bool operator ==(VoxelState a, VoxelState b)
     {
         return a.Index == b.Index;
     }
 
-    public static bool operator !=(VoxelData a, VoxelData b)
+    public static bool operator !=(VoxelState a, VoxelState b)
     {
         return a.Index != b.Index;
     }
 
     public override readonly bool Equals(object? obj)
     {
-        return obj is VoxelData data && data == this;
+        return obj is VoxelState data && data == this;
     }
 
-    public override int GetHashCode()
+    public override readonly int GetHashCode()
     {
         return unchecked((int)Index);
     }

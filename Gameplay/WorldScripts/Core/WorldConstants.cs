@@ -37,8 +37,8 @@ public class WorldConstants
     public static int ChunkIndex(int x, int y, int z)
     {
         return
-            (z & CHUNK_SIZE_MASK) << CHUNK_SIZE_POWER * 2 |
-            (y & CHUNK_SIZE_MASK) << CHUNK_SIZE_POWER |
+            (y & CHUNK_SIZE_MASK) << CHUNK_SIZE_POWER * 2 |
+            (z & CHUNK_SIZE_MASK) << CHUNK_SIZE_POWER |
             (x & CHUNK_SIZE_MASK);
     }
 
@@ -46,15 +46,15 @@ public class WorldConstants
     public static uint ChunkIndex(uint x, uint y, uint z)
     {
         return
-            (z & CHUNK_SIZE_MASK) << CHUNK_SIZE_POWER * 2 |
-            (y & CHUNK_SIZE_MASK) << CHUNK_SIZE_POWER |
+            (y & CHUNK_SIZE_MASK) << CHUNK_SIZE_POWER * 2 |
+            (z & CHUNK_SIZE_MASK) << CHUNK_SIZE_POWER |
             (x & CHUNK_SIZE_MASK);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static uint ClusterIndex(uint x, uint y, uint z)
     {
-        return z * 9 + y * 3 + x;
+        return y * 9 + z * 3 + x;
     }
     #endregion
 
@@ -83,7 +83,7 @@ public class WorldConstants
     {
         return new RegionCoord(chunkCoord.X, chunkCoord.Z);
     }
-    public static RegionCoord ConvertToRegionCoord(GlobalVoxelCoord globalCoord)
+    public static RegionCoord ConvertToRegionCoord(VoxelCoordGlobal globalCoord)
     {
         return new RegionCoord
         (
@@ -94,9 +94,9 @@ public class WorldConstants
     #endregion
 
     #region Global Coord Constructors    
-    public static GlobalVoxelCoord ConvertToGlobalCoord(ChunkCoord chunkCoord, LocalVoxelCoord localCoord)
+    public static VoxelCoordGlobal ConvertToGlobalCoord(ChunkCoord chunkCoord, VoxelCoordLocal localCoord)
     {
-        return new GlobalVoxelCoord()
+        return new VoxelCoordGlobal()
         {
             X = ConvertToGlobalFromChunk(chunkCoord.X) + localCoord.X,
             Y = ConvertToGlobalFromChunk(chunkCoord.Y) + localCoord.Y,
@@ -104,9 +104,9 @@ public class WorldConstants
         };
     }
 
-    public static GlobalVoxelCoord ConvertToGlobalCoord(LocalVoxelCoord localCoord)
+    public static VoxelCoordGlobal ConvertToGlobalCoord(VoxelCoordLocal localCoord)
     {
-        return new GlobalVoxelCoord()
+        return new VoxelCoordGlobal()
         {
             X = localCoord.X,
             Y = localCoord.Y,
@@ -114,9 +114,9 @@ public class WorldConstants
         };
     }
 
-    public static GlobalVoxelCoord ConvertToGlobalCoord(RegionCoord regionCoord)
+    public static VoxelCoordGlobal ConvertToGlobalCoord(RegionCoord regionCoord)
     {
-        return new GlobalVoxelCoord()
+        return new VoxelCoordGlobal()
         {
             X = ConvertToGlobalFromChunk(regionCoord.X),
             Y = 0,
@@ -124,9 +124,9 @@ public class WorldConstants
         };
     }
 
-    public static GlobalVoxelCoord ConvertToGlobalCoord(ChunkCoord coord)
+    public static VoxelCoordGlobal ConvertToGlobalCoord(ChunkCoord coord)
     {
-        return new GlobalVoxelCoord(
+        return new VoxelCoordGlobal(
             ConvertToGlobalFromChunk(coord.X),
             ConvertToGlobalFromChunk(coord.Y),
             ConvertToGlobalFromChunk(coord.Z));
@@ -134,7 +134,7 @@ public class WorldConstants
     #endregion
 
     #region Chunk Coord Constructors
-    public static ChunkCoord ConvertToChunkCoord(GlobalVoxelCoord globalCoord)
+    public static ChunkCoord ConvertToChunkCoord(VoxelCoordGlobal globalCoord)
     {
         return new ChunkCoord()
         {
@@ -156,9 +156,9 @@ public class WorldConstants
     #endregion
 
     #region Local Coord Constructors
-    public static LocalVoxelCoord ConvertToLocalCoord(GlobalVoxelCoord globalCoord)
+    public static VoxelCoordLocal ConvertToLocalCoord(VoxelCoordGlobal globalCoord)
     {
-        return new LocalVoxelCoord(
+        return new VoxelCoordLocal(
             ConvertToLocalFromGlobal(globalCoord.X),
             ConvertToLocalFromGlobal(globalCoord.Y),
             ConvertToLocalFromGlobal(globalCoord.Z));

@@ -7,10 +7,10 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.MeshGeneration;
 public class MeshGenerator_v2 : IMeshGenerator
 {
     readonly VoxelIndexer voxelIndexer;
-    readonly VoxelData[] nVoxelDatas = new VoxelData[27];
+    readonly VoxelState[] nVoxelDatas = new VoxelState[27];
     readonly VoxelType[] nVoxelTypes = new VoxelType[27];
 
-    readonly VoxelData[] allVoxelDatas = new VoxelData[(CHUNK_SIZE + 2) * (CHUNK_SIZE + 2) * (CHUNK_SIZE + 2)];
+    readonly VoxelState[] allVoxelDatas = new VoxelState[(CHUNK_SIZE + 2) * (CHUNK_SIZE + 2) * (CHUNK_SIZE + 2)];
     readonly VoxelType[] allVoxelTypes = new VoxelType[(CHUNK_SIZE + 2) * (CHUNK_SIZE + 2) * (CHUNK_SIZE + 2)];
 
     public MeshGenerator_v2(VoxelIndexer voxelIndexer)
@@ -31,9 +31,9 @@ public class MeshGenerator_v2 : IMeshGenerator
 
             uint vertCount = 0;
 
-            for (uint z = 0; z < CHUNK_SIZE; z++)
+            for (uint y = 0; y < CHUNK_SIZE; y++)
             {
-                for (uint y = 0; y < CHUNK_SIZE; y++)
+                for (uint z = 0; z < CHUNK_SIZE; z++)
                 {
                     for (uint x = 0; x < CHUNK_SIZE; x++)
                     {
@@ -114,12 +114,12 @@ public class MeshGenerator_v2 : IMeshGenerator
     private void SetVoxels(ChunkDataCluster cluster)
     {
         int i = 0;
-        Span<VoxelData> voxelDatas = allVoxelDatas;
+        Span<VoxelState> voxelDatas = allVoxelDatas;
         Span<VoxelType> voxelTypes = allVoxelTypes;
 
-        for (int z = -1; z < CHUNK_SIZE + 1; z++)
+        for (int y = -1; y < CHUNK_SIZE + 1; y++)
         {
-            for (int y = -1; y < CHUNK_SIZE + 1; y++)
+            for (int z = -1; z < CHUNK_SIZE + 1; z++)
             {
                 for (int x = -1; x < CHUNK_SIZE + 1; x++, i++)
                 {
@@ -142,21 +142,21 @@ public class MeshGenerator_v2 : IMeshGenerator
     private void GetNeighbourVoxels(int x, int y, int z)
     {
         int index = 0;
-        for (int z_off = 0; z_off < 3; z_off++)
+        for (int y_off = 0; y_off < 3; y_off++)
         {
-            int z_local = z + z_off;
+            int y_local = y + y_off;
 
-            for (int y_off = 0; y_off < 3; y_off++)
+            for (int z_off = 0; z_off < 3; z_off++)
             {
-                int y_local = y + y_off;
+                int z_local = z + z_off;
 
                 for (int x_off = 0; x_off < 3; x_off++, index++)
                 {
                     int x_local = x + x_off;
 
                     int allIndex =
-                        z_local * (CHUNK_SIZE + 2) * (CHUNK_SIZE + 2) +
-                        y_local * (CHUNK_SIZE + 2) +
+                        y_local * (CHUNK_SIZE + 2) * (CHUNK_SIZE + 2) +
+                        z_local * (CHUNK_SIZE + 2) +
                         x_local;
 
                     nVoxelDatas[index] = allVoxelDatas[allIndex];

@@ -17,7 +17,7 @@ public struct RegionCoord
     public readonly int Global_Voxel_Z => ConvertToGlobalFromChunk(Z);
 
     #region Conversions
-    public static explicit operator GlobalVoxelCoord(RegionCoord chunkCoord)
+    public static explicit operator VoxelCoordGlobal(RegionCoord chunkCoord)
     {
         return ConvertToGlobalCoord(chunkCoord);
     }

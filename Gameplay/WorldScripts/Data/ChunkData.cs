@@ -4,7 +4,7 @@ using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 namespace FainCraft.Gameplay.WorldScripts.Data;
 public class ChunkData
 {
-    public VoxelData[] VoxelData { get; private set; } = new VoxelData[CHUNK_VOLUME];
+    public VoxelState[] VoxelData { get; private set; } = new VoxelState[CHUNK_VOLUME];
 
     public bool IsEmpty()
     {
@@ -24,31 +24,31 @@ public class ChunkData
         other.VoxelData.AsSpan().CopyTo(VoxelData);
     }
 
-    public VoxelData this[int index]
+    public VoxelState this[int index]
     {
         get => VoxelData[index];
         set => VoxelData[index] = value;
     }
 
-    public VoxelData this[uint index]
+    public VoxelState this[uint index]
     {
         get => VoxelData[index];
         set => VoxelData[index] = value;
     }
 
-    public VoxelData this[int x, int y, int z]
+    public VoxelState this[int x, int y, int z]
     {
         get => VoxelData[ChunkIndex(x, y, z)];
         set => VoxelData[ChunkIndex(x, y, z)] = value;
     }
 
-    public VoxelData this[uint x, uint y, uint z]
+    public VoxelState this[uint x, uint y, uint z]
     {
         get => VoxelData[ChunkIndex(x, y, z)];
         set => VoxelData[ChunkIndex(x, y, z)] = value;
     }
 
-    public VoxelData this[LocalVoxelCoord localVoxelCoord]
+    public VoxelState this[VoxelCoordLocal localVoxelCoord]
     {
         get => VoxelData[localVoxelCoord.VoxelIndex];
         set => VoxelData[localVoxelCoord.VoxelIndex] = value;

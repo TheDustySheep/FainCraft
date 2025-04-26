@@ -28,7 +28,7 @@ public class ChunkDataCluster
         }
     }
 
-    public VoxelData GetCenterChunkVoxel(uint x, uint y, uint z)
+    public VoxelState GetCenterChunkVoxel(uint x, uint y, uint z)
     {
         uint localIndex = ChunkIndex(x, y, z);
 
@@ -37,7 +37,7 @@ public class ChunkDataCluster
         return chunkData[localIndex];
     }
 
-    public VoxelData GetVoxel(int x, int y, int z)
+    public VoxelState GetVoxel(int x, int y, int z)
     {
         int chunkIndex = 13 +
             (x >> CHUNK_SIZE_POWER) +

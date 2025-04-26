@@ -39,7 +39,7 @@ public struct ChunkCoord
     public Vector3 Extents = Vector3.One * CHUNK_SIZE * 0.5f;
 
     #region Conversions
-    public static explicit operator GlobalVoxelCoord(ChunkCoord chunkCoord)
+    public static explicit operator VoxelCoordGlobal(ChunkCoord chunkCoord)
     {
         return ConvertToGlobalCoord(chunkCoord);
     }

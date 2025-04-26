@@ -1,10 +1,10 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Core;
 using FainCraft.Gameplay.WorldScripts.Data;
 using FainCraft.Gameplay.WorldScripts.Editing;
+using FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Biomes;
 using FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.HeightMaps;
 using FainCraft.Gameplay.WorldScripts.Voxels;
 using FainEngine_v2.Utils;
-using System;
 using System.Diagnostics;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
@@ -12,76 +12,82 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld
 {
     internal class OverworldGenerator : ITerrainGenerator
     {
-        readonly VoxelIndexer _indexer;
+        readonly BiomesDecider _biomeDecider;
+        readonly BiomesFactory _biomeFactory;
 
-        readonly HeightMapGenerator heightMapGenerator;
-
-        readonly VoxelData Air;
-        readonly VoxelData Grass;
-        readonly VoxelData Dirt;
-        readonly VoxelData Sand;
-        readonly VoxelData Stone;
-        readonly VoxelData Water;
+        readonly RegionMaps _maps = new();
 
         public OverworldGenerator(VoxelIndexer indexer, int seed=1337)
         {
-            _indexer = indexer;
-
-            heightMapGenerator = new HeightMapGenerator(seed);
-
-            Air   = new() { Index = indexer.GetIndex("Air")   };
-            Grass = new() { Index = indexer.GetIndex("Grass") };
-            Dirt  = new() { Index = indexer.GetIndex("Dirt")  };
-            Sand  = new() { Index = indexer.GetIndex("Sand")  };
-            Stone = new() { Index = indexer.GetIndex("Stone") };
-            Water = new() { Index = indexer.GetIndex("Water") };
+            _biomeFactory = new BiomesFactory(indexer, seed);
+            _biomeDecider = new BiomesDecider(_biomeFactory, seed);
         }
 
         public RegionGenerationResult Generate(RegionCoord regionCoord)
         {
             Stopwatch sw = Stopwatch.StartNew();
-            GlobalVoxelCoord regionGlobal = (GlobalVoxelCoord)regionCoord;
+            VoxelCoordGlobal regionGlobal = (VoxelCoordGlobal)regionCoord;
 
             var regionData = new RegionData();
 
-            heightMapGenerator.Generate(regionCoord);
+            // Generate the surrounding biomes
+            _biomeDecider.SampleBiomes(_maps, regionCoord);
 
-            for (int y = 0; y < REGION_Y_TOTAL_COUNT; y++)
-            {
-                var chunkCoord = new ChunkCoord(regionCoord, y - REGION_Y_NEG_COUNT);
+            // Sample terrain surface
+            BiomesSampler.SampleSurfaceHeights(_maps, regionCoord);
 
-                GenerateChunk(regionData.Chunks[y], chunkCoord);
-            }
+            // Iterate over the chunks
+            HandlePainting(regionData, regionCoord);
 
+            // Decorate surface
+            HandleDecoration(regionData, regionCoord);
+
+            // Debug stuffs
             sw.Stop();
             SystemDiagnostics.SubmitTerrainGeneration(new TerrainDebugData() { TotalTime = sw.Elapsed });
 
             return new RegionGenerationResult(regionData, new List<IVoxelEdit>());
         }
 
-        private void GenerateChunk(ChunkData data, ChunkCoord chunkCoord)
+        private void HandlePainting(RegionData regionData, RegionCoord regionCoord)
         {
+            for (int y = 0; y < REGION_Y_TOTAL_COUNT; y++)
+            {
+                var chunkCoord = new ChunkCoord(regionCoord, y - REGION_Y_NEG_COUNT);
+                PaintChunk(regionData.Chunks[y], chunkCoord);
+            }
+        }
+
+        private void PaintChunk(ChunkData data, ChunkCoord chunkCoord)
+        {
+            Span<VoxelState> column = stackalloc VoxelState[CHUNK_SIZE];
             for (int l_x = 0; l_x < CHUNK_SIZE; l_x++)
             {
                 for (int l_z = 0; l_z < CHUNK_SIZE; l_z++)
                 {
-                    int height = heightMapGenerator.GetHeight(l_x, l_z);
+                    var biome = _maps.GetBiome(l_x, l_z);
+                    var painter = biome.Painter;
+
+                    painter.Paint(_maps, column, chunkCoord, l_x, l_z);
 
                     for (int l_y = 0; l_y < CHUNK_SIZE; l_y++)
                     {
-                        LocalVoxelCoord  localCoord  = new(l_x, l_y, l_z);
-                        GlobalVoxelCoord globalCoord = new(chunkCoord, localCoord);
-
-                        VoxelData voxel;
-
-                        if (globalCoord.Y > height)
-                            voxel = Air;
-                        else
-                            voxel = Stone;
-
-                        data[localCoord] = voxel;
+                        // Copy vertical column over to the chunk data
+                        VoxelCoordLocal localCoord = new(l_x, l_y, l_z);
+                        data[localCoord.VoxelIndex] = column[l_y];
                     }
                 }
+            }
+        }
+
+        private void HandleDecoration(RegionData regionData, RegionCoord regionCoord)
+        {
+            List<VoxelCoord2DGlobal> spawnLocations = new(CHUNK_AREA);
+
+            foreach (var biome in _maps.Biomes.Data.Distinct())
+            {
+                var decorator = biome.Decorator;
+                decorator.HandleSpawn(regionData, regionCoord);
             }
         }
     }

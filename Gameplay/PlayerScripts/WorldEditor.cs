@@ -36,7 +36,7 @@ internal class WorldEditor
 
             if (GameInputs.IsMouseDown(MouseButton.Left))
             {
-                EditVoxel(hit.VoxelPosition, new VoxelData() { Index = 0 });
+                EditVoxel(hit.VoxelPosition, new VoxelState() { Index = 0 });
             }
             else if (GameInputs.IsMouseDown(MouseButton.Right))
             {
@@ -50,14 +50,14 @@ internal class WorldEditor
                         return;
                 }
 
-                EditVoxel(faceVox, new VoxelData() { Index = 5 });
+                EditVoxel(faceVox, new VoxelState() { Index = 5 });
             }
         }
     }
 
-    private void EditVoxel(Vector3D<int> coord, VoxelData newVoxel)
+    private void EditVoxel(Vector3D<int> coord, VoxelState newVoxel)
     {
-        GlobalVoxelCoord voxCoord = new GlobalVoxelCoord(coord);
+        VoxelCoordGlobal voxCoord = new VoxelCoordGlobal(coord);
         worldData.EditVoxelData(voxCoord, oldVoxel =>
         {
             return newVoxel;
@@ -76,7 +76,7 @@ internal class WorldEditor
             10f,
             voxPos =>
             {
-                GlobalVoxelCoord coord = new GlobalVoxelCoord(voxPos);
+                VoxelCoordGlobal coord = new VoxelCoordGlobal(voxPos);
 
                 if (!worldData.GetVoxelData(coord, out var voxelData))
                     return false;

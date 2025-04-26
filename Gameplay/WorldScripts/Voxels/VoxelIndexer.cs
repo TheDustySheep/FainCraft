@@ -40,16 +40,16 @@ public class VoxelIndexer
     {
         return Voxels[index];
     }
-    public VoxelData GetVoxel(string name)
+    public VoxelState GetVoxel(string name)
     {
         NameToIndex.TryGetValue(name, out var index);
-        return new VoxelData() { Index = index };
+        return new VoxelState() { Index = index };
     }
 
-    public VoxelData GetVoxel(VoxelType type)
+    public VoxelState GetVoxel(VoxelType type)
     {
         TypeToIndex.TryGetValue(type, out var index);
-        return new VoxelData() { Index = index };
+        return new VoxelState() { Index = index };
     }
 
     public uint GetIndex(VoxelType type)

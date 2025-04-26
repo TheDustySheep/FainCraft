@@ -5,12 +5,12 @@ namespace FainCraft.Gameplay.WorldScripts.Editing;
 internal struct ReplaceSingleVoxel : IVoxelEdit
 {
     readonly bool immediate;
-    readonly VoxelData oldVoxel;
-    readonly VoxelData newVoxel;
+    readonly VoxelState oldVoxel;
+    readonly VoxelState newVoxel;
 
-    public GlobalVoxelCoord GlobalCoord { get; set; }
+    public VoxelCoordGlobal GlobalCoord { get; set; }
 
-    public ReplaceSingleVoxel(GlobalVoxelCoord coord, VoxelData oldVoxel, VoxelData newVoxel, bool immediate = false)
+    public ReplaceSingleVoxel(VoxelCoordGlobal coord, VoxelState oldVoxel, VoxelState newVoxel, bool immediate = false)
     {
         GlobalCoord = coord;
 
@@ -21,8 +21,8 @@ internal struct ReplaceSingleVoxel : IVoxelEdit
 
     public VoxelEditResult Execute(IVoxelEditable worldData)
     {
-        VoxelData newVoxel = this.newVoxel;
-        VoxelData oldVoxel = this.oldVoxel;
+        VoxelState newVoxel = this.newVoxel;
+        VoxelState oldVoxel = this.oldVoxel;
 
         worldData.EditVoxelData
         (
@@ -36,6 +36,6 @@ internal struct ReplaceSingleVoxel : IVoxelEdit
             immediate
         );
 
-        return new VoxelEditResult((LocalVoxelCoord)GlobalCoord);
+        return new VoxelEditResult((VoxelCoordLocal)GlobalCoord);
     }
 }

@@ -5,11 +5,11 @@ namespace FainCraft.Gameplay.WorldScripts.Editing;
 internal struct SetSingleVoxel : IVoxelEdit
 {
     readonly bool immediate;
-    readonly VoxelData newVoxel;
+    readonly VoxelState newVoxel;
 
-    public GlobalVoxelCoord GlobalCoord { get; set; }
+    public VoxelCoordGlobal GlobalCoord { get; set; }
 
-    public SetSingleVoxel(GlobalVoxelCoord coord, VoxelData newVoxel, bool immediate = false)
+    public SetSingleVoxel(VoxelCoordGlobal coord, VoxelState newVoxel, bool immediate = false)
     {
         GlobalCoord = coord;
 
@@ -19,7 +19,7 @@ internal struct SetSingleVoxel : IVoxelEdit
 
     public VoxelEditResult Execute(IVoxelEditable worldData)
     {
-        VoxelData newVoxel = this.newVoxel;
+        VoxelState newVoxel = this.newVoxel;
 
         worldData.EditVoxelData
         (
@@ -28,6 +28,6 @@ internal struct SetSingleVoxel : IVoxelEdit
             immediate
         );
 
-        return new VoxelEditResult((LocalVoxelCoord)GlobalCoord);
+        return new VoxelEditResult((VoxelCoordLocal)GlobalCoord);
     }
 }

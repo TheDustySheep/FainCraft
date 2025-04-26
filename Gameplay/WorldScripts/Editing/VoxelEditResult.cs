@@ -7,7 +7,7 @@ internal struct VoxelEditResult
     public bool Immediate;
     public bool[] UpdateChunks;
 
-    public VoxelEditResult(LocalVoxelCoord coord, bool immediate = false)
+    public VoxelEditResult(VoxelCoordLocal coord, bool immediate = false)
     {
         Immediate = immediate;
         UpdateChunks = new bool[6]

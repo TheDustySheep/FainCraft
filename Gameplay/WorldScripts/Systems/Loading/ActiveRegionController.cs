@@ -9,7 +9,7 @@ internal class ActiveRegionController : IActiveRegionController
     readonly HashSet<RegionCoord> ActiveRegions = new();
     bool hasInit = false;
 
-    int LOAD_RADIUS = 32;
+    int LOAD_RADIUS = 16;
 
     public ActiveRegionController(ILoadingController loadingController)
     {

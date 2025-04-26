@@ -25,9 +25,9 @@ internal class CollisionHandler
         entity.Position.Y -= 0.002f;
         entity.Size.Y = 0.502f;
 
-        GlobalVoxelCoord playerCoord = new GlobalVoxelCoord(entity.Position);
-        GlobalVoxelCoord minVoxel = playerCoord + new GlobalVoxelCoord(-1, -1, -1);
-        GlobalVoxelCoord maxVoxel = playerCoord + new GlobalVoxelCoord(1, 1, 1);
+        VoxelCoordGlobal playerCoord = new VoxelCoordGlobal(entity.Position);
+        VoxelCoordGlobal minVoxel = playerCoord + new VoxelCoordGlobal(-1, -1, -1);
+        VoxelCoordGlobal maxVoxel = playerCoord + new VoxelCoordGlobal(1, 1, 1);
 
         float bestDotProd = 0f;
         Vector3 bestGroundAngle = Vector3.Zero;
@@ -39,7 +39,7 @@ internal class CollisionHandler
             {
                 for (var i_x = minVoxel.X; i_x <= maxVoxel.X; i_x++)
                 {
-                    GlobalVoxelCoord voxelCoord = new GlobalVoxelCoord(i_x, i_y, i_z);
+                    VoxelCoordGlobal voxelCoord = new VoxelCoordGlobal(i_x, i_y, i_z);
 
                     worldData.GetVoxelData(voxelCoord, out var voxelData);
 
@@ -101,9 +101,9 @@ internal class CollisionHandler
     readonly List<StaticAABB> colliders = new();
     private void PhysicsStep(ref DynamicAABB playerAABB, VoxelIndexer indexer)
     {
-        GlobalVoxelCoord playerCoord = new GlobalVoxelCoord(playerAABB.Position);
-        GlobalVoxelCoord minVoxel = playerCoord + new GlobalVoxelCoord(-1, -1, -1);
-        GlobalVoxelCoord maxVoxel = playerCoord + new GlobalVoxelCoord(1, 2, 1);
+        VoxelCoordGlobal playerCoord = new VoxelCoordGlobal(playerAABB.Position);
+        VoxelCoordGlobal minVoxel = playerCoord + new VoxelCoordGlobal(-1, -1, -1);
+        VoxelCoordGlobal maxVoxel = playerCoord + new VoxelCoordGlobal(1, 2, 1);
 
         colliders.Clear();
 
@@ -114,7 +114,7 @@ internal class CollisionHandler
             {
                 for (var i_x = minVoxel.X; i_x <= maxVoxel.X; i_x++)
                 {
-                    GlobalVoxelCoord voxelCoord = new GlobalVoxelCoord(i_x, i_y, i_z);
+                    VoxelCoordGlobal voxelCoord = new VoxelCoordGlobal(i_x, i_y, i_z);
 
                     worldData.GetVoxelData(voxelCoord, out var voxelData);
 

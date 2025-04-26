@@ -91,5 +91,21 @@
     "Physics_Solid": true,
     "Skip_Draw_Similar": true,
     "Biome_Blend": [ false, false, false, false, false, false ]
+  },
+  {
+    "Name": "Snow",
+    "Draw_Self": true,
+    "Fully_Opaque": true,
+    "TexIDs": [ 178, 178, 178, 178, 178, 178 ],
+    "Physics_Solid": true,
+    "Biome_Blend": [ false, false, false, false, false, false ]
+  },
+  {
+    "Name": "Snow_Grass",
+    "Draw_Self": true,
+    "Fully_Opaque": true,
+    "TexIDs": [ 180, 180, 242, 178, 180, 180 ],
+    "Physics_Solid": true,
+    "Biome_Blend": [ false, false, false, false, false, false ]
   }
 ]

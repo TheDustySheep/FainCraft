@@ -40,13 +40,13 @@ internal class WorldData : IWorldData
         }
     }
 
-    public bool VoxelExists(GlobalVoxelCoord globalCoord)
+    public bool VoxelExists(VoxelCoordGlobal globalCoord)
     {
         ChunkCoord chunkCoord = (ChunkCoord)globalCoord;
         return GetChunk(chunkCoord) is not null;
     }
 
-    public bool GetVoxelData(GlobalVoxelCoord globalCoord, out VoxelData voxelData)
+    public bool GetVoxelData(VoxelCoordGlobal globalCoord, out VoxelState voxelData)
     {
         ChunkCoord chunkCoord = (ChunkCoord)globalCoord;
 
@@ -58,11 +58,11 @@ internal class WorldData : IWorldData
             return false;
         }
 
-        voxelData = chunk[(LocalVoxelCoord)globalCoord];
+        voxelData = chunk[(VoxelCoordLocal)globalCoord];
         return true;
     }
 
-    public bool SetVoxelData(GlobalVoxelCoord globalCoord, VoxelData voxelData, bool immediate = false)
+    public bool SetVoxelData(VoxelCoordGlobal globalCoord, VoxelState voxelData, bool immediate = false)
     {
         ChunkCoord chunkCoord = (ChunkCoord)globalCoord;
 
@@ -71,7 +71,7 @@ internal class WorldData : IWorldData
         if (chunk is null)
             return false;
 
-        chunk[(LocalVoxelCoord)globalCoord] = voxelData;
+        chunk[(VoxelCoordLocal)globalCoord] = voxelData;
 
         if (OnChunkUpdate is null)
             return true;
@@ -90,7 +90,7 @@ internal class WorldData : IWorldData
         return true;
     }
 
-    public bool EditVoxelData(GlobalVoxelCoord globalCoord, Func<VoxelData, VoxelData> editFunc, bool immediate = false)
+    public bool EditVoxelData(VoxelCoordGlobal globalCoord, Func<VoxelState, VoxelState> editFunc, bool immediate = false)
     {
         ChunkCoord chunkCoord = (ChunkCoord)globalCoord;
 
@@ -101,7 +101,7 @@ internal class WorldData : IWorldData
             return false;
         }
 
-        var oldVoxelData = chunk[(LocalVoxelCoord)globalCoord];
+        var oldVoxelData = chunk[(VoxelCoordLocal)globalCoord];
 
         var newVoxelData = editFunc.Invoke(oldVoxelData);
 
@@ -109,7 +109,7 @@ internal class WorldData : IWorldData
         if (newVoxelData == oldVoxelData)
             return true;
 
-        var localCoord = (LocalVoxelCoord)globalCoord;
+        var localCoord = (VoxelCoordLocal)globalCoord;
 
         chunk[localCoord] = newVoxelData;
 

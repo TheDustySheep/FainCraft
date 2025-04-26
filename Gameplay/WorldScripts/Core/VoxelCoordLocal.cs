@@ -4,7 +4,7 @@ using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Core;
 
-public struct LocalVoxelCoord
+public struct VoxelCoordLocal
 {
     private ushort LocalIndex;
 
@@ -18,38 +18,38 @@ public struct LocalVoxelCoord
 
     public int Y
     {
-        get => LocalIndex >> 5 & 31;
-        set => LocalIndex = (ushort)(LocalIndex & ~992 | (value & 31) << 5);
-    }
-
-    public int Z
-    {
         get => LocalIndex >> 10 & 31;
         set => LocalIndex = (ushort)(LocalIndex & ~31744 | (value & 31) << 10);
     }
 
-    public LocalVoxelCoord(int x, int y, int z)
+    public int Z
+    {
+        get => LocalIndex >> 5 & 31;
+        set => LocalIndex = (ushort)(LocalIndex & ~992 | (value & 31) << 5);
+    }
+
+    public VoxelCoordLocal(int x, int y, int z)
     {
         LocalIndex = (ushort)ChunkIndex(x, y, z);
     }
 
-    public LocalVoxelCoord(int index)
+    public VoxelCoordLocal(int index)
     {
         LocalIndex = (ushort)index;
     }
 
     #region Conversions
-    public static explicit operator GlobalVoxelCoord(LocalVoxelCoord localCoord)
+    public static explicit operator VoxelCoordGlobal(VoxelCoordLocal localCoord)
     {
         return ConvertToGlobalCoord(localCoord);
     }
 
-    public static explicit operator Vector3D<int>(LocalVoxelCoord localCoord)
+    public static explicit operator Vector3D<int>(VoxelCoordLocal localCoord)
     {
         return new Vector3D<int>(localCoord.X, localCoord.Y, localCoord.Z);
     }
 
-    public static explicit operator Vector3(LocalVoxelCoord localCoord)
+    public static explicit operator Vector3(VoxelCoordLocal localCoord)
     {
         return new Vector3(localCoord.X, localCoord.Y, localCoord.Z);
     }
