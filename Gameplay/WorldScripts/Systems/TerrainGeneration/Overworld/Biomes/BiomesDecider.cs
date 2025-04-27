@@ -9,8 +9,8 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
     {
         readonly BiomesFactory _biomes;
 
-        readonly NoiseMapHumidity    _noiseMapHumidity;
-        readonly NoiseMapMountains   _noiseMapMountains; 
+        readonly NoiseMapHumidity _noiseMapHumidity;
+        readonly NoiseMapMountains _noiseMapMountains;
         readonly NoiseMapContinental _noiseMapContinental;
         readonly NoiseMapTemperature _noiseMapTemperature;
 
@@ -18,8 +18,8 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
         {
             _biomes = biomeFactory;
 
-            _noiseMapHumidity    = new NoiseMapHumidity(seed);
-            _noiseMapMountains   = new NoiseMapMountains(seed);
+            _noiseMapHumidity = new NoiseMapHumidity(seed);
+            _noiseMapMountains = new NoiseMapMountains(seed);
             _noiseMapContinental = new NoiseMapContinental(seed);
             _noiseMapTemperature = new NoiseMapTemperature(seed);
         }
@@ -41,7 +41,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
 
                     maps.SetBiomeOversampled(
                         x + RegionMaps.OVERSAMPLE_RADIUS,
-                        z + RegionMaps.OVERSAMPLE_RADIUS, 
+                        z + RegionMaps.OVERSAMPLE_RADIUS,
                         GetBiome(coord));
                 }
             }
@@ -55,9 +55,9 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
                 {
                     VoxelCoord2DGlobal coord = new(regionCoord, l_x, l_z);
 
-                    maps.Humidity   [l_x, l_z] = _noiseMapHumidity   .Sample(coord);
-                    maps.Mountains  [l_x, l_z] = _noiseMapMountains  .Sample(coord);
-                    maps.Continents [l_x, l_z] = _noiseMapContinental.Sample(coord);
+                    maps.Humidity[l_x, l_z] = _noiseMapHumidity.Sample(coord);
+                    maps.Mountains[l_x, l_z] = _noiseMapMountains.Sample(coord);
+                    maps.Continents[l_x, l_z] = _noiseMapContinental.Sample(coord);
                     maps.Temperature[l_x, l_z] = _noiseMapTemperature.Sample(coord);
                 }
             }
@@ -65,9 +65,9 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
 
         public IBiome GetBiome(VoxelCoord2DGlobal globalCoord2D)
         {
-            float humidity    = _noiseMapHumidity   .Sample(globalCoord2D);
-            float mountains   = _noiseMapMountains  .Sample(globalCoord2D);
-            float continent   = _noiseMapContinental.Sample(globalCoord2D);
+            float humidity = _noiseMapHumidity.Sample(globalCoord2D);
+            float mountains = _noiseMapMountains.Sample(globalCoord2D);
+            float continent = _noiseMapContinental.Sample(globalCoord2D);
             float temperature = _noiseMapTemperature.Sample(globalCoord2D);
 
             // Ocean

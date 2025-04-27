@@ -1,9 +1,5 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Data;
 using FainCraft.Gameplay.WorldScripts.Voxels;
-using Newtonsoft.Json.Linq;
-using Silk.NET.Assimp;
-using System;
-using System.Collections;
 using System.Diagnostics;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 

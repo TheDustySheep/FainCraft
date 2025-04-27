@@ -1,12 +1,6 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Core;
 using FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Biomes.SurfaceDecoration;
 using FainEngine_v2.Utils;
-using Silk.NET.Assimp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Biomes.Types
 {
@@ -31,7 +25,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
         public float SampleHeight(RegionMaps maps, VoxelCoord2DGlobal coord)
         {
             float val = noise.GetNoise(coord.X, coord.Z);
-            
+
             // Ridge peaks
             val = 1 - MathF.Abs(val);
             val = MathF.Pow(val, 2);

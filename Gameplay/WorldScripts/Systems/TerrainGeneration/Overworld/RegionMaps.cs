@@ -11,9 +11,9 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld
 
         public Array2D<IBiome> Biomes = new(CHUNK_SIZE + OVERSAMPLE_RADIUS * 2, CHUNK_SIZE + OVERSAMPLE_RADIUS * 2);
 
-        public Array2D<float> Humidity    = new(CHUNK_SIZE, CHUNK_SIZE);
-        public Array2D<float> Mountains   = new(CHUNK_SIZE, CHUNK_SIZE);
-        public Array2D<float> Continents  = new(CHUNK_SIZE, CHUNK_SIZE);
+        public Array2D<float> Humidity = new(CHUNK_SIZE, CHUNK_SIZE);
+        public Array2D<float> Mountains = new(CHUNK_SIZE, CHUNK_SIZE);
+        public Array2D<float> Continents = new(CHUNK_SIZE, CHUNK_SIZE);
         public Array2D<float> Temperature = new(CHUNK_SIZE, CHUNK_SIZE);
 
         public Array2D<float> SurfaceHeight = new(CHUNK_SIZE, CHUNK_SIZE);

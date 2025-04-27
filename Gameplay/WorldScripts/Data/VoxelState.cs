@@ -2,7 +2,7 @@
 public struct VoxelState
 {
     public uint Index;
-    
+
     public static bool operator ==(VoxelState a, VoxelState b)
     {
         return a.Index == b.Index;

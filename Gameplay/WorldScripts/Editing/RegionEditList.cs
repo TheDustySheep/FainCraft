@@ -40,11 +40,11 @@ namespace FainCraft.Gameplay.WorldScripts.Editing
             }
         }
 
-        public void ApplyEdits(RegionCoord regionCoord, RegionData data, List<ChunkCoord>? remeshChunks=null)
+        public void ApplyEdits(RegionCoord regionCoord, RegionData data, List<ChunkCoord>? remeshChunks = null)
         {
             if (!EditList.Remove(regionCoord, out var list))
                 return;
-            
+
             foreach (var pair in list)
             {
                 var coord = pair.Coord;
@@ -67,17 +67,17 @@ namespace FainCraft.Gameplay.WorldScripts.Editing
                     if (localCoord.X == 0)
                         remeshChunks.Add(chunkCoord + new ChunkCoord(-1, 0, 0));
                     else if (localCoord.X == CHUNK_SIZE - 1)
-                        remeshChunks.Add(chunkCoord + new ChunkCoord( 1, 0, 0));
+                        remeshChunks.Add(chunkCoord + new ChunkCoord(1, 0, 0));
 
                     if (localCoord.Y == 0)
-                        remeshChunks.Add(chunkCoord + new ChunkCoord( 0, -1, 0));
+                        remeshChunks.Add(chunkCoord + new ChunkCoord(0, -1, 0));
                     else if (localCoord.Y == CHUNK_SIZE - 1)
-                        remeshChunks.Add(chunkCoord + new ChunkCoord( 0,  1, 0));
+                        remeshChunks.Add(chunkCoord + new ChunkCoord(0, 1, 0));
 
                     if (localCoord.Z == 0)
-                        remeshChunks.Add(chunkCoord + new ChunkCoord( 0, 0, -1));
+                        remeshChunks.Add(chunkCoord + new ChunkCoord(0, 0, -1));
                     else if (localCoord.Z == CHUNK_SIZE - 1)
-                        remeshChunks.Add(chunkCoord + new ChunkCoord( 0, 0,  1));
+                        remeshChunks.Add(chunkCoord + new ChunkCoord(0, 0, 1));
                 }
             }
         }

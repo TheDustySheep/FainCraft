@@ -1,6 +1,5 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Core;
 using FainEngine_v2.Utils;
-using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.HeightMaps
 {

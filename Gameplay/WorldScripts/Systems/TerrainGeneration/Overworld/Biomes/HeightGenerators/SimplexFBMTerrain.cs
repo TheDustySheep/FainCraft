@@ -1,10 +1,5 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Core;
 using FainEngine_v2.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Biomes.HeightGenerators
 {
@@ -18,18 +13,18 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
         float _maxHeight;
 
         public SimplexFBMTerrain(
-            int seed, 
-            float baseHeight, 
-            float variation, 
-            float frequency, 
+            int seed,
+            float baseHeight,
+            float variation,
+            float frequency,
             float minHeight = -10000,
-            float maxHeight =  10000,
-            int octaves=5, 
-            float fbmGain=0.5f, 
-            float fbmLacunarity=2.0f)
+            float maxHeight = 10000,
+            int octaves = 5,
+            float fbmGain = 0.5f,
+            float fbmLacunarity = 2.0f)
         {
             _baseHeight = baseHeight;
-            _variation  = variation;
+            _variation = variation;
 
             _minHeight = minHeight;
             _maxHeight = maxHeight;

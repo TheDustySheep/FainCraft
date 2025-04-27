@@ -1,13 +1,13 @@
-﻿using FainEngine_v2.Entities;
-using FainEngine_v2.Utils;
-using CsvHelper;
-using System.Globalization;
+﻿using CsvHelper;
 using FainCraft.Gameplay.WorldScripts.Core;
+using FainEngine_v2.Entities;
+using FainEngine_v2.Utils;
+using System.Globalization;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems;
 internal class SystemDiagnostics : IEntity
 {
-    static readonly WriteOverQueue<MeshGenDebugData> MeshData     = new(1024);
+    static readonly WriteOverQueue<MeshGenDebugData> MeshData = new(1024);
     static readonly WriteOverQueue<TerrainDebugData> TerrainTimes = new(128);
 
     Timer timer;

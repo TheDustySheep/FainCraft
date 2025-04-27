@@ -1,6 +1,5 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Core;
 using FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Biomes.Types;
-using FainEngine_v2.Utils;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Biomes
@@ -47,7 +46,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
         public static void SampleSurfaceHeights(RegionMaps maps, RegionCoord regionCoord)
         {
             const int SAMPLE_RADIUS = RegionMaps.OVERSAMPLE_RADIUS;
-            const int SAMPLE_AREA   = RegionMaps.OVERSAMPLE_AREA;
+            const int SAMPLE_AREA = RegionMaps.OVERSAMPLE_AREA;
 
             Dictionary<IBiome, float> weightedBiomes = new(SAMPLE_AREA);
 
@@ -67,7 +66,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
                             if (weightedBiomes.ContainsKey(biome))
                                 weightedBiomes[biome] += KERNAL[dx + SAMPLE_RADIUS, dz + SAMPLE_RADIUS];
                             else
-                                weightedBiomes[biome]  = KERNAL[dx + SAMPLE_RADIUS, dz + SAMPLE_RADIUS];
+                                weightedBiomes[biome] = KERNAL[dx + SAMPLE_RADIUS, dz + SAMPLE_RADIUS];
                         }
                     }
 

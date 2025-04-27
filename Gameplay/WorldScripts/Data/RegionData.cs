@@ -1,6 +1,5 @@
 ﻿namespace FainCraft.Gameplay.WorldScripts.Data;
 
-using FainCraft.Gameplay.WorldScripts.Core;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 internal class RegionData

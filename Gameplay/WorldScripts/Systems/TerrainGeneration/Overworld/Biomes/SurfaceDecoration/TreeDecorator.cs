@@ -19,9 +19,9 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
         {
             random = new Random(seed);
 
-            AIR    = new() { Index = indexer.GetIndex("Air")    };
-            GRASS  = new() { Index = indexer.GetIndex("Grass")  };
-            LOG    = new() { Index = indexer.GetIndex("Log")    };
+            AIR = new() { Index = indexer.GetIndex("Air") };
+            GRASS = new() { Index = indexer.GetIndex("Grass") };
+            LOG = new() { Index = indexer.GetIndex("Log") };
             LEAVES = new() { Index = indexer.GetIndex("Leaves") };
         }
 
@@ -31,12 +31,12 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
             {
                 int l_x = random.Next(CHUNK_SIZE);
                 int l_z = random.Next(CHUNK_SIZE);
-                
+
                 var globalCoord = FindTreeSpawn(edits, regionData, regionCoord, l_x, l_z);
 
                 if (globalCoord is null)
                     continue;
-                
+
                 PlaceTree(edits, globalCoord.Value);
             }
         }
@@ -74,7 +74,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
             for (int y = 0; y < h; y++)
             {
                 edits.AddEdit(
-                    globalCoord.Offset(0, y, 0), 
+                    globalCoord.Offset(0, y, 0),
                     new VoxelEditSet(LOG)
                 );
             }
@@ -88,11 +88,11 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
                 _ => 1,
             };
 
-            for (int x=-leafRadius; x<=leafRadius; x++)
+            for (int x = -leafRadius; x <= leafRadius; x++)
             {
-                for (int z=-leafRadius; z<=leafRadius; z++)
+                for (int z = -leafRadius; z <= leafRadius; z++)
                 {
-                    for (int y = h-2; y < h*2; y++)
+                    for (int y = h - 2; y < (h - 1) * 2; y++)
                     {
                         edits.AddEdit(
                             globalCoord.Offset(x, y, z),

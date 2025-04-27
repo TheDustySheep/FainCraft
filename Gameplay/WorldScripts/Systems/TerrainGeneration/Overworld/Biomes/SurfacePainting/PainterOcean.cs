@@ -1,6 +1,5 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Core;
 using FainCraft.Gameplay.WorldScripts.Data;
-using FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.HeightMaps;
 using FainCraft.Gameplay.WorldScripts.Voxels;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
@@ -18,9 +17,9 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
 
         public PainterOcean(VoxelIndexer indexer)
         {
-            AIR   = new() { Index = indexer.GetIndex("Air") };
+            AIR = new() { Index = indexer.GetIndex("Air") };
             WATER = new() { Index = indexer.GetIndex("Water") };
-            SAND  = new() { Index = indexer.GetIndex("Sand") };
+            SAND = new() { Index = indexer.GetIndex("Sand") };
             STONE = new() { Index = indexer.GetIndex("Stone") };
         }
 

@@ -6,8 +6,8 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
 {
     internal class Biome : IBiome
     {
-        public ITerrain          Terrain   { get; private set; }
-        public ISurfacePainter   Painter   { get; private set; }
+        public ITerrain Terrain { get; private set; }
+        public ISurfacePainter Painter { get; private set; }
         public ISurfaceDecorator Decorator { get; private set; }
 
         public Biome(ISurfacePainter painter, ISurfaceDecorator decorator, ITerrain terrain)

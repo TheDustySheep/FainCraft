@@ -3,7 +3,6 @@ using FainCraft.Gameplay.WorldScripts.Data;
 using FainCraft.Gameplay.WorldScripts.Editing;
 using FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Biomes;
 using FainCraft.Gameplay.WorldScripts.Voxels;
-using System.Diagnostics;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld
@@ -15,7 +14,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld
 
         readonly RegionMaps _maps = new();
 
-        public OverworldGenerator(VoxelIndexer indexer, int seed=1337)
+        public OverworldGenerator(VoxelIndexer indexer, int seed = 1337)
         {
             _biomeFactory = new BiomesFactory(indexer, seed);
             _biomeDecider = new BiomesDecider(_biomeFactory, seed);

@@ -1,5 +1,4 @@
-﻿using Silk.NET.Maths;
-using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
+﻿using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Core;
 public struct RegionCoord
