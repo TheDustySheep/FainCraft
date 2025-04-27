@@ -5,15 +5,10 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration;
 internal class RegionGenerationResult
 {
     public RegionData RegionData;
-    public List<IVoxelEdit> VoxelEdits;
+    public RegionEditList VoxelEdits;
+    public TerrainDebugData TerrainDebugData;
 
-    public RegionGenerationResult(RegionData data)
-    {
-        RegionData = data;
-        VoxelEdits = new();
-    }
-
-    public RegionGenerationResult(RegionData regionData, List<IVoxelEdit> voxelEdits)
+    public RegionGenerationResult(RegionData regionData, RegionEditList voxelEdits)
     {
         RegionData = regionData;
         VoxelEdits = voxelEdits;

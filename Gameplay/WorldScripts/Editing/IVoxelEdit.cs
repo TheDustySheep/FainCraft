@@ -1,8 +1,8 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Core;
+using FainCraft.Gameplay.WorldScripts.Data;
 
 namespace FainCraft.Gameplay.WorldScripts.Editing;
 internal interface IVoxelEdit
 {
-    public VoxelCoordGlobal GlobalCoord { get; }
-    public VoxelEditResult Execute(IVoxelEditable worldData);
+    public VoxelState Execute(VoxelState oldState);
 }

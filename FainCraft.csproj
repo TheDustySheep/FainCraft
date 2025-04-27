@@ -64,6 +64,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Gameplay\WorldScripts\Systems\TerrainGeneration\StructureEdit\" />
     <Folder Include="Resources\Debug\" />
   </ItemGroup>
 

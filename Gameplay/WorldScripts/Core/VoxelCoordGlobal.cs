@@ -49,6 +49,11 @@ public struct VoxelCoordGlobal
     }
 
     #region Conversions
+    public VoxelCoordGlobal Offset(int dx, int dy, int dz)
+    {
+        return new VoxelCoordGlobal(X + dx, Y + dy, Z + dz);
+    }
+
     public static explicit operator VoxelCoordLocal(VoxelCoordGlobal globalCoord)
     {
         return ConvertToLocalCoord(globalCoord);

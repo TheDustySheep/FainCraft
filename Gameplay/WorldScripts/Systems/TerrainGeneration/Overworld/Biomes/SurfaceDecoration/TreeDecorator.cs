@@ -1,5 +1,6 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Core;
 using FainCraft.Gameplay.WorldScripts.Data;
+using FainCraft.Gameplay.WorldScripts.Editing;
 using FainCraft.Gameplay.WorldScripts.Voxels;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
@@ -12,41 +13,91 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
         readonly VoxelState AIR;
         readonly VoxelState GRASS;
         readonly VoxelState LOG;
+        readonly VoxelState LEAVES;
 
         public TreeDecorator(VoxelIndexer indexer, int seed)
         {
             random = new Random(seed);
 
-            AIR   = new() { Index = indexer.GetIndex("Air")   };
-            GRASS = new() { Index = indexer.GetIndex("Grass") };
-            LOG   = new() { Index = indexer.GetIndex("Log")   };
+            AIR    = new() { Index = indexer.GetIndex("Air")    };
+            GRASS  = new() { Index = indexer.GetIndex("Grass")  };
+            LOG    = new() { Index = indexer.GetIndex("Log")    };
+            LEAVES = new() { Index = indexer.GetIndex("Leaves") };
         }
 
-        public void HandleSpawn(RegionData regionData, RegionCoord regionCoord)
+        public void HandleSpawn(RegionEditList edits, RegionData regionData, RegionCoord regionCoord)
         {
             for (int i = 0; i < 5; i++)
             {
                 int l_x = random.Next(CHUNK_SIZE);
                 int l_z = random.Next(CHUNK_SIZE);
+                
+                var globalCoord = FindTreeSpawn(edits, regionData, regionCoord, l_x, l_z);
 
-                // Iterate downwards from sky
-                for (int c_y = REGION_Y_TOTAL_COUNT - 1; c_y >= 0; c_y--)
+                if (globalCoord is null)
+                    continue;
+                
+                PlaceTree(edits, globalCoord.Value);
+            }
+        }
+
+        private VoxelCoordGlobal? FindTreeSpawn(RegionEditList edits, RegionData regionData, RegionCoord regionCoord, int l_x, int l_z)
+        {
+            // Iterate downwards from sky
+            for (int r_y = REGION_Y_TOTAL_COUNT - 1; r_y >= 0; r_y--)
+            {
+                var chunk = regionData.Chunks[r_y];
+                int c_y = r_y - REGION_Y_NEG_COUNT;
+
+                for (int l_y = CHUNK_SIZE - 1; l_y >= 0; l_y--)
                 {
-                    var chunk = regionData.Chunks[c_y];
+                    var voxelState = chunk[l_x, l_y, l_z];
+                    if (voxelState != GRASS)
+                        continue;
 
-                    for (int l_y = CHUNK_SIZE - 1; l_y >= 0; l_y--)
+                    var chunkCoord = new ChunkCoord(regionCoord, c_y);
+                    var globalCoord = new VoxelCoordGlobal(chunkCoord, new VoxelCoordLocal(l_x, l_y, l_z));
+                    globalCoord.Y += 1;
+
+                    // Found suitable location
+                    return globalCoord;
+                }
+            }
+
+            return null;
+        }
+
+        private void PlaceTree(RegionEditList edits, VoxelCoordGlobal globalCoord)
+        {
+            int h = random.Next(3, 7);
+
+            for (int y = 0; y < h; y++)
+            {
+                edits.AddEdit(
+                    globalCoord.Offset(0, y, 0), 
+                    new VoxelEditSet(LOG)
+                );
+            }
+
+            var leafRadius = h switch
+            {
+                3 => 1,
+                4 => 2,
+                5 => 2,
+                6 => 3,
+                _ => 1,
+            };
+
+            for (int x=-leafRadius; x<=leafRadius; x++)
+            {
+                for (int z=-leafRadius; z<=leafRadius; z++)
+                {
+                    for (int y = h-2; y < h*2; y++)
                     {
-                        var voxelState = chunk[l_x, l_y, l_z];
-                        if (voxelState == GRASS)
-                        {
-                            int h = random.Next(4);
-
-                            // TODO this will throw an exception if the top most block is a grass block
-                            for (int j = 1; j <= 3 + h; j++)
-                            {
-                                chunk[l_x, l_y + j, l_z] = LOG;
-                            }
-                        }
+                        edits.AddEdit(
+                            globalCoord.Offset(x, y, z),
+                            new VoxelEditReplaceTarget(LEAVES, AIR)
+                        );
                     }
                 }
             }

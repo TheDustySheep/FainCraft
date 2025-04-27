@@ -41,7 +41,7 @@ internal class CollisionHandler
                 {
                     VoxelCoordGlobal voxelCoord = new VoxelCoordGlobal(i_x, i_y, i_z);
 
-                    worldData.GetVoxelData(voxelCoord, out var voxelData);
+                    worldData.GetVoxelState(voxelCoord, out var voxelData);
 
                     // Discard non-solid voxels
                     if (!indexer.GetVoxelType(voxelData.Index).Physics_Solid)
@@ -116,7 +116,7 @@ internal class CollisionHandler
                 {
                     VoxelCoordGlobal voxelCoord = new VoxelCoordGlobal(i_x, i_y, i_z);
 
-                    worldData.GetVoxelData(voxelCoord, out var voxelData);
+                    worldData.GetVoxelState(voxelCoord, out var voxelData);
 
                     // Discard non-solid voxels
                     if (!indexer.GetVoxelType(voxelData.Index).Physics_Solid)

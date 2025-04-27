@@ -2,9 +2,7 @@
 using FainCraft.Gameplay.WorldScripts.Data;
 using FainCraft.Gameplay.WorldScripts.Editing;
 using FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Biomes;
-using FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.HeightMaps;
 using FainCraft.Gameplay.WorldScripts.Voxels;
-using FainEngine_v2.Utils;
 using System.Diagnostics;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
@@ -25,7 +23,6 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld
 
         public RegionGenerationResult Generate(RegionCoord regionCoord)
         {
-            Stopwatch sw = Stopwatch.StartNew();
             VoxelCoordGlobal regionGlobal = (VoxelCoordGlobal)regionCoord;
 
             var regionData = new RegionData();
@@ -40,13 +37,9 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld
             HandlePainting(regionData, regionCoord);
 
             // Decorate surface
-            HandleDecoration(regionData, regionCoord);
+            var edits = HandleDecoration(regionData, regionCoord);
 
-            // Debug stuffs
-            sw.Stop();
-            SystemDiagnostics.SubmitTerrainGeneration(new TerrainDebugData() { TotalTime = sw.Elapsed });
-
-            return new RegionGenerationResult(regionData, new List<IVoxelEdit>());
+            return new RegionGenerationResult(regionData, edits);
         }
 
         private void HandlePainting(RegionData regionData, RegionCoord regionCoord)
@@ -80,15 +73,19 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld
             }
         }
 
-        private void HandleDecoration(RegionData regionData, RegionCoord regionCoord)
+        private RegionEditList HandleDecoration(RegionData regionData, RegionCoord regionCoord)
         {
-            List<VoxelCoord2DGlobal> spawnLocations = new(CHUNK_AREA);
+            var edits = new RegionEditList();
 
             foreach (var biome in _maps.Biomes.Data.Distinct())
             {
                 var decorator = biome.Decorator;
-                decorator.HandleSpawn(regionData, regionCoord);
+                decorator.HandleSpawn(edits, regionData, regionCoord);
             }
+
+            edits.ApplyEdits(regionCoord, regionData);
+
+            return edits;
         }
     }
 }

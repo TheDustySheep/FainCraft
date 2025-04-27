@@ -14,12 +14,13 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
         readonly VoxelState STONE;
 
         const int WATER_HEIGHT = 0;
+        const int MAX_SAND_HEIGHT = 8;
 
         public PainterOcean(VoxelIndexer indexer)
         {
-            AIR = new() { Index = indexer.GetIndex("Air") };
+            AIR   = new() { Index = indexer.GetIndex("Air") };
             WATER = new() { Index = indexer.GetIndex("Water") };
-            SAND = new() { Index = indexer.GetIndex("Sand") };
+            SAND  = new() { Index = indexer.GetIndex("Sand") };
             STONE = new() { Index = indexer.GetIndex("Stone") };
         }
 
@@ -43,7 +44,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
                     else
                         voxel = WATER;
                 }
-                else if (depth < 3)
+                else if (depth < 3 && globalCoord.Y < MAX_SAND_HEIGHT)
                     voxel = SAND;
                 else
                     voxel = STONE;

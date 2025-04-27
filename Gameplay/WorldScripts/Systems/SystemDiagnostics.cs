@@ -7,8 +7,8 @@ using FainCraft.Gameplay.WorldScripts.Core;
 namespace FainCraft.Gameplay.WorldScripts.Systems;
 internal class SystemDiagnostics : IEntity
 {
-    static readonly WriteOverQueue<MeshGenDebugData> MeshData     = new(10_000);
-    static readonly WriteOverQueue<TerrainDebugData> TerrainTimes = new(10_000);
+    static readonly WriteOverQueue<MeshGenDebugData> MeshData     = new(1024);
+    static readonly WriteOverQueue<TerrainDebugData> TerrainTimes = new(128);
 
     Timer timer;
 
@@ -33,14 +33,14 @@ internal class SystemDiagnostics : IEntity
         if (TerrainTimes.Count > 0)
         {
             var values = TerrainTimes.ToArray();
-            var avg = values.Average(i => i.ChunkTime.TotalMilliseconds);
-            Console.WriteLine($" - Terrain Generation   {avg:F4}ms - {1d / avg:00000} C/ms");
+            var avg = values.Average(i => i.TotalTime.TotalMilliseconds);
+            Console.WriteLine($" - Terrain Generation   {avg:F4}ms - {1d / avg:00000.0} R/ms ({WorldConstants.REGION_Y_TOTAL_COUNT} C/R)");
         }
         if (MeshData.Count > 0)
         {
             var values = MeshData.ToArray();
             var avg = values.Average(i => i.TotalTime.TotalMilliseconds);
-            Console.WriteLine($" - Mesh Data Generation {avg:F4}ms - {1d/avg:00000} C/ms");
+            Console.WriteLine($" - Mesh Data Generation {avg:F4}ms - {1d / avg:00000.0} C/ms");
         }
     }
 

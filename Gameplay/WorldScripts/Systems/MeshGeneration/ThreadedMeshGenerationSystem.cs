@@ -30,7 +30,7 @@ internal class ThreadedMeshGenerationSystem : IMeshGenerationSystem
             clusterPool.Enqueue(new ChunkDataCluster());
         }
 
-        workerThread1 = new WorkerThread(() =>
+        workerThread1 = new WorkerThread("Mesh Generation Thread 1", () =>
         {
             var generator = generatorFactory.Invoke();
             while (buffer.TryDequeue(out var pair))
@@ -40,7 +40,7 @@ internal class ThreadedMeshGenerationSystem : IMeshGenerationSystem
             }
         });
 
-        workerThread2 = new WorkerThread(() =>
+        workerThread2 = new WorkerThread("Mesh Generation Thread 2", () =>
         {
             var generator = generatorFactory.Invoke();
             while (buffer.TryDequeue(out var pair))

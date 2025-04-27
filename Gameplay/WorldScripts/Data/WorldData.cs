@@ -10,7 +10,7 @@ internal class WorldData : IWorldData
     public event Action<ChunkCoord, bool>? OnChunkUpdate;
     private readonly Dictionary<RegionCoord, RegionData> regions = new();
 
-    readonly Dictionary<RegionCoord, List<IVoxelEdit>> voxelEdits = new();
+    readonly RegionEditList regionEditList = new RegionEditList();
 
     public WorldData(VoxelIndexer indexer)
     {
@@ -18,25 +18,20 @@ internal class WorldData : IWorldData
     }
 
     // Voxel
-    public void AddVoxelEdits(IEnumerable<IVoxelEdit> edits)
+    public void AddRegionEdits(RegionEditList edits)
     {
-        foreach (var edit in edits)
-        {
-            RegionCoord regionCoord = (RegionCoord)edit.GlobalCoord;
+        var remesh = new List<ChunkCoord>();
 
-            if (regions.ContainsKey(regionCoord))
-            {
-                edit.Execute(this);
-            }
-            else
-            {
-                if (!voxelEdits.TryGetValue(regionCoord, out var editList))
-                {
-                    editList = new List<IVoxelEdit>();
-                    voxelEdits[regionCoord] = editList;
-                }
-                editList.Add(edit);
-            }
+        regionEditList.Combine(edits);
+
+        foreach (var pair in regions)
+        {
+            regionEditList.ApplyEdits(pair.Key, pair.Value, remesh);
+        }
+
+        foreach (var chunk in remesh)
+        {
+            OnChunkUpdate?.Invoke(chunk, false);
         }
     }
 
@@ -46,7 +41,7 @@ internal class WorldData : IWorldData
         return GetChunk(chunkCoord) is not null;
     }
 
-    public bool GetVoxelData(VoxelCoordGlobal globalCoord, out VoxelState voxelData)
+    public bool GetVoxelState(VoxelCoordGlobal globalCoord, out VoxelState voxelData)
     {
         ChunkCoord chunkCoord = (ChunkCoord)globalCoord;
 
@@ -62,7 +57,7 @@ internal class WorldData : IWorldData
         return true;
     }
 
-    public bool SetVoxelData(VoxelCoordGlobal globalCoord, VoxelState voxelData, bool immediate = false)
+    public bool SetVoxelState(VoxelCoordGlobal globalCoord, VoxelState voxelData, bool immediate = false)
     {
         ChunkCoord chunkCoord = (ChunkCoord)globalCoord;
 
@@ -203,34 +198,28 @@ internal class WorldData : IWorldData
         new RegionCoord( 0, 1),
     };
 
-    public bool SetRegion(RegionCoord coord, RegionData data, bool immediate = false)
+    public bool SetRegion(RegionCoord coord, RegionData data)
     {
         regions[coord] = data;
 
-        if (voxelEdits.TryGetValue(coord, out var editList))
+        foreach (var pair in regions)
         {
-            foreach (var edit in editList)
-            {
-                edit.Execute(this);
-            }
-            voxelEdits.Remove(coord);
+            regionEditList.ApplyEdits(pair.Key, pair.Value);
         }
 
-        if (OnChunkUpdate is null)
-            return true;
-
+        // Update surrounding chunks
         for (int i = 0; i < 4; i++)
         {
             var offset_coord = REGION_OFFSETS[i] + coord;
 
             for (int y = 0; y < REGION_Y_TOTAL_COUNT; y++)
             {
-                OnChunkUpdate.Invoke(new ChunkCoord()
+                OnChunkUpdate?.Invoke(new ChunkCoord()
                 {
                     X = offset_coord.X,
                     Y = y - REGION_Y_NEG_COUNT,
                     Z = offset_coord.Z,
-                }, immediate);
+                }, false);
             }
         }
 

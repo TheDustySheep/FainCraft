@@ -1,4 +1,6 @@
 ﻿namespace FainCraft.Gameplay.WorldScripts.Data;
+
+using FainCraft.Gameplay.WorldScripts.Core;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 internal class RegionData
@@ -21,21 +23,21 @@ internal class RegionData
         Chunks = _chunks;
     }
 
-    public ChunkData? GetChunk(int y)
+    public ChunkData? GetChunk(int c_y)
     {
-        y += REGION_Y_NEG_COUNT;
-        if (y < 0 || y > REGION_Y_TOTAL_COUNT - 1)
+        c_y += REGION_Y_NEG_COUNT;
+        if (c_y < 0 || c_y > REGION_Y_TOTAL_COUNT - 1)
             return null;
-        return Chunks[y];
+        return Chunks[c_y];
     }
 
-    public bool SetChunk(int y, ChunkData data)
+    public bool SetChunk(int c_y, ChunkData data)
     {
-        y += REGION_Y_NEG_COUNT;
-        if (y < 0 || y > REGION_Y_TOTAL_COUNT - 1)
+        c_y += REGION_Y_NEG_COUNT;
+        if (c_y < 0 || c_y > REGION_Y_TOTAL_COUNT - 1)
             return false;
 
-        Chunks[y] = data;
+        Chunks[c_y] = data;
         return true;
     }
 }

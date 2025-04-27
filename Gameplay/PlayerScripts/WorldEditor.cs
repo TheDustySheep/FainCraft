@@ -78,7 +78,7 @@ internal class WorldEditor
             {
                 VoxelCoordGlobal coord = new VoxelCoordGlobal(voxPos);
 
-                if (!worldData.GetVoxelData(coord, out var voxelData))
+                if (!worldData.GetVoxelState(coord, out var voxelData))
                     return false;
 
                 var type = indexer.GetVoxelType(voxelData.Index);
