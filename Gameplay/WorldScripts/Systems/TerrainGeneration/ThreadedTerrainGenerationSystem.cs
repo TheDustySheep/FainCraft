@@ -8,33 +8,48 @@ using System.Diagnostics;
 namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration;
 internal class ThreadedTerrainGenerationSystem : ITerrainGenerationSystem
 {
-    const int MAX_UPDATES_PER_TICK = 1024;
+    const int MAX_UPDATES_PER_TICK = 1;
 
     readonly IWorldData worldData;
 
     readonly WorkerThread workerThread;
+
     readonly ConcurrentQueue<RegionCoord> toGenerate = new();
     readonly ConcurrentQueue<GenerateResult> complete = new();
+
+    Timer timer;
 
     public ThreadedTerrainGenerationSystem(IWorldData worldData, ITerrainGenerator generator)
     {
         this.worldData = worldData;
 
-        workerThread = new WorkerThread("Terrain Generation Thread", () =>
+        int count = 0;
+        timer = new Timer(x =>
+        {
+            Console.WriteLine($"Generating {count} regions/sec");
+            count = 0;
+        }, null, 1000, 1000);
+
+        workerThread = new WorkerThread("Terrain Generation Thread 1", () =>
         {
             var sw = new Stopwatch();
+
             while (toGenerate.TryDequeue(out RegionCoord coord))
             {
-                Console.WriteLine($"To Generate Count {toGenerate.Count}");
                 sw.Restart();
                 var data = generator.Generate(coord);
-
+            
                 complete.Enqueue(new GenerateResult(coord, data.RegionData, data.VoxelEdits));
                 sw.Stop();
-                data.TerrainDebugData.TotalTime = sw.Elapsed;
-                SystemDiagnostics.SubmitTerrainGeneration(data.TerrainDebugData);
+                SystemDiagnostics.SubmitTerrainGeneration(sw.Elapsed);
+                count++;
             }
         });
+    }
+
+    ~ThreadedTerrainGenerationSystem()
+    {
+        workerThread.Terminate();
     }
 
     public void Request(RegionCoord coord)
@@ -44,14 +59,11 @@ internal class ThreadedTerrainGenerationSystem : ITerrainGenerationSystem
 
     public void Tick()
     {
-        int i = 0;
-        for (i = 0; i < MAX_UPDATES_PER_TICK && complete.TryDequeue(out var result); i++)
+        for (int i = 0; i < MAX_UPDATES_PER_TICK && complete.TryDequeue(out var result); i++)
         {
             worldData.SetRegion(result.Coord, result.RegionData);
             worldData.AddRegionEdits(result.VoxelEdits);
         }
-        if (i > 0)
-            Console.WriteLine($"Regions Generated this frame {i}. Queue Count {complete.Count}");
     }
 
     private class GenerateResult

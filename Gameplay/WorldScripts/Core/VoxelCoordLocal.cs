@@ -57,7 +57,7 @@ public struct VoxelCoordLocal
 
     public override string ToString()
     {
-        return $"X: {X} Y: {Y} Z:{Z}";
+        return $"XPos_px: {X} YPox_px: {Y} Z:{Z}";
     }
 
     public override readonly int GetHashCode()

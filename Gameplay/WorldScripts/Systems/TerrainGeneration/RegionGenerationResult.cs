@@ -6,7 +6,6 @@ internal class RegionGenerationResult
 {
     public RegionData RegionData;
     public RegionEditList VoxelEdits;
-    public TerrainDebugData TerrainDebugData;
 
     public RegionGenerationResult(RegionData regionData, RegionEditList voxelEdits)
     {

@@ -92,6 +92,6 @@ public struct VoxelVertex
 
     public override string ToString()
     {
-        return $"X:{XPos} Y:{YPos} Z:{ZPos}";
+        return $"XPos_px:{XPos} YPox_px:{YPos} Z:{ZPos}";
     }
 }

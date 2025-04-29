@@ -127,7 +127,7 @@ public struct VoxelCoordGlobal
     #region Overrides
     public override readonly string ToString()
     {
-        return $"X: {X} Y: {Y} Z:{Z}";
+        return $"XPos_px: {X} YPox_px: {Y} Z:{Z}";
     }
 
     public override readonly bool Equals(object? obj)

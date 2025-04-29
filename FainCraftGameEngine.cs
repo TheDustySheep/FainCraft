@@ -20,7 +20,7 @@ internal class FainCraftGameEngine : FainGameEngine
         var postShader  = ResourceLoader.LoadShader(@"C:\Users\Sean\source\repos\FainCraft\Resources\Shaders\PostProcessing\");
         var postProcess = EntityManager.SpawnEntity(new PostProcess(postShader));
 
-        //var ui = EntityManager.SpawnEntity<UIController>(); 
+        var ui = EntityManager.SpawnEntity<UIController>(); 
 
         var world = EntityManager.SpawnEntity<World>();
         var player = EntityManager.SpawnEntity(new PlayerEntity(world));
