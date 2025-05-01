@@ -29,7 +29,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
 
             _oceanPainter = new PainterOcean(indexer);
             _plainsPainter = new PainterPlains(indexer);
-            _hillsPainter = new PainterSnow(indexer, 50);
+            _hillsPainter = new PainterHills(indexer, 70);
             _sandyPainter = new PainterSandy(indexer);
 
             Hills = new BiomeHills(_hillsPainter);

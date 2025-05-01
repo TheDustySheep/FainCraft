@@ -9,29 +9,35 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
         public ISurfacePainter Painter { get; private set; }
         public ISurfaceDecorator Decorator { get; } = new NullDecorator();
 
-        FastNoiseLite noise;
+        FastNoiseLite ridge_noise;
+        FastNoiseLite peak_noise;
 
         public BiomeHills(ISurfacePainter decorator)
         {
             Painter = decorator;
 
-            noise = new FastNoiseLite();
-            noise.SetNoiseType(FastNoiseLite.NoiseType.Cellular);
-            noise.SetFractalType(FastNoiseLite.FractalType.Ridged);
-            noise.SetFrequency(0.01f);
-            noise.SetFractalOctaves(4);
+            ridge_noise = new FastNoiseLite();
+            ridge_noise.SetNoiseType(FastNoiseLite.NoiseType.Cellular);
+            ridge_noise.SetFractalType(FastNoiseLite.FractalType.Ridged);
+            ridge_noise.SetFrequency(0.0015f);
+            ridge_noise.SetFractalOctaves(4);
+
+            peak_noise = new FastNoiseLite();
+            peak_noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2S);
+            peak_noise.SetFractalType(FastNoiseLite.FractalType.FBm);
+            peak_noise.SetFrequency(0.04f);
+            peak_noise.SetFractalOctaves(3);
         }
 
         public float SampleHeight(RegionMaps maps, VoxelCoord2DGlobal coord)
         {
-            float val = noise.GetNoise(coord.X, coord.Z);
+            float val = ridge_noise.GetNoise(coord.X, coord.Z);
 
             // Ridge peaks
             val = 1 - MathF.Abs(val);
-            val = MathF.Pow(val, 2);
+            val = MathF.Pow(val, 2f);
 
-            // Smooth out peaks with Cos
-            //val = 0.5f * MathF.Cos(MathF.PI * (1f - val)) + 0.5f;
+            val += peak_noise.GetNoise(coord.X, coord.Z) * 0.06f;
 
             // Blend mountains
             float m_blend = maps.Mountains[coord.Local_X, coord.Local_Z];
@@ -39,15 +45,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
             m_blend = EasingFunctions.Clamp(m_blend, 0f, 1f);
             val *= m_blend;
 
-            // Blend continents
-            //float c_blend = maps.Continents[coord.Local_X, coord.Local_Z];
-            //c_blend = EasingFunctions.Remap(c_blend, -0.2f, -0.1f, 0f, 1f);
-            //c_blend = EasingFunctions.Clamp(c_blend, 0f, 1f);
-            //val *= c_blend;
-
-
-
-            return val * 96f + 4f;
+            return (val * 120f) + 4f;
         }
     }
 }

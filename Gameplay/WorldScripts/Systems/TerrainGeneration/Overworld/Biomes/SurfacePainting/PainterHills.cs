@@ -6,23 +6,28 @@ using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Biomes.SurfaceDecoration
 {
-    internal class PainterSnow : ISurfacePainter
+    internal class PainterHills : ISurfacePainter
     {
         readonly VoxelState AIR;
         readonly VoxelState STONE;
         readonly VoxelState SNOW;
+        readonly VoxelState GRASS;
+        readonly VoxelState DIRT;
 
         FastNoiseLite noise;
 
         readonly int _snowLine;
+        readonly int _grassLine = 40;
 
-        public PainterSnow(VoxelIndexer indexer, int snowLine)
+        public PainterHills(VoxelIndexer indexer, int snowLine)
         {
             _snowLine = snowLine;
 
-            AIR = new() { Index = indexer.GetIndex("Air") };
+            AIR   = new() { Index = indexer.GetIndex("Air")   };
             STONE = new() { Index = indexer.GetIndex("Stone") };
-            SNOW = new() { Index = indexer.GetIndex("Snow") };
+            SNOW  = new() { Index = indexer.GetIndex("Snow")  };
+            GRASS = new() { Index = indexer.GetIndex("Grass") };
+            DIRT  = new() { Index = indexer.GetIndex("Dirt")  };
 
             noise = new FastNoiseLite();
             noise.SetNoiseType(FastNoiseLite.NoiseType.Value);
@@ -36,7 +41,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
 
             VoxelCoordLocal c_l_coord = new(l_x, 0, l_z);
             VoxelCoordGlobal c_g_coord = new(chunkCoord, c_l_coord);
-            float snowLine = noise.GetNoise(c_g_coord.X, c_g_coord.Z) * 5f + _snowLine;
+            float variation = noise.GetNoise(c_g_coord.X, c_g_coord.Z) * 5f;
 
             for (int l_y = 0; l_y < CHUNK_SIZE; l_y++)
             {
@@ -47,12 +52,25 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.Bi
 
                 int depth = surfaceHeight - globalCoord.Y;
 
-                if (depth < -1)
+                if (depth < 0)
                     voxel = AIR;
-                else if (depth == -1 && globalCoord.Y > snowLine)
-                    voxel = SNOW;
+                else if (depth == 0)
+                {
+                    if (globalCoord.Y > _snowLine + variation)
+                        voxel = SNOW;
+                    else if (globalCoord.Y < _grassLine + variation)
+                        voxel = GRASS;
+                    else
+                        voxel = STONE;
+                }
+                else if (depth <= 3 && globalCoord.Y < _grassLine + variation)
+                {
+                    voxel = DIRT;
+                }
                 else
+                {
                     voxel = STONE;
+                }
 
                 data[l_y] = voxel;
             }

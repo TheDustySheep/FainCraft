@@ -15,8 +15,8 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.TerrainGeneration.Overworld.He
             noise.SetFractalType(FastNoiseLite.FractalType.FBm);
             noise.SetFractalOctaves(3);
 
-            //noise.SetFractalGain(0.65f);
-            //noise.SetFractalLacunarity(3.0f);
+            //ridge_noise.SetFractalGain(0.65f);
+            //ridge_noise.SetFractalLacunarity(3.0f);
         }
 
         public float Sample(VoxelCoord2DGlobal coord)
