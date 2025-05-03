@@ -8,9 +8,11 @@ public class ChunkData
 
     public bool IsEmpty()
     {
+        ReadOnlySpan<VoxelState> span = VoxelData.AsSpan();
+
         ulong sum = 0;
-        for (int i = 0; i < CHUNK_VOLUME; i++)
-            sum += VoxelData[i].Index;
+        foreach (var state in span)
+            sum += state.Index;
         return sum == 0;
     }
 

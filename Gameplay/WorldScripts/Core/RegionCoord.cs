@@ -1,4 +1,5 @@
-﻿using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
+﻿using Silk.NET.Maths;
+using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Core;
 public struct RegionCoord
@@ -28,6 +29,11 @@ public struct RegionCoord
     #endregion
 
     #region Operators
+    public readonly uint ManhattenDistance(RegionCoord other)
+    {
+        return (uint)(Math.Abs(X - other.X) + Math.Abs(Z - other.Z));
+    }
+
     public static bool operator ==(RegionCoord a, RegionCoord b)
     {
         return a.X == b.X && a.Z == b.Z;
@@ -47,17 +53,27 @@ public struct RegionCoord
     {
         return new RegionCoord(a.X - b.X, a.Z - b.Z);
     }
+
+    public static RegionCoord operator +(RegionCoord a, Vector2D<int> b)
+    {
+        return new RegionCoord(a.X + b.X, a.Z + b.Y);
+    }
+
+    public static RegionCoord operator -(RegionCoord a, Vector2D<int> b)
+    {
+        return new RegionCoord(a.X - b.X, a.Z - b.Y);
+    }
     #endregion
 
     #region Overrides
     public override readonly string ToString()
     {
-        return $"XPos_px:{X} Z:{Z}";
+        return $"X:{X} Z:{Z}";
     }
 
     public override readonly int GetHashCode()
     {
-        return ((X & 0xFFFF) << 16) | (Z & 0xFFFF); // Second half of the bits
+        return HashCode.Combine(X, Z); // Second half of the bits
     }
 
     public override readonly bool Equals(object? obj)

@@ -61,7 +61,7 @@ internal class WorldEditor
         worldData.EditVoxelData(voxCoord, oldVoxel =>
         {
             return newVoxel;
-        }, true);
+        });
     }
 
     private bool RaycastVoxel(out VoxelHit hit)

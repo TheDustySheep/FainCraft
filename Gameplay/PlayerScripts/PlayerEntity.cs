@@ -10,7 +10,7 @@ using System.Numerics;
 namespace FainCraft.Gameplay.PlayerScripts;
 internal class PlayerEntity : GameObject, IWorldEntity
 {
-    public readonly Transform camTransform = new Transform();
+    public readonly Transform camTransform = new();
     public readonly Camera3D camera;
     public readonly PlayerCharacterController controller;
     public readonly EntityMotor Motor;
@@ -50,6 +50,8 @@ internal class PlayerEntity : GameObject, IWorldEntity
         camera.Update();
         worldEditor.Update();
         Motor.Update();
+
+        SharedVariables.PlayerPosition.Value = new PlayerPosition(Transform.GlobalPosition);
     }
 
     public override void FixedUpdate()

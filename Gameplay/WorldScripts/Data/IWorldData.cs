@@ -13,16 +13,18 @@ internal interface IWorldData
 
     // Chunk
     public ChunkData? GetChunk(ChunkCoord coord);
-    public bool UpdateChunk(ChunkCoord coord, ChunkData data, bool immediate = false);
+    public bool UpdateChunk(ChunkCoord coord, ChunkData data);
 
     // Cluster
     public ChunkData?[] GetCluster(ChunkCoord coord);
 
     // Region
     public RegionData? GetRegion(RegionCoord coord);
+    public bool RegionExists(RegionCoord coord);
+
     public bool SetRegion(RegionCoord coord, RegionData data);
     bool GetVoxelState(VoxelCoordGlobal globalCoord, out VoxelState voxelData);
     bool VoxelExists(VoxelCoordGlobal globalCoord);
-    bool SetVoxelState(VoxelCoordGlobal globalCoord, VoxelState voxelData, bool immediate = false);
-    bool EditVoxelData(VoxelCoordGlobal globalCoord, Func<VoxelState, VoxelState> editFunc, bool immediate = false);
+    bool SetVoxelState(VoxelCoordGlobal globalCoord, VoxelState voxelData);
+    bool EditVoxelData(VoxelCoordGlobal globalCoord, Func<VoxelState, VoxelState> editFunc);
 }

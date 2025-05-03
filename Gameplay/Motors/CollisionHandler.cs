@@ -32,7 +32,7 @@ internal class CollisionHandler
         float bestDotProd = 0f;
         Vector3 bestGroundAngle = Vector3.Zero;
 
-        // Add walls to the nearby colliders to list
+        // Add walls to the nearby colliders to _coords
         for (var i_y = minVoxel.Y; i_y <= maxVoxel.Y; i_y++)
         {
             for (var i_z = minVoxel.Z; i_z <= maxVoxel.Z; i_z++)
@@ -107,7 +107,7 @@ internal class CollisionHandler
 
         colliders.Clear();
 
-        // Add walls to the nearby colliders to list
+        // Add walls to the nearby colliders to _coords
         for (var i_y = minVoxel.Y; i_y <= maxVoxel.Y; i_y++)
         {
             for (var i_z = minVoxel.Z; i_z <= maxVoxel.Z; i_z++)

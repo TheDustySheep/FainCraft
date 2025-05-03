@@ -5,28 +5,24 @@ using System.Runtime.CompilerServices;
 namespace FainCraft.Gameplay.WorldScripts.Voxels;
 public class VoxelIndexer
 {
-    VoxelType[] Voxels = Array.Empty<VoxelType>();
-
+    readonly VoxelType[] Voxels;
     readonly Dictionary<VoxelType, uint> TypeToIndex = new();
-    readonly Dictionary<string, uint> NameToIndex = new();
+    readonly Dictionary<string,    uint> NameToIndex = new();
 
-    public void LoadVoxels()
-    {
-        string voxel_text = File.ReadAllText(@"Resources\Voxels\Voxels.json");
-        var voxels = JsonConvert.DeserializeObject<VoxelType[]>(voxel_text);
-        if (voxels is null)
-        {
-            Console.WriteLine("Could not load voxels");
-            return;
-        }
+    public VoxelDataCache<bool> CacheLightingSolid { get; }
 
-        LoadVoxels(voxels);
-    }
-
-    public void LoadVoxels(VoxelType[] voxels)
+    private VoxelIndexer(VoxelType[] voxels)
     {
         Voxels = voxels;
 
+        UpdateIndex();
+
+        CacheLightingSolid = new VoxelDataCache<bool>(Voxels, v => v.Physics_Solid);
+
+    }
+
+    private void UpdateIndex()
+    {
         for (uint i = 0; i < Voxels.Length; i++)
         {
             var voxel = Voxels[i];
@@ -35,11 +31,14 @@ public class VoxelIndexer
         }
     }
 
+    #region Indexing
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public VoxelType GetVoxelType(uint index)
     {
         return Voxels[index];
     }
+
     public VoxelState GetVoxel(string name)
     {
         NameToIndex.TryGetValue(name, out var index);
@@ -62,5 +61,32 @@ public class VoxelIndexer
     {
         NameToIndex.TryGetValue(name, out var index);
         return index;
+    }
+
+    #endregion
+
+    public static class Builder
+    {
+        private static VoxelType[] LoadFile(string filePath)
+        {
+            string voxel_text = File.ReadAllText(filePath);
+            var voxels = JsonConvert.DeserializeObject<VoxelType[]>(voxel_text);
+
+            if (voxels is not null)
+                return voxels;
+
+            Console.WriteLine("Could not load voxels");
+            return [];
+        }
+
+        public static VoxelIndexer FromFilePath(string filePath = @"Resources\Voxels\Voxels.json")
+        {
+            return new VoxelIndexer(LoadFile(filePath));
+        }
+
+        public static VoxelIndexer FromVoxelTypes(VoxelType[] types)
+        {
+            return new VoxelIndexer(types);
+        }
     }
 }

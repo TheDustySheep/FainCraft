@@ -1,6 +1,6 @@
 ﻿using FainCraft.Gameplay.PlayerScripts;
 using FainCraft.Gameplay.WorldScripts;
-using FainCraft.Gameplay.WorldScripts.Systems;
+using FainCraft.UI;
 using FainEngine_v2.Core;
 using FainEngine_v2.Entities;
 using FainEngine_v2.Rendering.PostProcessing;
@@ -15,12 +15,12 @@ internal class FainCraftGameEngine : FainGameEngine
 
     protected override void Load()
     {
-        //EntityManager.SpawnEntity<SystemDiagnostics>();
 
         var postShader  = ResourceLoader.LoadShader(@"C:\Users\Sean\source\repos\FainCraft\Resources\Shaders\PostProcessing\");
         var postProcess = EntityManager.SpawnEntity(new PostProcess(postShader));
 
-        var ui = EntityManager.SpawnEntity<UIController>(); 
+        var ui = EntityManager.SpawnEntity<UIController>();
+        ui.Canvas.Root.AddChild(new DebugStatsUI(ui.Canvas));
 
         var world = EntityManager.SpawnEntity<World>();
         var player = EntityManager.SpawnEntity(new PlayerEntity(world));

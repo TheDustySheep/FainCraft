@@ -1,5 +1,5 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Core;
-using FainCraft.Gameplay.WorldScripts.Systems.MeshGeneration;
+using FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering;
 internal interface IRenderSystem
