@@ -9,14 +9,15 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.TerrainGeneratio
     internal class BiomeHills : IBiome
     {
         public ISurfacePainter Painter { get; private set; }
-        public ISurfaceDecorator Decorator { get; } = new NullDecorator();
+        public ISurfaceDecorator Decorator { get; }
 
         FastNoiseLite ridge_noise;
         FastNoiseLite peak_noise;
 
-        public BiomeHills(ISurfacePainter decorator)
+        public BiomeHills(ISurfacePainter painter, ISurfaceDecorator decorator)
         {
-            Painter = decorator;
+            Painter = painter;
+            Decorator = decorator;
 
             ridge_noise = new FastNoiseLite();
             ridge_noise.SetNoiseType(FastNoiseLite.NoiseType.Cellular);
@@ -27,7 +28,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.TerrainGeneratio
             peak_noise = new FastNoiseLite();
             peak_noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2S);
             peak_noise.SetFractalType(FastNoiseLite.FractalType.FBm);
-            peak_noise.SetFrequency(0.04f);
+            peak_noise.SetFrequency(0.015f);
             peak_noise.SetFractalOctaves(3);
         }
 

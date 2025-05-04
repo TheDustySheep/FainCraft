@@ -56,9 +56,9 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.TerrainGeneratio
                 {
                     VoxelCoord2DGlobal coord = new(regionCoord, l_x, l_z);
 
-                    maps.Humidity[l_x, l_z] = _noiseMapHumidity.Sample(coord);
-                    maps.Mountains[l_x, l_z] = _noiseMapMountains.Sample(coord);
-                    maps.Continents[l_x, l_z] = _noiseMapContinental.Sample(coord);
+                    maps.Humidity[l_x, l_z]    = _noiseMapHumidity.Sample(coord);
+                    maps.Mountains[l_x, l_z]   = _noiseMapMountains.Sample(coord);
+                    maps.Continents[l_x, l_z]  = _noiseMapContinental.Sample(coord);
                     maps.Temperature[l_x, l_z] = _noiseMapTemperature.Sample(coord);
                 }
             }
@@ -66,9 +66,9 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.TerrainGeneratio
 
         public IBiome GetBiome(VoxelCoord2DGlobal globalCoord2D)
         {
-            float humidity = _noiseMapHumidity.Sample(globalCoord2D);
-            float mountains = _noiseMapMountains.Sample(globalCoord2D);
-            float continent = _noiseMapContinental.Sample(globalCoord2D);
+            float humidity    = _noiseMapHumidity.Sample(globalCoord2D);
+            float mountains   = _noiseMapMountains.Sample(globalCoord2D);
+            float continent   = _noiseMapContinental.Sample(globalCoord2D);
             float temperature = _noiseMapTemperature.Sample(globalCoord2D);
 
             // Ocean
@@ -95,7 +95,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.TerrainGeneratio
                 }
                 else
                 {
-                    if (temperature > 0)
+                    if (temperature > 0.3)
                         return _biomes.Desert;
                     else
                         return _biomes.Plains;

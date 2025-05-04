@@ -39,7 +39,7 @@ internal class RegionLoadingController : IRegionLoadingController
             return;
         
         // Try loading from file
-        if (_fileLoader.RequestLoad(coord))
+        if (_fileLoader.Request(coord))
         {
             _promises[coord] = new GeneratePromise(GeneratePromise.System.FileLoader);
             return;

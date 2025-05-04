@@ -41,15 +41,19 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading
                 using FileStream fs = new (filePath, FileMode.Create);
 
                 _regionSerializer.Serialize(fs, coord, data);
+                Console.WriteLine("Handling save request");
             }
 
             // Handle loading files
             while (_queue.TryDequeueLoadRequest(out var coord))
             {
+                Console.WriteLine("Yep, found a request");
+
                 string filePath = RegionFilePath(coord);
                 using FileStream fs = new(filePath, FileMode.Open);
 
                 _regionSerializer.Deserialize(fs, out _, out var data);
+                Console.WriteLine("Yep, deserialized");
 
                 _queue.LoadResult(coord, data);
             }
@@ -63,7 +67,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading
             }
         }
 
-        public bool RequestLoad(RegionCoord coord)
+        public bool Request(RegionCoord coord)
         {
             if (!File.Exists(RegionFilePath(coord)))
                 return false;

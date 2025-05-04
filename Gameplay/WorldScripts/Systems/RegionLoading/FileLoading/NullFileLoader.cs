@@ -11,7 +11,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading
     public class NullFileLoader : IFileLoadingSystem
     {
         public IEnumerable<(RegionCoord, RegionData)> GetComplete() { yield break; }
-        public bool RequestLoad(RegionCoord coord) => false;
+        public bool Request(RegionCoord coord) => false;
         public void Save(RegionCoord coord, RegionData region) { }
     }
 }

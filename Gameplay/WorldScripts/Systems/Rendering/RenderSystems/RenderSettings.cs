@@ -7,8 +7,8 @@
 
         public static readonly RenderSettings Default = new()
         {
-            LoadRadius = 4,
-            RenderRadius = 2,
+            LoadRadius = 16,
+            RenderRadius = 12,
         };
     }
 }

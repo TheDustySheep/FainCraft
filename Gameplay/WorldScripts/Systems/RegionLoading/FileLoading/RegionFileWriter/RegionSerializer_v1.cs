@@ -9,12 +9,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.Regi
     {
         const long CHUNK_TABLE_DATA_LENGTH = 32;
 
-        IChunkSerializer chunkSerializer;
-
-        public RegionSerializer_v1(IChunkSerializer chunkSerializer)
-        {
-            this.chunkSerializer = chunkSerializer;
-        }
+        SerializerSelector selector = new();
 
         public void Serialize(FileStream stream, RegionCoord coord, RegionData data)
         {
@@ -43,7 +38,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.Regi
             for (int i = 0; i < data.Chunks.Length; i++)
             {
                 var chunk = data.Chunks[i];
-                var serialized = chunkSerializer.Serialize(chunk);
+                var serialized = selector.Serialize(chunk, out int algorithm);
 
                 //--------------------
                 // Chunk Header Table
@@ -58,7 +53,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.Regi
                 writer.Write(0); // Z Position
 
                 // Write the compression algorithm
-                writer.Write(1);
+                writer.Write(algorithm);
                 // 0 - Empty (Fully air - no data saved)
                 // 1 - No compression
 
@@ -128,13 +123,8 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.Regi
                 stream.Position = dataPtr;
 
                 // Chunk is empty
-                if (algorithm == 0)
-                    chunkDatas[i] = new ChunkData();
-                else if (algorithm == 1)
-                {
-                    byte[] bytes = reader.ReadBytes((int)length);
-                    chunkDatas[i] = chunkSerializer.Deserialize(bytes);
-                }
+                byte[] bytes = reader.ReadBytes((int)length);
+                chunkDatas[i] = selector.Deserialize(algorithm, bytes);
             }
 
             data = new RegionData(chunkDatas);

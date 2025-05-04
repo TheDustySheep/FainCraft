@@ -50,7 +50,7 @@ internal class World : GameObject
         _meshSystem   = new ThreadedMeshGenerationSystem(WorldData, _renderSystem, () => new MeshGenerator_v2(indexer));
 
         // Terrain / Loading
-        _fileLoadingSystem = new BasicFileLoader("Save_1", new RegionSerializer_v1(new NoCompressionSerializer()));
+        _fileLoadingSystem = new BasicFileLoader("Save_1", new RegionSerializer_v1());
 
         WorldData.OnChunkUpdate += SavingFunc;
 

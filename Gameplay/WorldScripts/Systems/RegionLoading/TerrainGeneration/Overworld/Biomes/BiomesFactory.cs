@@ -33,7 +33,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.TerrainGeneratio
             _hillsPainter = new PainterHills(indexer, 70);
             _sandyPainter = new PainterSandy(indexer);
 
-            Hills = new BiomeHills(_hillsPainter);
+            Hills = new BiomeHills(_hillsPainter, _decoratorTrees);
             Ocean = new Biome(_oceanPainter, _decoratorNull, new SimplexFBMTerrain(seed, -5f, 5f, 0.020f));
             OceanDeep = new Biome(_oceanPainter, _decoratorNull, new SimplexFBMTerrain(seed, -30f, 15f, 0.020f));
             Plains = new Biome(_plainsPainter, _decoratorTrees, new SimplexFBMTerrain(seed, 5f, 10f, 0.005f, minHeight: 1f));
