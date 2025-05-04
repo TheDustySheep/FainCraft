@@ -10,9 +10,8 @@ internal class ThreadedMeshGenerationSystem : IMeshGenerationSystem
     readonly IWorldData _worldData;
     readonly IRenderSystem _renderSystem;
 
-    const int MAX_UPDATES_PER_TICK = 16;
-    readonly WorkerThread workerThread1;
-    readonly WorkerThread workerThread2;
+    const int MAX_UPDATES_PER_TICK = 1024;
+    readonly WorkerThread[] workerThreads;
 
     MeshQueue _queue = new();
 
@@ -21,33 +20,37 @@ internal class ThreadedMeshGenerationSystem : IMeshGenerationSystem
         _worldData = worldData;
         _renderSystem = renderSystem;
 
-        workerThread1 = CreateWorker(1, generatorFactory);
-        workerThread2 = CreateWorker(2, generatorFactory);
+        workerThreads = CreateWorkers(1, generatorFactory);
 
         worldData.OnChunkUpdate += Generate;
     }
 
     ~ThreadedMeshGenerationSystem()
     {
-        workerThread1.Terminate();
-        workerThread2.Terminate();
+        foreach (var worker in workerThreads)
+            worker.Terminate();
     }
 
-    private WorkerThread CreateWorker(int i, Func<IMeshGenerator> generatorFactory)
+    private WorkerThread[] CreateWorkers(int count, Func<IMeshGenerator> generatorFactory)
     {
-        return new WorkerThread($"Mesh Generation Thread {i}", () =>
+        WorkerThread[] threads = new WorkerThread[count];
+        for (int i = 0; i < count; i++)
         {
-            Stopwatch sw = new Stopwatch();
-            var generator = generatorFactory.Invoke();
-            while (_queue.TryDequeueGeneration(out var coord, out var cluster))
+            threads[i] = new WorkerThread($"Mesh Generation Thread {i+1}", () =>
             {
-                sw.Restart();
-                var data = generator.GenerateMesh(cluster);
-                _queue.EnqueueComplete(coord, cluster, data);
-                sw.Stop();
-                DebugGenerationTimeSignals.MeshGenerate(sw.Elapsed);
-            }
-        });
+                Stopwatch sw = new Stopwatch();
+                var generator = generatorFactory.Invoke();
+                while (_queue.TryDequeueGeneration(out var coord, out var cluster, out var meshData))
+                {
+                    sw.Restart();
+                    generator.GenerateMesh(cluster, meshData);
+                    _queue.EnqueueComplete(coord, cluster, meshData);
+                    sw.Stop();
+                    DebugGenerationTimeSignals.MeshGenerate(sw.Elapsed);
+                }
+            });
+        }
+        return threads;
     }
 
     public void Generate(ChunkCoord coord, bool important)
@@ -73,6 +76,7 @@ internal class ThreadedMeshGenerationSystem : IMeshGenerationSystem
         for (int i = 0; i < MAX_UPDATES_PER_TICK && _queue.TryDequeueComplete(out var coord, out var meshData); i++)
         {
             _renderSystem.UpdateChunk(coord, meshData);
+            _queue.ReturnMeshData(meshData);
         }
     }
 }

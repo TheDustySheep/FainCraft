@@ -9,18 +9,12 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration
     {
         public int QueueCount => _toGenerate.Count;
 
-        readonly Queue<ChunkDataCluster> _clusterPool = new Queue<ChunkDataCluster>();
+        readonly ObjectPool<ChunkDataCluster> _clusterPool  = new() { MaxItems = 128 };
+        readonly ObjectPool<VoxelMeshData>    _meshDataPool = new() { MaxItems = 128 };
+
         readonly OrderedSet<ChunkCoord> _toGenerate = new();
         readonly ConcurrentQueue<(ChunkCoord coord, ChunkDataCluster cluster)> _buffer = new();
         readonly ConcurrentQueue<(ChunkCoord coord, ChunkDataCluster cluster, VoxelMeshData data)> complete = new();
-
-        public MeshQueue()
-        {
-            for (int i = 0; i < 128; i++)
-            {
-                _clusterPool.Enqueue(new ChunkDataCluster());
-            }
-        }
 
         #region Requests
         public void EnqueueRequest(ChunkCoord chunkCoord, bool important)
@@ -33,25 +27,14 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration
 
         public bool TryDequeueRequest(out ChunkCoord coord, out ChunkDataCluster cluster)
         {
-            if (_toGenerate.Count == 0)
+            if (!_toGenerate.TryDequeue(out coord))
             {
                 coord = default;
                 cluster = default!;
                 return false;
             }
 
-            if (!_clusterPool.TryDequeue(out cluster!))
-            {
-                coord = default;
-                return false;
-            }
-
-            if (!_toGenerate.TryDequeue(out coord))
-            {
-                _clusterPool.Enqueue(cluster);
-                return false;
-            }
-
+            cluster = _clusterPool.Request();
             return true;
         }
         #endregion
@@ -63,17 +46,27 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration
             _buffer.Enqueue((coord, cluster));
         }
 
-        public bool TryDequeueGeneration(out ChunkCoord coord, out ChunkDataCluster cluster)
+        public bool TryDequeueGeneration(
+            out ChunkCoord coord, 
+            out ChunkDataCluster cluster, 
+            out VoxelMeshData meshData
+        )
         {
             if (_buffer.TryDequeue(out var pair))
             {
-                coord = pair.coord;
-                cluster = pair.cluster;
+                coord    = pair.coord;
+                cluster  = pair.cluster;
+                meshData = _meshDataPool.Request();
+
+                if (meshData is null)
+                    throw new Exception("HOW THE FUCK IS THIS POSSIBLE");
+
                 return true;
             }
 
-            coord = default;
-            cluster = default!;
+            coord    = default;
+            cluster  = default!;
+            meshData = default!;
             return false;
         }
 
@@ -89,9 +82,9 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration
         {
             if (complete.TryDequeue(out var pair))
             {
-                coord = pair.coord;
+                coord    = pair.coord;
                 meshData = pair.data;
-                _clusterPool.Enqueue(pair.cluster);
+                _clusterPool.Return(pair.cluster);
                 return true;
             }
 
@@ -100,6 +93,10 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration
             return false;
         }
 
+        public void ReturnMeshData(VoxelMeshData meshData)
+        {
+            _meshDataPool.Return(meshData);
+        }
         #endregion
     }
 }

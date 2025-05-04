@@ -3,5 +3,5 @@
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration;
 public interface IMeshGenerator
 {
-    public VoxelMeshData GenerateMesh(ChunkDataCluster cluster);
+    public void GenerateMesh(ChunkDataCluster cluster, VoxelMeshData meshData);
 }

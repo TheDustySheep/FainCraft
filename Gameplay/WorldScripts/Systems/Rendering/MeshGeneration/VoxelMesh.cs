@@ -4,16 +4,19 @@ using FainEngine_v2.Rendering.Meshing;
 using System.Numerics;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
-//using System.Numerics;
-//using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
-
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration;
 internal class VoxelMesh : CustomVertexMesh<VoxelVertex, uint>
 {
-    //private AABB bounds = new(Vector3.Zero, Vector3.One * CHUNK_SIZE);
-    //public override AABB Bounds { get => bounds; set => bounds = value; }
+    public VoxelMesh() : base()
+    {
+        Bounds = new BoundingBox()
+        {
+            Min = Vector3.Zero,
+            Max = Vector3.One * CHUNK_SIZE
+        };
+    }
 
-    public VoxelMesh(VoxelVertex[] vertices, uint[] triangles) : base(GameGraphics.GL, vertices, triangles)
+    public VoxelMesh(VoxelVertex[] vertices, uint[] triangles) : base(vertices, triangles)
     {
         Bounds = new BoundingBox()
         {
@@ -25,5 +28,12 @@ internal class VoxelMesh : CustomVertexMesh<VoxelVertex, uint>
     protected override Vector3 GetVertexPosition(VoxelVertex vertex)
     {
         return new Vector3(vertex.XPos, vertex.YPos, vertex.ZPos);
+    }
+
+    internal void UpdateData(VoxelMeshData data)
+    {
+        SetTriangles(data.Triangles.ToArray());
+        SetVertices(data.Vertices.ToArray());
+        Apply();
     }
 }

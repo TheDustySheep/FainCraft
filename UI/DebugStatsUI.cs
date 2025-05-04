@@ -41,7 +41,7 @@ namespace FainCraft.UI
 
             LayoutAxis = Layout.Axis.Y;
 
-            _timer = new Timer(i => UpdateText(), null, 0, 1000);
+            _timer = new Timer(i => UpdateText(), null, 0, 500);
         }
 
         ~DebugStatsUI()

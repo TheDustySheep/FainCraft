@@ -1,11 +1,9 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Data;
 using FainCraft.Gameplay.WorldScripts.Voxels;
-using FainCraft.Signals.Gameplay.WorldScripts;
-using System.Diagnostics;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration;
-public class MeshGenerator_v2 : IMeshGenerator
+public class MeshGenerator_v3 : IMeshGenerator
 {
     readonly VoxelIndexer voxelIndexer;
     readonly VoxelState[] nVoxelDatas = new VoxelState[27];
@@ -16,7 +14,7 @@ public class MeshGenerator_v2 : IMeshGenerator
 
     const uint VOXEL_UP = 22;
 
-    public MeshGenerator_v2(VoxelIndexer voxelIndexer)
+    public MeshGenerator_v3(VoxelIndexer voxelIndexer)
     {
         this.voxelIndexer = voxelIndexer;
     }
@@ -28,7 +26,7 @@ public class MeshGenerator_v2 : IMeshGenerator
         if (cluster.CenterEmpty)
             return;
 
-        var tris = meshData.Triangles;
+        var tris  = meshData.Triangles;
         var verts = meshData.Vertices;
 
         SetVoxels(cluster);
@@ -53,7 +51,7 @@ public class MeshGenerator_v2 : IMeshGenerator
 
                     for (int face = 0; face < 6; face++)
                     {
-                        uint faceIndex    = FACE_N_INDEX[face];
+                        uint faceIndex = FACE_N_INDEX[face];
                         var faceVoxelData = nVoxelDatas[faceIndex];
                         var faceVoxelType = nVoxelTypes[faceIndex];
 
@@ -135,24 +133,24 @@ public class MeshGenerator_v2 : IMeshGenerator
         int index = 0;
         for (int y_off = 0; y_off < 3; y_off++)
         {
-            int y_local = (y + y_off) * (CHUNK_SIZE + 2) * (CHUNK_SIZE + 2);
+            int y_local = y + y_off;
 
             for (int z_off = 0; z_off < 3; z_off++)
             {
-                int z_local = (z + z_off) * (CHUNK_SIZE + 2);
+                int z_local = z + z_off;
 
-                int baseIndex = y_local + z_local + x;
+                for (int x_off = 0; x_off < 3; x_off++, index++)
+                {
+                    int x_local = x + x_off;
 
-                nVoxelDatas[index + 0] = allVoxelDatas[baseIndex + 0];
-                nVoxelTypes[index + 0] = allVoxelTypes[baseIndex + 0];
+                    int allIndex =
+                        y_local * (CHUNK_SIZE + 2) * (CHUNK_SIZE + 2) +
+                        z_local * (CHUNK_SIZE + 2) +
+                        x_local;
 
-                nVoxelDatas[index + 1] = allVoxelDatas[baseIndex + 1];
-                nVoxelTypes[index + 1] = allVoxelTypes[baseIndex + 1];
-
-                nVoxelDatas[index + 2] = allVoxelDatas[baseIndex + 2];
-                nVoxelTypes[index + 2] = allVoxelTypes[baseIndex + 2];
-
-                index += 3;
+                    nVoxelDatas[index] = allVoxelDatas[allIndex];
+                    nVoxelTypes[index] = allVoxelTypes[allIndex];
+                }
             }
         }
     }

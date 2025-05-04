@@ -1,20 +1,16 @@
 ﻿namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration;
 public class VoxelMeshData
 {
-    public VoxelVertex[] Vertices;
-    public uint[] Triangles;
+    public readonly List<VoxelVertex> Vertices  = new();
+    public readonly List<uint>        Triangles = new();
 
-    public VoxelMeshData()
+    public void Clear()
     {
-        Vertices = Array.Empty<VoxelVertex>();
-        Triangles = Array.Empty<uint>();
+        Vertices .Clear(); 
+        Triangles.Clear();
     }
 
-    public VoxelMeshData(VoxelVertex[] vertices, uint[] triangles)
-    {
-        Vertices = vertices;
-        Triangles = triangles;
-    }
-
-    public bool IsEmpty => Vertices.Length == 0 || Triangles.Length == 0;
+    public bool IsEmpty => 
+        Vertices.Count == 0 || 
+        Triangles.Count == 0;
 }
