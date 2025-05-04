@@ -2,6 +2,7 @@
 using FainCraft.Gameplay.WorldScripts.Core;
 using FainCraft.Signals.Gameplay.WorldScripts;
 using FainEngine_v2.Core;
+using FainEngine_v2.Rendering;
 using FainEngine_v2.UI;
 using FainEngine_v2.UI.Elements;
 using FainEngine_v2.Utils;
@@ -47,8 +48,12 @@ namespace FainCraft.UI
             sb.AppendLine($" - FPS: {1f / GameTime.DeltaTime:F2}");
             sb.AppendLine($" - TPS: {1f / GameTime.FixedDeltaTime:F2}");
             sb.AppendLine($"");
+            sb.AppendLine($"Frames Per Second");
+            sb.AppendLine($"Player: {SharedVariables.PlayerPosition.Value.Position}");
+            sb.AppendLine($"");
             sb.AppendLine($"Mesh Generation");
-            sb.AppendLine($" - Loaded: {DebugVariables.LoadedMeshCount}");
+            sb.AppendLine($" - Loaded (O): {DebugVariables.OpaqueMeshCount}");
+            sb.AppendLine($" - Loaded (T): {DebugVariables.TransparentMeshCount}");
             sb.AppendLine($" - Queue:  {DebugVariables.MeshQueueCount}");
             if (MeshTimes.Count > 0)
             {
@@ -69,6 +74,13 @@ namespace FainCraft.UI
             sb.AppendLine($"World");
             sb.AppendLine($" - Loaded: {DebugVariables.WorldLoadedRegions} regions");
             sb.AppendLine($" - Loaded: {DebugVariables.WorldLoadedRegions.Value * WorldConstants.REGION_Y_TOTAL_COUNT} chunks");
+
+            sb.AppendLine($"");
+            sb.AppendLine($"Draw Calls");
+            sb.AppendLine($" - Total: {RenderDebugVariables.DrawCallDebugData.Value.TotalDrawCalls}");
+            sb.AppendLine($" - Opaque: {RenderDebugVariables.DrawCallDebugData.Value.OpaqueCalls}");
+            sb.AppendLine($" - Transparent: {RenderDebugVariables.DrawCallDebugData.Value.TransparentCalls}");
+            sb.AppendLine($" - UI: {RenderDebugVariables.DrawCallDebugData.Value.UICalls}");
             return sb.ToString();
         }
     }

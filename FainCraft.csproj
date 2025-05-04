@@ -10,8 +10,11 @@
 
   <ItemGroup>
     <Compile Remove="Gameplay\WorldScripts\Systems\RegionLoading\TerrainGeneration\StructureEdit\**" />
+    <Compile Remove="Resources\Debug\**" />
     <EmbeddedResource Remove="Gameplay\WorldScripts\Systems\RegionLoading\TerrainGeneration\StructureEdit\**" />
+    <EmbeddedResource Remove="Resources\Debug\**" />
     <None Remove="Gameplay\WorldScripts\Systems\RegionLoading\TerrainGeneration\StructureEdit\**" />
+    <None Remove="Resources\Debug\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,13 +32,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Resources\Debug\mesh_times.csv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Resources\Shaders\PostProcessing\postprocess.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Shaders\PostProcessing\postprocess.vert">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\Voxel_Shader_Transparent\voxels.frag">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\Voxel_Shader_Transparent\voxels.obs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Shaders\Voxel_Shader_Transparent\voxels.vert">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Shaders\Voxel_Shader\voxels.frag">
@@ -68,10 +77,6 @@
     <None Update="Resources\Textures\grass.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Resources\Debug\" />
   </ItemGroup>
 
 </Project>

@@ -1,21 +1,23 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Core;
-using FainCraft.Signals.Gameplay.WorldScripts;
 using FainEngine_v2.Collections;
-using FainEngine_v2.Core;
+using FainEngine_v2.Rendering;
 using FainEngine_v2.Rendering.Materials;
-using System.Diagnostics;
 using System.Numerics;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.RenderSystems;
 internal class RenderSystem : IRenderSystem, IDisposable
 {
     readonly ObjectPool<VoxelMesh_v2> _meshPool = new();
-    readonly Dictionary<ChunkCoord, VoxelMesh_v2> _chunks = new();
-    readonly Material _material;
+    readonly Dictionary<ChunkCoord, VoxelMesh_v2> _opaqueMeshes      = new();
+    readonly Dictionary<ChunkCoord, VoxelMesh_v2> _transparentMeshes = new();
 
-    public RenderSystem(Material material)
+    readonly Material _opaqueMaterial;
+    readonly Material _transparentMaterial;
+
+    public RenderSystem(Material opaqueMaterial, Material transparentMaterial)
     {
-        _material = material;
+        _opaqueMaterial      = opaqueMaterial;
+        _transparentMaterial = transparentMaterial;
     }
 
     ~RenderSystem()
@@ -25,41 +27,83 @@ internal class RenderSystem : IRenderSystem, IDisposable
 
     public void Draw()
     {
-        foreach ((var coord, var mesh) in _chunks)
+        foreach ((var coord, var mesh) in _opaqueMeshes)
         {
             var model = Matrix4x4.CreateTranslation(coord.GlobalMin);
-            GameGraphics.DrawMesh(mesh, _material, model);
+            GameGraphics.DrawMesh(mesh, _opaqueMaterial, model);
+        }
+
+        foreach ((var coord, var mesh) in _transparentMeshes)
+        {
+            var model = Matrix4x4.CreateTranslation(coord.GlobalMin);
+            GameGraphics.DrawMesh(mesh, _transparentMaterial, model);
         }
     }
 
     public void UnloadChunk(ChunkCoord coord)
     {
-        if (!_chunks.Remove(coord, out var oldMesh))
-            return;
-
-        oldMesh.Clear();
-        _meshPool.Return(oldMesh);
-        DebugVariables.LoadedMeshCount.Value = _chunks.Count;
+        UnloadOpaque(coord);
+        UnloadTransparent(coord);
     }
 
-    public void UpdateChunk(ChunkCoord coord, VoxelMeshData data)
+    private void UnloadOpaque(ChunkCoord coord)
     {
-        if (data.IsEmpty)
+        if (_opaqueMeshes.Remove(coord, out var oldMesh))
         {
-            UnloadChunk(coord);
-            return;
+            oldMesh.Clear();
+            _meshPool.Return(oldMesh);
+            DebugVariables.OpaqueMeshCount.Value = _opaqueMeshes.Count;
         }
+    }
 
-        if (_chunks.TryGetValue(coord, out var mesh))
+    private void UnloadTransparent(ChunkCoord coord)
+    {
+        if (_transparentMeshes.Remove(coord, out var oldMesh))
         {
-            mesh.UpdateData(data);
+            oldMesh.Clear();
+            _meshPool.Return(oldMesh);
+            DebugVariables.TransparentMeshCount.Value = _transparentMeshes.Count;
+        }
+    }
+
+    public void UpdateChunk(ChunkCoord coord, VoxelMeshData opaque, VoxelMeshData transparent)
+    {
+        if (opaque.IsEmpty)
+        {
+            UnloadOpaque(coord);
         }
         else
         {
-            mesh = _meshPool.Request();
-            mesh.UpdateData(data);
-            _chunks[coord] = mesh;
-            DebugVariables.LoadedMeshCount.Value = _chunks.Count;
+            if (_opaqueMeshes.TryGetValue(coord, out var mesh))
+            {
+                mesh.UpdateData(opaque);
+            }
+            else
+            {
+                mesh = _meshPool.Request();
+                mesh.UpdateData(opaque);
+                _opaqueMeshes[coord] = mesh;
+                DebugVariables.OpaqueMeshCount.Value = _opaqueMeshes.Count;
+            }
+        }
+
+        if (transparent.IsEmpty)
+        {
+            UnloadTransparent(coord);
+        }
+        else
+        {
+            if (_transparentMeshes.TryGetValue(coord, out var mesh))
+            {
+                mesh.UpdateData(transparent);
+            }
+            else
+            {
+                mesh = _meshPool.Request();
+                mesh.UpdateData(transparent);
+                _transparentMeshes[coord] = mesh;
+                DebugVariables.OpaqueMeshCount.Value = _transparentMeshes.Count;
+            }
         }
     }
 
@@ -68,7 +112,10 @@ internal class RenderSystem : IRenderSystem, IDisposable
         foreach (var mesh in _meshPool.Bag)
             mesh.Dispose();
 
-        foreach (var mesh in _chunks.Values)
+        foreach (var mesh in _opaqueMeshes.Values)
+            mesh.Dispose();
+
+        foreach (var mesh in _transparentMeshes.Values)
             mesh.Dispose();
     }
 }

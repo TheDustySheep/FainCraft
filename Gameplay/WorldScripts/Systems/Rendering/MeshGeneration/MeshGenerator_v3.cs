@@ -19,19 +19,24 @@ public class MeshGenerator_v3 : IMeshGenerator
         this.voxelIndexer = voxelIndexer;
     }
 
-    public void GenerateMesh(ChunkDataCluster cluster, VoxelMeshData meshData)
+    public void GenerateMesh(ChunkDataCluster cluster, VoxelMeshData opaqueMeshData, VoxelMeshData transparentMeshData)
     {
-        meshData.Clear();
+        opaqueMeshData.Clear();
+        transparentMeshData.Clear();
 
         if (cluster.CenterEmpty)
             return;
 
-        var tris  = meshData.Triangles;
-        var verts = meshData.Vertices;
+        var o_tris  = opaqueMeshData.Triangles;
+        var o_verts = opaqueMeshData.Vertices;
+
+        var t_tris  = transparentMeshData.Triangles;
+        var t_verts = transparentMeshData.Vertices;
 
         SetVoxels(cluster);
 
-        uint vertCount = 0;
+        uint o_vertCount = 0;
+        uint t_vertCount = 0;
 
         for (uint y = 0; y < CHUNK_SIZE; y++)
         {
@@ -45,13 +50,15 @@ public class MeshGenerator_v3 : IMeshGenerator
                     if (!voxelType.DrawSelf)
                         continue;
 
+                    var verts = voxelType.Is_Transparent ? t_verts : o_verts;
+
                     GetNeighbourVoxels((int)x, (int)y, (int)z);
 
                     uint surfaceFluid = Convert.ToUInt32(voxelType.Is_Fluid && !nVoxelTypes[VOXEL_UP].Is_Fluid);
 
                     for (int face = 0; face < 6; face++)
                     {
-                        uint faceIndex = FACE_N_INDEX[face];
+                        uint faceIndex    = FACE_N_INDEX[face];
                         var faceVoxelData = nVoxelDatas[faceIndex];
                         var faceVoxelType = nVoxelTypes[faceIndex];
 
@@ -63,7 +70,7 @@ public class MeshGenerator_v3 : IMeshGenerator
                             continue;
 
                         uint animate_foliage = Convert.ToUInt32(voxelType.Animate_Foliage);
-                        uint blend_biome = Convert.ToUInt32(voxelType.Biome_Blend[face]);
+                        uint blend_biome     = Convert.ToUInt32(voxelType.Biome_Blend[face]);
 
                         for (uint i = 0; i < 4; i++)
                         {
@@ -78,7 +85,7 @@ public class MeshGenerator_v3 : IMeshGenerator
                             uint side1 = Convert.ToUInt32(nVoxelTypes[AO_LOOKUP[face * 12 + i * 3 + 0]].Fully_Opaque);
                             uint cornr = Convert.ToUInt32(nVoxelTypes[AO_LOOKUP[face * 12 + i * 3 + 1]].Fully_Opaque);
                             uint side2 = Convert.ToUInt32(nVoxelTypes[AO_LOOKUP[face * 12 + i * 3 + 2]].Fully_Opaque);
-                            vert.AO = GetVertexAO(side1, side2, cornr);
+                            vert.AO = GetBranchlessVertexAO(side1, side2, cornr);
 
                             vert.Biome_Blend = blend_biome;
                             vert.Animate_Foliage = animate_foliage;
@@ -86,14 +93,28 @@ public class MeshGenerator_v3 : IMeshGenerator
                             verts.Add(vert);
                         }
 
-                        tris.Add(TRIANGLES[0] + vertCount);
-                        tris.Add(TRIANGLES[1] + vertCount);
-                        tris.Add(TRIANGLES[2] + vertCount);
-                        tris.Add(TRIANGLES[3] + vertCount);
-                        tris.Add(TRIANGLES[4] + vertCount);
-                        tris.Add(TRIANGLES[5] + vertCount);
+                        if (voxelType.Is_Transparent)
+                        {
+                            t_tris.Add(TRIANGLES[0] + t_vertCount);
+                            t_tris.Add(TRIANGLES[1] + t_vertCount);
+                            t_tris.Add(TRIANGLES[2] + t_vertCount);
+                            t_tris.Add(TRIANGLES[3] + t_vertCount);
+                            t_tris.Add(TRIANGLES[4] + t_vertCount);
+                            t_tris.Add(TRIANGLES[5] + t_vertCount);
 
-                        vertCount += 4;
+                            t_vertCount += 4;
+                        }
+                        else
+                        {
+                            o_tris.Add(TRIANGLES[0] + o_vertCount);
+                            o_tris.Add(TRIANGLES[1] + o_vertCount);
+                            o_tris.Add(TRIANGLES[2] + o_vertCount);
+                            o_tris.Add(TRIANGLES[3] + o_vertCount);
+                            o_tris.Add(TRIANGLES[4] + o_vertCount);
+                            o_tris.Add(TRIANGLES[5] + o_vertCount);
+
+                            o_vertCount += 4;
+                        }
                     }
                 }
             }
@@ -120,12 +141,13 @@ public class MeshGenerator_v3 : IMeshGenerator
         }
     }
 
-    private uint GetVertexAO(uint side1, uint side2, uint corner)
-    {
-        if ((side1 & side2) == 1)
-            return 0;
 
-        return 3 - (side1 + side2 + corner);
+    private static uint GetBranchlessVertexAO(uint side1, uint side2, uint corner)
+    {
+        uint s = side1 & side2;
+        uint result = 3 - (side1 + side2 + corner);
+        result *= (1 - s);
+        return result;
     }
 
     private void GetNeighbourVoxels(int x, int y, int z)
@@ -133,24 +155,24 @@ public class MeshGenerator_v3 : IMeshGenerator
         int index = 0;
         for (int y_off = 0; y_off < 3; y_off++)
         {
-            int y_local = y + y_off;
+            int y_local = (y + y_off) * (CHUNK_SIZE + 2) * (CHUNK_SIZE + 2);
 
             for (int z_off = 0; z_off < 3; z_off++)
             {
-                int z_local = z + z_off;
+                int z_local = (z + z_off) * (CHUNK_SIZE + 2);
 
-                for (int x_off = 0; x_off < 3; x_off++, index++)
-                {
-                    int x_local = x + x_off;
+                int baseIndex = y_local + z_local + x;
 
-                    int allIndex =
-                        y_local * (CHUNK_SIZE + 2) * (CHUNK_SIZE + 2) +
-                        z_local * (CHUNK_SIZE + 2) +
-                        x_local;
+                nVoxelDatas[index + 0] = allVoxelDatas[baseIndex + 0];
+                nVoxelTypes[index + 0] = allVoxelTypes[baseIndex + 0];
 
-                    nVoxelDatas[index] = allVoxelDatas[allIndex];
-                    nVoxelTypes[index] = allVoxelTypes[allIndex];
-                }
+                nVoxelDatas[index + 1] = allVoxelDatas[baseIndex + 1];
+                nVoxelTypes[index + 1] = allVoxelTypes[baseIndex + 1];
+
+                nVoxelDatas[index + 2] = allVoxelDatas[baseIndex + 2];
+                nVoxelTypes[index + 2] = allVoxelTypes[baseIndex + 2];
+
+                index += 3;
             }
         }
     }

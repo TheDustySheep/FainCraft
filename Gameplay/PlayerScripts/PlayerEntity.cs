@@ -24,7 +24,7 @@ internal class PlayerEntity : GameObject, IWorldEntity
 
     public PlayerEntity(World world)
     {
-        Transform.LocalPosition = new Vector3(32, 130, 32);
+        Transform.LocalPosition = new Vector3(-300, 130, 100);
         camTransform.LocalPosition = new Vector3(0, 0.85f, 0);
         camTransform.SetParent(Transform);
 

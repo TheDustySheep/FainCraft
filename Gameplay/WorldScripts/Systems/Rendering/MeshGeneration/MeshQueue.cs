@@ -14,7 +14,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration
 
         readonly OrderedSet<ChunkCoord> _toGenerate = new();
         readonly ConcurrentQueue<(ChunkCoord coord, ChunkDataCluster cluster)> _buffer = new();
-        readonly ConcurrentQueue<(ChunkCoord coord, ChunkDataCluster cluster, VoxelMeshData data)> complete = new();
+        readonly ConcurrentQueue<(ChunkCoord coord, ChunkDataCluster cluster, VoxelMeshData opaque, VoxelMeshData transparent)> complete = new();
 
         #region Requests
         public void EnqueueRequest(ChunkCoord chunkCoord, bool important)
@@ -49,47 +49,54 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration
         public bool TryDequeueGeneration(
             out ChunkCoord coord, 
             out ChunkDataCluster cluster, 
-            out VoxelMeshData meshData
+            out VoxelMeshData meshData1,
+            out VoxelMeshData meshData2
         )
         {
             if (_buffer.TryDequeue(out var pair))
             {
-                coord    = pair.coord;
-                cluster  = pair.cluster;
-                meshData = _meshDataPool.Request();
-
-                if (meshData is null)
-                    throw new Exception("HOW THE FUCK IS THIS POSSIBLE");
+                coord     = pair.coord;
+                cluster   = pair.cluster;
+                meshData1 = _meshDataPool.Request();
+                meshData2 = _meshDataPool.Request();
 
                 return true;
             }
 
-            coord    = default;
-            cluster  = default!;
-            meshData = default!;
+            coord     = default;
+            cluster   = default!;
+            meshData1 = default!;
+            meshData2 = default!;
             return false;
         }
 
         #endregion
 
         #region Completed
-        public void EnqueueComplete(ChunkCoord coord, ChunkDataCluster cluster, VoxelMeshData meshData)
+        public void EnqueueComplete(
+            ChunkCoord coord, 
+            ChunkDataCluster cluster,
+            VoxelMeshData meshData1,
+            VoxelMeshData meshData2
+        )
         {
-            complete.Enqueue((coord, cluster, meshData));
+            complete.Enqueue((coord, cluster, meshData1, meshData2));
         }
 
-        public bool TryDequeueComplete(out ChunkCoord coord, out VoxelMeshData meshData)
+        public bool TryDequeueComplete(out ChunkCoord coord, out VoxelMeshData opaque, out VoxelMeshData transparent)
         {
             if (complete.TryDequeue(out var pair))
             {
-                coord    = pair.coord;
-                meshData = pair.data;
+                coord       = pair.coord;
+                opaque      = pair.opaque;
+                transparent = pair.transparent;
                 _clusterPool.Return(pair.cluster);
                 return true;
             }
 
-            coord = default;
-            meshData = default!;
+            coord       = default;
+            opaque      = default!;
+            transparent = default!;
             return false;
         }
 

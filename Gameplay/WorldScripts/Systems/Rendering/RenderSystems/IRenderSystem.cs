@@ -5,5 +5,5 @@ internal interface IRenderSystem
 {
     void Draw();
     void UnloadChunk(ChunkCoord coord);
-    void UpdateChunk(ChunkCoord coord, VoxelMeshData data);
+    void UpdateChunk(ChunkCoord coord, VoxelMeshData opaque, VoxelMeshData transparent);
 }

@@ -4,11 +4,13 @@
     {
         public int LoadRadius;
         public int RenderRadius;
+        public int MeshesAppliedPerFrame;
 
         public static readonly RenderSettings Default = new()
         {
-            LoadRadius = 16,
-            RenderRadius = 12,
+            LoadRadius = 12,
+            RenderRadius = 4,
+            MeshesAppliedPerFrame = 4,
         };
     }
 }

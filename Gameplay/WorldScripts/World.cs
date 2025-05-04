@@ -33,9 +33,9 @@ internal class World : GameObject
 
     public World()
     {
-        var voxel_atlas    = ResourceLoader.LoadTextureAtlas(@"C:\Users\Sean\source\repos\FainCraft\Resources\Textures\atlas.png", 16, mipMapMode: Texture.MipMapModes.Nearest);
-        var voxel_shader   = ResourceLoader.LoadShader(@"C:\Users\Sean\source\repos\FainCraft\Resources\Shaders\Voxel_Shader\");
-        var voxel_material = new VoxelMaterial(voxel_shader, voxel_atlas);
+        var voxel_atlas      = ResourceLoader.LoadTextureAtlas(@"C:\Users\Sean\source\repos\FainCraft\Resources\Textures\atlas.png", 16, mipMapMode: Texture.MipMapModes.Nearest);
+        var voxel_material_o = new VoxelMaterial           (ResourceLoader.LoadShader(@"C:\Users\Sean\source\repos\FainCraft\Resources\Shaders\Voxel_Shader\"), voxel_atlas);
+        var voxel_material_t = new VoxelMaterialTransparent(ResourceLoader.LoadShader(@"C:\Users\Sean\source\repos\FainCraft\Resources\Shaders\Voxel_Shader_Transparent\"), voxel_atlas);
 
         var indexer = VoxelIndexer.Builder.FromFilePath();
 
@@ -46,24 +46,29 @@ internal class World : GameObject
         WorldData = new WorldData(indexer);
 
         // Rendering
-        _renderSystem = new RenderSystem(voxel_material);
-        _meshSystem   = new ThreadedMeshGenerationSystem(WorldData, _renderSystem, () => new MeshGenerator_v2(indexer));
+        _renderSystem = new RenderSystem(voxel_material_o, voxel_material_t);
+        _meshSystem   = new ThreadedMeshGenerationSystem(WorldData, _renderSystem, () => new MeshGenerator_v3(indexer));
 
         // Terrain / Loading
-        _fileLoadingSystem = new BasicFileLoader("Save_1", new RegionSerializer_v1());
 
-        WorldData.OnChunkUpdate += SavingFunc;
 
         _terrainSystem     = new ThreadedTerrainGenerationSystem(new OverworldGenerator(indexer));
-        _loadingController = new RegionLoadingController(WorldData, _terrainSystem, _fileLoadingSystem);
 
+        bool enableSaving = false;
+
+        if (enableSaving)
+            _fileLoadingSystem = new BasicFileLoader("Save_1", new RegionSerializer_v1());
+        else
+            _fileLoadingSystem = new NullFileLoader();
+
+        WorldData.OnChunkUpdate += SavingFunc;
+        _loadingController = new RegionLoadingController(WorldData, _terrainSystem, _fileLoadingSystem);
 
         // Active region control
         var activeRegionController = new ActiveRegionController_v2();
         activeRegionController.OnLoad   += _loadingController.Load;
         activeRegionController.OnUnload += _loadingController.Unload;
         _activeRegionController = activeRegionController;
-
     }
 
     private void SavingFunc(ChunkCoord coord, bool important)

@@ -3,6 +3,7 @@ using FainCraft.Gameplay.WorldScripts.Data;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering.RenderSystems;
 using FainCraft.Signals.Gameplay.WorldScripts;
 using FainEngine_v2.Utils;
+using FainEngine_v2.Utils.Variables;
 using System.Diagnostics;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration;
@@ -11,13 +12,14 @@ internal class ThreadedMeshGenerationSystem : IMeshGenerationSystem
     readonly IWorldData _worldData;
     readonly IRenderSystem _renderSystem;
 
-    const int MAX_UPDATES_PER_TICK = 8;
+    ReferenceVariable<RenderSettings> _settings;
     readonly WorkerThread[] workerThreads;
 
     MeshQueue _queue = new();
 
     public ThreadedMeshGenerationSystem(IWorldData worldData, IRenderSystem renderSystem, Func<IMeshGenerator> generatorFactory)
     {
+        _settings = SharedVariables.RenderSettings;
         _worldData = worldData;
         _renderSystem = renderSystem;
 
@@ -41,11 +43,11 @@ internal class ThreadedMeshGenerationSystem : IMeshGenerationSystem
             {
                 Stopwatch sw = new Stopwatch();
                 var generator = generatorFactory.Invoke();
-                while (_queue.TryDequeueGeneration(out var coord, out var cluster, out var meshData))
+                while (_queue.TryDequeueGeneration(out var coord, out var cluster, out var meshData1, out var meshData2))
                 {
                     sw.Restart();
-                    generator.GenerateMesh(cluster, meshData);
-                    _queue.EnqueueComplete(coord, cluster, meshData);
+                    generator.GenerateMesh(cluster, meshData1, meshData2);
+                    _queue.EnqueueComplete(coord, cluster, meshData1, meshData2);
                     sw.Stop();
                     DebugGenerationTimeSignals.MeshGenerate(sw.Elapsed);
                 }
@@ -64,7 +66,7 @@ internal class ThreadedMeshGenerationSystem : IMeshGenerationSystem
         DebugVariables.MeshQueueCount.Value = _queue.QueueCount;
 
         // Handle requests
-        for (int i = 0; i < MAX_UPDATES_PER_TICK; i++)
+        for (int i = 0; i < _settings.Value.MeshesAppliedPerFrame; i++)
         {
             if (!_queue.TryDequeueRequest(out var coord, out var cluster))
                 break;
@@ -74,10 +76,11 @@ internal class ThreadedMeshGenerationSystem : IMeshGenerationSystem
         }
 
         // Handle completed
-        for (int i = 0; i < MAX_UPDATES_PER_TICK && _queue.TryDequeueComplete(out var coord, out var meshData); i++)
+        for (int i = 0; i < _settings.Value.MeshesAppliedPerFrame && _queue.TryDequeueComplete(out var coord, out var opaque, out var transparent); i++)
         {
-            _renderSystem.UpdateChunk(coord, meshData);
-            _queue.ReturnMeshData(meshData);
+            _renderSystem.UpdateChunk(coord, opaque, transparent);
+            _queue.ReturnMeshData(opaque);
+            _queue.ReturnMeshData(transparent);
         }
     }
 }

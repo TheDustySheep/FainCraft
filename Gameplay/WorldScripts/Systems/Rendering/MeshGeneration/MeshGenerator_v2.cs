@@ -21,15 +21,16 @@ public class MeshGenerator_v2 : IMeshGenerator
         this.voxelIndexer = voxelIndexer;
     }
 
-    public void GenerateMesh(ChunkDataCluster cluster, VoxelMeshData meshData)
+    public void GenerateMesh(ChunkDataCluster cluster, VoxelMeshData opaqueMeshData, VoxelMeshData transparentMeshData)
     {
-        meshData.Clear();
+        opaqueMeshData.Clear();
+        transparentMeshData.Clear();
 
         if (cluster.CenterEmpty)
             return;
 
-        var tris = meshData.Triangles;
-        var verts = meshData.Vertices;
+        var tris  = opaqueMeshData.Triangles;
+        var verts = opaqueMeshData.Vertices;
 
         SetVoxels(cluster);
 
@@ -129,6 +130,7 @@ public class MeshGenerator_v2 : IMeshGenerator
 
         return 3 - (side1 + side2 + corner);
     }
+
 
     private void GetNeighbourVoxels(int x, int y, int z)
     {

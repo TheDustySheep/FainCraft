@@ -6,14 +6,14 @@ public struct VoxelVertex
     /// </summary>
     public uint Data1;
 
-    static readonly uint MASK_XPOS = 0b_0000_0000_0000_0000_0000_0000_0011_1111;
-    static readonly uint MASK_YPOS = 0b_0000_0000_0000_0000_0000_1111_1100_0000;
-    static readonly uint MASK_ZPOS = 0b_0000_0000_0000_0011_1111_0000_0000_0000;
-    static readonly uint MASK_CORNER = 0b_0000_0000_0000_1100_0000_0000_0000_0000;
-    static readonly uint MASK_NORMAL = 0b_0000_0000_0111_0000_0000_0000_0000_0000;
-    static readonly uint MASK_IS_FLUID = 0b_0000_0000_1000_0000_0000_0000_0000_0000;
-    static readonly uint MASK_AO = 0b_0000_0011_0000_0000_0000_0000_0000_0000;
-    static readonly uint MASK_IS_FOLIAGE = 0b_0000_0100_0000_0000_0000_0000_0000_0000;
+    static readonly uint MASK_XPOS        = 0b_0000_0000_0000_0000_0000_0000_0011_1111;
+    static readonly uint MASK_YPOS        = 0b_0000_0000_0000_0000_0000_1111_1100_0000;
+    static readonly uint MASK_ZPOS        = 0b_0000_0000_0000_0011_1111_0000_0000_0000;
+    static readonly uint MASK_CORNER      = 0b_0000_0000_0000_1100_0000_0000_0000_0000;
+    static readonly uint MASK_NORMAL      = 0b_0000_0000_0111_0000_0000_0000_0000_0000;
+    static readonly uint MASK_IS_FLUID    = 0b_0000_0000_1000_0000_0000_0000_0000_0000;
+    static readonly uint MASK_AO          = 0b_0000_0011_0000_0000_0000_0000_0000_0000;
+    static readonly uint MASK_IS_FOLIAGE  = 0b_0000_0100_0000_0000_0000_0000_0000_0000;
     static readonly uint MASK_BIOME_BLEND = 0b_0000_1000_0000_0000_0000_0000_0000_0000;
     static readonly uint MASK_BIOME_INDEX = 0b_1111_0000_0000_0000_0000_0000_0000_0000;
 
