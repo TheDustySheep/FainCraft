@@ -12,6 +12,10 @@ using FainEngine_v2.Entities;
 using FainEngine_v2.Rendering.Materials;
 using FainEngine_v2.Resources;
 using FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading;
+using FainCraft.Gameplay.WorldScripts.Systems.Rendering.RenderSystems;
+using FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.RegionSerialization;
+using FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.ChunkSerializers;
+using FainCraft.Gameplay.WorldScripts.Core;
 
 namespace FainCraft.Gameplay.WorldScripts;
 internal class World : GameObject
@@ -22,8 +26,10 @@ internal class World : GameObject
     readonly IRenderSystem            _renderSystem;
     readonly IMeshGenerationSystem    _meshSystem;
     readonly ITerrainGenerationSystem _terrainSystem;
-    readonly IRegionLoadingController       _loadingController;
+    readonly IRegionLoadingController _loadingController;
     readonly IActiveRegionController  _activeRegionController;
+
+    readonly IFileLoadingSystem       _fileLoadingSystem;
 
     public World()
     {
@@ -33,18 +39,43 @@ internal class World : GameObject
 
         var indexer = VoxelIndexer.Builder.FromFilePath();
 
+        // Entities
         WorldEntityController = new WorldEntityController();
-        WorldData = new WorldData(indexer);
-        _renderSystem = new RenderSystem(voxel_material);
-        _meshSystem = new ThreadedMeshGenerationSystem(WorldData, _renderSystem, () => new MeshGenerator_v2(indexer));
-        //_meshSystem = new BasicMeshGenerationSystem(WorldData, _renderSystem, new MeshGenerator_Bitwise(_indexer));
-        _terrainSystem = new ThreadedTerrainGenerationSystem(new OverworldGenerator(indexer));
-        _loadingController = new RegionLoadingController(WorldData, _terrainSystem, new NullFileLoader());
 
+        // Data
+        WorldData = new WorldData(indexer);
+
+        // Rendering
+        _renderSystem = new RenderSystem(voxel_material);
+        _meshSystem   = new ThreadedMeshGenerationSystem(WorldData, _renderSystem, () => new MeshGenerator_v2(indexer));
+
+        // Terrain / Loading
+        _fileLoadingSystem = new BasicFileLoader("Save_1", new RegionSerializer_v1(new NoCompressionSerializer()));
+
+        WorldData.OnChunkUpdate += SavingFunc;
+
+        _terrainSystem     = new ThreadedTerrainGenerationSystem(new OverworldGenerator(indexer));
+        _loadingController = new RegionLoadingController(WorldData, _terrainSystem, _fileLoadingSystem);
+
+
+        // Active region control
         var activeRegionController = new ActiveRegionController_v2();
-        activeRegionController.OnLoad += _loadingController.Load;
+        activeRegionController.OnLoad   += _loadingController.Load;
+        activeRegionController.OnUnload += _loadingController.Unload;
         _activeRegionController = activeRegionController;
 
+    }
+
+    private void SavingFunc(ChunkCoord coord, bool important)
+    {
+        if (!important)
+            return;
+
+        var regionCoord = (RegionCoord)coord;
+        var data = WorldData.GetRegion(regionCoord);
+        if (data is null)
+            return;
+        _fileLoadingSystem.Save(regionCoord, data);
     }
 
     public override void Update()

@@ -1,5 +1,4 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Core;
-using FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration;
 using FainCraft.Signals.Gameplay.WorldScripts;
 using FainEngine_v2.Collections;
 using FainEngine_v2.Core;
@@ -7,7 +6,7 @@ using FainEngine_v2.Rendering.Materials;
 using System.Diagnostics;
 using System.Numerics;
 
-namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering;
+namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.RenderSystems;
 internal class RenderSystem : IRenderSystem, IDisposable
 {
     readonly ObjectPool<VoxelMesh_v2> _meshPool = new();
@@ -35,19 +34,16 @@ internal class RenderSystem : IRenderSystem, IDisposable
 
     public void UnloadChunk(ChunkCoord coord)
     {
-        Stopwatch sw = Stopwatch.StartNew();
         if (!_chunks.Remove(coord, out var oldMesh))
             return;
 
         oldMesh.Clear();
         _meshPool.Return(oldMesh);
-        DebugGenerationTimeSignals.LoadedMeshesCountUpdate((uint)_chunks.Count);
-        Console.WriteLine($"Removing chunk took {sw.Elapsed.TotalMilliseconds:2F} ms");
+        DebugVariables.LoadedMeshCount.Value = _chunks.Count;
     }
 
     public void UpdateChunk(ChunkCoord coord, VoxelMeshData data)
     {
-        Stopwatch sw = Stopwatch.StartNew();
         if (data.IsEmpty)
         {
             UnloadChunk(coord);
@@ -63,10 +59,8 @@ internal class RenderSystem : IRenderSystem, IDisposable
             mesh = _meshPool.Request();
             mesh.UpdateData(data);
             _chunks[coord] = mesh;
-            DebugGenerationTimeSignals.LoadedMeshesCountUpdate((uint)_chunks.Count);
+            DebugVariables.LoadedMeshCount.Value = _chunks.Count;
         }
-        sw.Stop();
-        Console.WriteLine($"Updating chunk took {sw.Elapsed.TotalMilliseconds:2F} ms");
     }
 
     public void Dispose()

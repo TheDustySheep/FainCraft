@@ -58,7 +58,7 @@ internal class WorldEditor
     private void EditVoxel(Vector3D<int> coord, VoxelState newVoxel)
     {
         VoxelCoordGlobal voxCoord = new VoxelCoordGlobal(coord);
-        worldData.EditVoxelData(voxCoord, oldVoxel =>
+        worldData.EditVoxelState(voxCoord, oldVoxel =>
         {
             return newVoxel;
         });

@@ -1,7 +1,6 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Core;
-using FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration;
 
-namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering;
+namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.RenderSystems;
 internal interface IRenderSystem
 {
     void Draw();

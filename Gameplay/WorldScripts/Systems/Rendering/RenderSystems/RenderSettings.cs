@@ -1,4 +1,4 @@
-﻿namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering
+﻿namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.RenderSystems
 {
     public struct RenderSettings
     {

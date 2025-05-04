@@ -4,7 +4,7 @@ using FainEngine_v2.Rendering.Meshing;
 using System.Numerics;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
-namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration;
+namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering;
 internal class VoxelMesh : CustomVertexMesh<VoxelVertex, uint>
 {
     public VoxelMesh() : base()

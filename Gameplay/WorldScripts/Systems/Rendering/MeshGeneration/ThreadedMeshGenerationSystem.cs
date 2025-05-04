@@ -1,5 +1,6 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Core;
 using FainCraft.Gameplay.WorldScripts.Data;
+using FainCraft.Gameplay.WorldScripts.Systems.Rendering.RenderSystems;
 using FainCraft.Signals.Gameplay.WorldScripts;
 using FainEngine_v2.Utils;
 using System.Diagnostics;
@@ -10,7 +11,7 @@ internal class ThreadedMeshGenerationSystem : IMeshGenerationSystem
     readonly IWorldData _worldData;
     readonly IRenderSystem _renderSystem;
 
-    const int MAX_UPDATES_PER_TICK = 1024;
+    const int MAX_UPDATES_PER_TICK = 8;
     readonly WorkerThread[] workerThreads;
 
     MeshQueue _queue = new();
@@ -28,7 +29,7 @@ internal class ThreadedMeshGenerationSystem : IMeshGenerationSystem
     ~ThreadedMeshGenerationSystem()
     {
         foreach (var worker in workerThreads)
-            worker.Terminate();
+            worker.Dispose();
     }
 
     private WorkerThread[] CreateWorkers(int count, Func<IMeshGenerator> generatorFactory)
@@ -60,7 +61,7 @@ internal class ThreadedMeshGenerationSystem : IMeshGenerationSystem
 
     public void Tick()
     {
-        DebugGenerationTimeSignals.MeshQueueUpdate((uint)_queue.QueueCount);
+        DebugVariables.MeshQueueCount.Value = _queue.QueueCount;
 
         // Handle requests
         for (int i = 0; i < MAX_UPDATES_PER_TICK; i++)

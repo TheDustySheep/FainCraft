@@ -17,7 +17,7 @@ internal class WorldData : IWorldData
         Indexer = indexer;
     }
 
-    // Voxel
+    #region Voxels
     public void AddRegionEdits(RegionEditList edits)
     {
         var remesh = new List<ChunkCoord>();
@@ -85,7 +85,7 @@ internal class WorldData : IWorldData
         return true;
     }
 
-    public bool EditVoxelData(VoxelCoordGlobal globalCoord, Func<VoxelState, VoxelState> editFunc)
+    public bool EditVoxelState(VoxelCoordGlobal globalCoord, Func<VoxelState, VoxelState> editFunc)
     {
         ChunkCoord chunkCoord = (ChunkCoord)globalCoord;
 
@@ -128,8 +128,9 @@ internal class WorldData : IWorldData
 
         return true;
     }
+    #endregion
 
-    // Chunk
+    #region Chunks
     public ChunkData? GetChunk(ChunkCoord coord)
     {
         if (regions.TryGetValue((RegionCoord)coord, out var regionData))
@@ -161,8 +162,9 @@ internal class WorldData : IWorldData
 
         return true;
     }
+    #endregion
 
-    // Cluster
+    #region Clusters
     public ChunkData?[] GetCluster(ChunkCoord coord)
     {
         var result = new ChunkData?[27];
@@ -182,8 +184,9 @@ internal class WorldData : IWorldData
 
         return result;
     }
+    #endregion
 
-    // Region
+    #region Regions
     public RegionData? GetRegion(RegionCoord coord)
     {
         regions.TryGetValue(coord, out var regionData);
@@ -206,10 +209,22 @@ internal class WorldData : IWorldData
     public bool SetRegion(RegionCoord coord, RegionData data)
     {
         regions[coord] = data;
+        DebugVariables.WorldLoadedRegions.Value = regions.Count;
 
+        // TODO Change the logic of this code so that it works with better time complexity and doesn't grow as the world does
         foreach (var pair in regions)
         {
             regionEditList.ApplyEdits(pair.Key, pair.Value);
+        }
+
+        for (int y = 0; y < REGION_Y_TOTAL_COUNT; y++)
+        {
+            OnChunkUpdate?.Invoke(new ChunkCoord()
+            {
+                X = coord.X,
+                Y = y - REGION_Y_NEG_COUNT,
+                Z = coord.Z,
+            }, true);
         }
 
         // Update surrounding chunks
@@ -230,4 +245,41 @@ internal class WorldData : IWorldData
 
         return true;
     }
+
+    public bool UnloadRegion(RegionCoord coord, out RegionData data)
+    {
+        if (!regions.Remove(coord, out data!))
+            return false;
+
+        DebugVariables.WorldLoadedRegions.Value = regions.Count;
+
+        for (int y = 0; y < REGION_Y_TOTAL_COUNT; y++)
+        {
+            OnChunkUpdate?.Invoke(new ChunkCoord()
+            {
+                X = coord.X,
+                Y = y - REGION_Y_NEG_COUNT,
+                Z = coord.Z,
+            }, true);
+        }
+
+        // Update surrounding chunks
+        for (int i = 0; i < 4; i++)
+        {
+            var offset_coord = REGION_OFFSETS[i] + coord;
+
+            for (int y = 0; y < REGION_Y_TOTAL_COUNT; y++)
+            {
+                OnChunkUpdate?.Invoke(new ChunkCoord()
+                {
+                    X = offset_coord.X,
+                    Y = y - REGION_Y_NEG_COUNT,
+                    Z = offset_coord.Z,
+                }, false);
+            }
+        }
+
+        return true;
+    }
+    #endregion
 }

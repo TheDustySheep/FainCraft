@@ -1,12 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <TargetFramework>net9.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Gameplay\WorldScripts\Systems\RegionLoading\TerrainGeneration\StructureEdit\**" />
+    <EmbeddedResource Remove="Gameplay\WorldScripts\Systems\RegionLoading\TerrainGeneration\StructureEdit\**" />
+    <None Remove="Gameplay\WorldScripts\Systems\RegionLoading\TerrainGeneration\StructureEdit\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="Resources\voxel.glsl" />
@@ -65,7 +71,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Gameplay\WorldScripts\Systems\RegionLoading\TerrainGeneration\StructureEdit\" />
     <Folder Include="Resources\Debug\" />
   </ItemGroup>
 

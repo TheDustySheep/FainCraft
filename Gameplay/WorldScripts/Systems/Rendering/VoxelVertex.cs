@@ -1,4 +1,4 @@
-﻿namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration;
+﻿namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering;
 public struct VoxelVertex
 {
     /// <summary>

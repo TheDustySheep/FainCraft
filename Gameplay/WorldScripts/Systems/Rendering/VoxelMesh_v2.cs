@@ -6,7 +6,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
-namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration
+namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering
 {
     public sealed class VoxelMesh_v2 : IMesh
     {

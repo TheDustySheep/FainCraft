@@ -1,4 +1,4 @@
-﻿namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration;
+﻿namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering;
 public class VoxelMeshData
 {
     public readonly List<VoxelVertex> Vertices  = new();

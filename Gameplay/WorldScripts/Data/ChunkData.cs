@@ -4,7 +4,20 @@ using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 namespace FainCraft.Gameplay.WorldScripts.Data;
 public class ChunkData
 {
-    public VoxelState[] VoxelData { get; private set; } = new VoxelState[CHUNK_VOLUME];
+    public VoxelState[] VoxelData { get; private set; }
+
+    public ChunkData()
+    {
+        VoxelData = new VoxelState[CHUNK_VOLUME];
+    }
+
+    public ChunkData(VoxelState[] states)
+    {
+        if (states.Length != CHUNK_VOLUME)
+            throw new Exception($"Error loading voxel states. Array of voxels was not the expected length. {states.Length}/{CHUNK_VOLUME}");
+
+        VoxelData = states;
+    }
 
     public bool IsEmpty()
     {

@@ -3,10 +3,7 @@ using FainCraft.Gameplay.WorldScripts.Core;
 using FainCraft.Gameplay.WorldScripts.Data;
 using FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading;
 using FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.TerrainGeneration;
-using FainEngine_v2.Extensions;
 using FainEngine_v2.Utils.Variables;
-using Silk.NET.Core.Native;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading;
 
@@ -42,7 +39,7 @@ internal class RegionLoadingController : IRegionLoadingController
             return;
         
         // Try loading from file
-        if (_fileLoader.Request(coord))
+        if (_fileLoader.RequestLoad(coord))
         {
             _promises[coord] = new GeneratePromise(GeneratePromise.System.FileLoader);
             return;
@@ -62,9 +59,9 @@ internal class RegionLoadingController : IRegionLoadingController
             return;
         }
 
-        // TODO Handle unloading from world data???
-
-
+        // Unload the data from the world
+        if (_worldData.UnloadRegion(coord, out var data))
+            _fileLoader.Save(coord, data);
     }
 
     public void Tick()
@@ -73,7 +70,7 @@ internal class RegionLoadingController : IRegionLoadingController
         foreach ((var coord, var data) in _fileLoader.GetComplete())
         {
             // If the promise didn't exist something must have gone wrong - Discard anyway
-            if (!_promises.TryGetValue(coord, out var promise))
+            if (!_promises.Remove(coord, out var promise))
                 throw new Exception($"Promise for file loading did not exist {coord}");
 
             // Cancelled - Discard
@@ -88,13 +85,15 @@ internal class RegionLoadingController : IRegionLoadingController
         foreach (var result in _terrainGenerator.GetComplete())
         {
             // If the promise didn't exist something must have gone wrong - Discard anyway
-            if (!_promises.TryGetValue(result.RegionCoord, out var promise))
+            if (!_promises.Remove(result.RegionCoord, out var promise))
                 throw new Exception($"Promise for terrain generation did not exist {result.RegionCoord}");
 
             // Cancelled - Discard
-            // TODO - Need to handle saving the generated data instead of discarding
             if (promise.IsCancelled)
+            {
+                _fileLoader.Save(result.RegionCoord, result.RegionData);
                 continue;
+            }
 
             // Handle the loaded data
             _worldData.SetRegion(result.RegionCoord, result.RegionData);

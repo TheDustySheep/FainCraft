@@ -26,14 +26,14 @@ internal class ThreadedTerrainGenerationSystem : ITerrainGenerationSystem
                 complete.Enqueue(data);
                 sw.Stop();
                 DebugGenerationTimeSignals.TerrainGenerate(sw.Elapsed);
-                DebugGenerationTimeSignals.TerrainQueueUpdate((uint)_queue.Count);
+                DebugVariables.TerrainQueueCount.Value = _queue.Count;
             }
         });
     }
 
     ~ThreadedTerrainGenerationSystem()
     {
-        workerThread.Terminate();
+        workerThread.Dispose();
     }
 
     public void Request(RegionCoord coord)

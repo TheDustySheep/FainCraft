@@ -21,10 +21,12 @@ internal interface IWorldData
     // Region
     public RegionData? GetRegion(RegionCoord coord);
     public bool RegionExists(RegionCoord coord);
-
     public bool SetRegion(RegionCoord coord, RegionData data);
-    bool GetVoxelState(VoxelCoordGlobal globalCoord, out VoxelState voxelData);
+    public bool UnloadRegion(RegionCoord coord, out RegionData data);
+
+    // Voxels
     bool VoxelExists(VoxelCoordGlobal globalCoord);
+    bool GetVoxelState(VoxelCoordGlobal globalCoord, out VoxelState voxelData);
     bool SetVoxelState(VoxelCoordGlobal globalCoord, VoxelState voxelData);
-    bool EditVoxelData(VoxelCoordGlobal globalCoord, Func<VoxelState, VoxelState> editFunc);
+    bool EditVoxelState(VoxelCoordGlobal globalCoord, Func<VoxelState, VoxelState> editFunc);
 }
