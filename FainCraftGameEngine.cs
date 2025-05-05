@@ -19,7 +19,7 @@ internal class FainCraftGameEngine : FainGameEngine
     protected override void Load()
     {
 
-        var postShader  = ResourceLoader.LoadShader(@"C:\Users\Sean\source\repos\FainCraft\Resources\Shaders\PostProcessing\");
+        var postShader  = ResourceLoader.LoadShader(@"Resources\Shaders\PostProcessing\");
         var postProcess = EntityManager.SpawnEntity(new PostProcess(postShader));
 
         var ui = EntityManager.SpawnEntity<UIController>();

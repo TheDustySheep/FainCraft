@@ -1,19 +1,6 @@
-#version 330 core
-layout (location = 0) in int aData1;
-layout (location = 1) in int aData2;
+#include "./water.glsl"
 
-out vec3 oTexCoord;
-out vec3 oVertexNormal;
-out vec3 oFragPos;
-out float oAO;
-out vec3 oBlendColor;
-
-uniform mat4 normalMat;
-uniform mat4 uModel;
-uniform mat4 uProjection;
-uniform mat4 uView;
-uniform float time;
-
+// Structs
 struct Vertex_Data
 {
     vec3 Position;
@@ -28,13 +15,7 @@ struct Vertex_Data
     bool animateFoliage;
 };
 
-const vec3 BIOME_COLORS[] = vec3[]
-(
-   vec3(142.0 / 255.0, 179.0 / 255.0, 97.0 / 255.0)
-);
-
-const vec3 FOLIAGE_COLOR = vec3(58.0 / 255.0, 95.0 / 255.0, 11.0 / 255.0);
-
+// Lookups
 const vec3 NORMAL_LOOKUP[6] = vec3[]
 (
    vec3(-1, 0, 0), 
@@ -55,28 +36,20 @@ const vec2 TEX_LOOKUP[4] = vec2[]
 
 vec3 DecodeTexCoord(int index, int corner)
 {
-    //int xIdx = (index & 15);
-    //int yIdx = (index >> 4) & 15;
-    
-    vec3 coord = vec3(0, 0, index);
+    const vec2 offsets[4] = vec2[4](
+        vec2(0.0, 0.0),
+        vec2(0.0, 1.0),
+        vec2(1.0, 1.0),
+        vec2(1.0, 0.0)
+    );
 
-    switch (corner) 
-    {
-        case 0:
-            coord.xy = vec2(0, 0);
-            break;
-        case 1:
-            coord.xy = vec2(0, 1);
-            break;
-        case 2:
-            coord.xy = vec2(1, 1);
-            break;
-        default:
-            coord.xy = vec2(1, 0);
-            break;
-    }
+    vec2 uv = offsets[corner];
+    return vec3(uv, index);
+}
 
-    return coord;
+float DecodeAO(int ao)
+{
+    return (float(ao) + 1.0) * 0.25;
 }
 
 float GetSumOfCoSins(float t, float frequency)
@@ -107,7 +80,7 @@ float GetSumOfSins(float t, float frequency)
     return result / 1.875;
 }
 
-float GetWave(vec2 pos)
+float GetWave(vec2 pos, float time)
 {
     float xWaveLastDir = GetSumOfCoSins(pos.x + (time - 1) * 2.5, 0.1);
     float zWaveLastDir = GetSumOfCoSins(pos.x + (time - 1) * 3.2, 0.1);
@@ -118,7 +91,7 @@ float GetWave(vec2 pos)
     return (xWave + zWave) * 0.5 * 0.2;
 }
 
-Vertex_Data ApplyFluid(Vertex_Data vertex_data)
+Vertex_Data ApplyFluid(Vertex_Data vertex_data, mat4x4 uModel, float time)
 {
     if (!vertex_data.isFluid)
         return vertex_data;
@@ -128,19 +101,15 @@ Vertex_Data ApplyFluid(Vertex_Data vertex_data)
     {
         vec3 globalPos = vec3(uModel * vec4(vertex_data.Position, 1.0));
 
-        float wavePos = GetWave(globalPos.xz);
-        vertex_data.Position.y += -0.2 + wavePos;
+        //float waveHeight = GetWave(globalPos.xz, time);
+        float waveHeight = computeWaveHeight(globalPos, time);
+        vertex_data.Position.y += waveHeight - 0.2;
     }
 
     return vertex_data;
 }
 
-float DecodeAO(int ao)
-{
-    return (float(ao) + 1.0) * 0.25;
-}
-
-Vertex_Data DecodeVertex()
+Vertex_Data DecodeVertex(int aData1, int aData2, mat4x4 uModel, float time)
 {
     Vertex_Data vertex_data;
 
@@ -165,40 +134,7 @@ Vertex_Data DecodeVertex()
     vertex_data.blendBiome = bool((aData1 >> 27) & 1);
     vertex_data.biomeIndex = (aData1 >> 28) & 15;
 
-    vertex_data = ApplyFluid(vertex_data);
+    vertex_data = ApplyFluid(vertex_data, uModel, time);
 
     return vertex_data;
-}
-
-void main()
-{
-    Vertex_Data vertex_data = DecodeVertex();
-
-    vec3 aPosition = vertex_data.Position;
-    vec3 aNormal   = vertex_data.Normal;
-    vec3 aTexCoord = vertex_data.TexCoord;
-
-    // Outputs
-    gl_Position = uProjection * uView * uModel * vec4(aPosition, 1.0);
-    oFragPos = vec3(uModel * vec4(aPosition, 1.0));
-    oVertexNormal = mat3(normalMat) * aNormal;
-    oTexCoord = aTexCoord;
-    oAO = DecodeAO(vertex_data.AO);
-
-    vec3 blendCol = vec3(1, 1, 1);
-
-    if (vertex_data.animateFoliage && vertex_data.blendBiome)
-    {
-        blendCol = (FOLIAGE_COLOR + BIOME_COLORS[vertex_data.biomeIndex]) * 0.5;
-    }
-    else if (vertex_data.blendBiome)
-    {
-        blendCol = BIOME_COLORS[vertex_data.biomeIndex];
-    }    
-    else if (vertex_data.animateFoliage)
-    {
-        blendCol = FOLIAGE_COLOR;
-    }
-
-    oBlendColor = blendCol;
 }

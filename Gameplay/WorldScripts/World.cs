@@ -7,7 +7,6 @@ using FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.TerrainGeneration;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering;
 using FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.TerrainGeneration.Overworld;
 using FainCraft.Gameplay.WorldScripts.Voxels;
-using FainCraft.Resources.Shaders.Voxel_Shader;
 using FainEngine_v2.Entities;
 using FainEngine_v2.Rendering.Materials;
 using FainEngine_v2.Resources;
@@ -16,6 +15,7 @@ using FainCraft.Gameplay.WorldScripts.Systems.Rendering.RenderSystems;
 using FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.RegionSerialization;
 using FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.ChunkSerializers;
 using FainCraft.Gameplay.WorldScripts.Core;
+using FainCraft.Gameplay.WorldScripts.Systems.Rendering.Materials;
 
 namespace FainCraft.Gameplay.WorldScripts;
 internal class World : GameObject
@@ -33,9 +33,9 @@ internal class World : GameObject
 
     public World()
     {
-        var voxel_atlas      = ResourceLoader.LoadTextureAtlas(@"C:\Users\Sean\source\repos\FainCraft\Resources\Textures\atlas.png", 16, mipMapMode: Texture.MipMapModes.Nearest);
-        var voxel_material_o = new VoxelMaterial           (ResourceLoader.LoadShader(@"C:\Users\Sean\source\repos\FainCraft\Resources\Shaders\Voxel_Shader\"), voxel_atlas);
-        var voxel_material_t = new VoxelMaterialTransparent(ResourceLoader.LoadShader(@"C:\Users\Sean\source\repos\FainCraft\Resources\Shaders\Voxel_Shader_Transparent\"), voxel_atlas);
+        var voxel_atlas      = ResourceLoader.LoadTextureAtlas(@"Resources\Textures\atlas.png", 16, mipMapMode: Texture.MipMapModes.Nearest);
+        var voxel_material_o = new VoxelMaterial           (ResourceLoader.LoadShader(@"Resources\Shaders\Voxels\Voxel_Shader\"), voxel_atlas);
+        var voxel_material_t = new VoxelMaterialTransparent(ResourceLoader.LoadShader(@"Resources\Shaders\Voxels\Voxel_Shader_Transparent\"), voxel_atlas);
 
         var indexer = VoxelIndexer.Builder.FromFilePath();
 
