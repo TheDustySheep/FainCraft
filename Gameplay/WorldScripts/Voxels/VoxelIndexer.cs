@@ -3,11 +3,11 @@ using Newtonsoft.Json;
 using System.Runtime.CompilerServices;
 
 namespace FainCraft.Gameplay.WorldScripts.Voxels;
-public class VoxelIndexer
+public class VoxelIndexer : IVoxelIndexer
 {
     readonly VoxelType[] Voxels;
     readonly Dictionary<VoxelType, uint> TypeToIndex = new();
-    readonly Dictionary<string,    uint> NameToIndex = new();
+    readonly Dictionary<string, uint> NameToIndex = new();
 
     public VoxelDataCache<bool> CacheLightingSolid { get; }
 

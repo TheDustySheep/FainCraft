@@ -28,6 +28,17 @@ public class ChunkDataCluster
         }
     }
 
+    public void SetData(ChunkData chunkData)
+    {
+        nChunks[13].CopyFrom(chunkData);
+
+        for (int i = 0; i < 13; i++)
+            nChunks[i].Clear();
+
+        for (int i = 14; i < 27; i++)
+            nChunks[i].Clear();
+    }
+
     public VoxelState GetCenterChunkVoxel(uint x, uint y, uint z)
     {
         uint localIndex = ChunkIndex(x, y, z);

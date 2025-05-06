@@ -1,4 +1,5 @@
 ﻿using FainCraft.Gameplay.Motors;
+using FainCraft.Gameplay.PlayerScripts.Gamemodes;
 using FainEngine_v2.Core;
 using FainEngine_v2.Core.GameObjects;
 using FainEngine_v2.Extensions;
@@ -12,110 +13,58 @@ internal class PlayerCharacterController
     readonly Transform camTransform;
     readonly EntityMotor motor;
 
-    bool _isSprinting;
-    readonly float jumpPeriod = 0.5f;
-    float jumpCooldown = 0f;
-    readonly float moveSpeed = 4.3f;
-    readonly float sprintSpeed = 5.6f;
     readonly float lookSensitivity = 0.1f;
     Vector2 CameraRotation;
+
+    IGamemode _survival;
+    IGamemode _noclip;
+
+    IGamemode _gamemode;
+    IGamemode Gamemode
+    {
+        get => _gamemode;
+        set
+        {
+            _gamemode.ExitState();
+            _gamemode = value;
+            value.EnterState();
+        }
+    }
+
 
     public PlayerCharacterController(Transform camTransform, EntityMotor motor)
     {
         this.camTransform = camTransform;
         this.motor = motor;
+
+        _survival = new Survival(motor, camTransform);
+        _noclip   = new NoClip(motor, camTransform);
+
+        _gamemode = _survival;
+        _gamemode.EnterState();
     }
 
     public void Update()
     {
-        UpdatePosition();
+        UpdateGamemode();
         UpdateRotation();
-    }
-
-    private void UpdatePosition()
-    {
-        Vector3 velocity = motor.Velocity;
-
-        // Movement
-        Vector3 movements = Movement();
-        velocity.X = movements.X;
-        velocity.Z = movements.Z;
-
-        if (GameInputs.IsKeyHeld(Key.ControlLeft))
-            _isSprinting = true;
-
-        // Jumping
-        if (GameInputs.IsKeyHeld(Key.Space) && motor.GroundedState.IsGrounded && jumpCooldown == 0f)
-        {
-            float force = MathF.Sqrt(2 * motor.Gravity * 1.25f);
-            velocity.Y = force;
-            jumpCooldown = jumpPeriod;
-        }
-        jumpCooldown = MathUtils.Max(0f, jumpCooldown - GameTime.DeltaTime);
-
-        // Flying
-        if (GameInputs.IsKeyHeld(Key.F))
-        {
-            velocity = camTransform.Forward * 100f;
-        }
-
-        motor.Velocity = velocity;
+        UpdatePosition();
 
         if (GameInputs.IsKeyDown(Key.Escape))
             GameInputs.ExitProgram();
     }
 
-    private Vector3 Movement()
+    private void UpdateGamemode()
     {
-        Vector2 inputs = MovementInputs();
-
-        Vector2 forward = camTransform.Forward.ToXZ().Normalized();
-        Vector2 right = camTransform.Right.ToXZ().Normalized();
-
-        if (_isSprinting)
-        {
-            inputs.Y *= sprintSpeed;
-            inputs.X *= moveSpeed;
-        }
-        else
-        {
-            inputs *= moveSpeed;
-        }
-
-        Vector2 moveVector = Vector2.Zero;
-        moveVector += inputs.Y * forward;
-        moveVector += inputs.X * right;
-        return moveVector.ToXZ();
+        if (GameInputs.IsKeyDown(Key.G))
+            Gamemode = _survival;
+        else if (GameInputs.IsKeyDown(Key.H))
+            Gamemode = _noclip;
     }
 
-    private Vector2 MovementInputs()
+    private void UpdatePosition()
     {
-        Vector2 input = Vector2.Zero;
-
-        if (GameInputs.IsKeyHeld(Key.W))
-        {
-            input.Y += 1f;
-        }
-        else if (GameInputs.IsKeyHeld(Key.S))
-        {
-            input.Y -= 1f;
-            _isSprinting = false;
-        }
-        else
-        {
-            _isSprinting = false;
-        }
-
-        if (GameInputs.IsKeyHeld(Key.A))
-        {
-            input.X -= 1f;
-        }
-        if (GameInputs.IsKeyHeld(Key.D))
-        {
-            input.X += 1f;
-        }
-
-        return input.Normalized();
+        _gamemode.UpdatePosition(MovementInputs());
     }
 
     private void UpdateRotation()
@@ -135,4 +84,23 @@ internal class PlayerCharacterController
             );
         }
     }
+
+    #region Movement Inputs
+    private Vector2 MovementInputs()
+    {
+        Vector2 input = Vector2.Zero;
+
+        if (GameInputs.IsKeyHeld(Key.W))
+            input.Y += 1f;
+        if (GameInputs.IsKeyHeld(Key.S))
+            input.Y -= 1f;
+
+        if (GameInputs.IsKeyHeld(Key.A))
+            input.X -= 1f;
+        if (GameInputs.IsKeyHeld(Key.D))
+            input.X += 1f;
+
+        return input.Normalized();
+    }
+    #endregion
 }

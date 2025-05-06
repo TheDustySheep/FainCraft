@@ -6,11 +6,11 @@ using FainEngine_v2.Physics.AABB;
 using System.Numerics;
 
 namespace FainCraft.Gameplay.Motors;
-internal class CollisionHandler
+public class CollisionHandler
 {
     public const int IterationCount = 10;
 
-    readonly VoxelIndexer indexer;
+    readonly IVoxelIndexer indexer;
     readonly IWorldData worldData;
 
     public CollisionHandler(IWorldData worldData)
@@ -99,11 +99,11 @@ internal class CollisionHandler
     }
 
     readonly List<StaticAABB> colliders = new();
-    private void PhysicsStep(ref DynamicAABB playerAABB, VoxelIndexer indexer)
+    private void PhysicsStep(ref DynamicAABB playerAABB, IVoxelIndexer indexer)
     {
         VoxelCoordGlobal playerCoord = new VoxelCoordGlobal(playerAABB.Position);
         VoxelCoordGlobal minVoxel = playerCoord + new VoxelCoordGlobal(-1, -1, -1);
-        VoxelCoordGlobal maxVoxel = playerCoord + new VoxelCoordGlobal(1, 2, 1);
+        VoxelCoordGlobal maxVoxel = playerCoord + new VoxelCoordGlobal( 1,  2,  1);
 
         colliders.Clear();
 

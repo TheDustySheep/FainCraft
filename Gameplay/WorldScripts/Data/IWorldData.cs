@@ -3,11 +3,11 @@ using FainCraft.Gameplay.WorldScripts.Editing;
 using FainCraft.Gameplay.WorldScripts.Voxels;
 
 namespace FainCraft.Gameplay.WorldScripts.Data;
-internal interface IWorldData
+public interface IWorldData
 {
     public event Action<ChunkCoord, bool>? OnChunkUpdate;
 
-    public VoxelIndexer Indexer { get; }
+    public IVoxelIndexer Indexer { get; }
 
     public void AddRegionEdits(RegionEditList edits);
 

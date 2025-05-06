@@ -5,7 +5,7 @@ using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration;
 public class MeshGenerator_v3 : IMeshGenerator
 {
-    readonly VoxelIndexer voxelIndexer;
+    readonly IVoxelIndexer voxelIndexer;
     readonly VoxelState[] nVoxelDatas = new VoxelState[27];
     readonly VoxelType[] nVoxelTypes = new VoxelType[27];
 
@@ -14,7 +14,7 @@ public class MeshGenerator_v3 : IMeshGenerator
 
     const uint VOXEL_UP = 22;
 
-    public MeshGenerator_v3(VoxelIndexer voxelIndexer)
+    public MeshGenerator_v3(IVoxelIndexer voxelIndexer)
     {
         this.voxelIndexer = voxelIndexer;
     }

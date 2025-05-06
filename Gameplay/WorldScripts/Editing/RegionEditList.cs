@@ -4,7 +4,7 @@ using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Editing
 {
-    internal class RegionEditList
+    public class RegionEditList
     {
         private readonly Dictionary<RegionCoord, List<RegionEdit>> EditList = [];
 

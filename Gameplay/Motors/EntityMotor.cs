@@ -6,10 +6,11 @@ using FainEngine_v2.Utils;
 using System.Numerics;
 
 namespace FainCraft.Gameplay.Motors;
-internal class EntityMotor
+public class EntityMotor
 {
     #region Public Properties
     public bool EnableGravity = true;
+    public bool EnableCollision = true;
     public GroundedState GroundedState => _groundedState;
 
     public float Gravity
@@ -103,9 +104,12 @@ internal class EntityMotor
             Delta = _currentVelocity * GameTime.FixedDeltaTime,
         };
 
-        _collisionHandler.VoxelCollisionsDynamic(ref playerAABB);
+        if (EnableCollision)
+            _collisionHandler.VoxelCollisionsDynamic(ref playerAABB);
+        else
+            playerAABB.Position += playerAABB.Delta;
 
-        _currentPosition = playerAABB.Position;
+            _currentPosition = playerAABB.Position;
         _currentVelocity = playerAABB.Delta / GameTime.FixedDeltaTime;
     }
 

@@ -6,13 +6,13 @@ using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 namespace FainCraft.Gameplay.WorldScripts.Data;
 internal class WorldData : IWorldData
 {
-    public VoxelIndexer Indexer { get; init; }
+    public IVoxelIndexer Indexer { get; init; }
     public event Action<ChunkCoord, bool>? OnChunkUpdate;
     private readonly Dictionary<RegionCoord, RegionData> regions = new();
 
     readonly RegionEditList regionEditList = new RegionEditList();
 
-    public WorldData(VoxelIndexer indexer)
+    public WorldData(IVoxelIndexer indexer)
     {
         Indexer = indexer;
     }

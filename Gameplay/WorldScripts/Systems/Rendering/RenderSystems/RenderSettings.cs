@@ -8,9 +8,9 @@
 
         public static readonly RenderSettings Default = new()
         {
-            LoadRadius = 4,
+            LoadRadius = 16,
             RenderRadius = 4,
-            MeshesAppliedPerFrame = 4,
+            MeshesAppliedPerFrame = 16,
         };
     }
 }

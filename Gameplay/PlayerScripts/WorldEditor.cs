@@ -15,7 +15,7 @@ namespace FainCraft.Gameplay.PlayerScripts;
 
 internal class WorldEditor
 {
-    readonly VoxelIndexer indexer;
+    readonly IVoxelIndexer indexer;
     readonly IWorldData worldData;
     readonly Transform camTransform;
     readonly IWorldEntityController entityController;
