@@ -30,7 +30,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.ActiveRegionControl
             _lastCoord = playerCoord;
 
             // materialize to lock in the spiral order
-            var spiral = GetSpiral(playerCoord, _renderSettings.Value.LoadRadius)
+            var spiral = GetSpiral(playerCoord, (int)_renderSettings.Value.LoadRadius)
                             .ToList();
 
             // 1) Unload anything no longer in the spiral

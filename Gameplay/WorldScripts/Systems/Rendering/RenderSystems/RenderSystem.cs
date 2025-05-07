@@ -27,14 +27,23 @@ internal class RenderSystem : IRenderSystem, IDisposable
 
     public void Draw()
     {
+        RegionCoord playerCoord = SharedVariables.PlayerPosition.Value.RegionCoord;
+        uint renderDistance = SharedVariables.RenderSettings.Value.RenderRadius;
+
         foreach ((var coord, var mesh) in _opaqueMeshes)
         {
+            if (playerCoord.OctileDistance((RegionCoord)coord) > renderDistance)
+                continue;
+
             var model = Matrix4x4.CreateTranslation(coord.GlobalMin);
             GameGraphics.DrawMesh(mesh, _opaqueMaterial, model);
         }
 
         foreach ((var coord, var mesh) in _transparentMeshes)
         {
+            if (playerCoord.OctileDistance((RegionCoord)coord) > renderDistance)
+                continue;
+
             var model = Matrix4x4.CreateTranslation(coord.GlobalMin);
             GameGraphics.DrawMesh(mesh, _transparentMaterial, model);
         }

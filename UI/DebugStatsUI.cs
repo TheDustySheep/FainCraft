@@ -6,8 +6,8 @@ using FainEngine_v2.Rendering;
 using FainEngine_v2.UI;
 using FainEngine_v2.UI.Elements;
 using FainEngine_v2.Utils;
-using Newtonsoft.Json.Linq;
 using System.Text;
+
 namespace FainCraft.UI
 {
     public class DebugStatsUI : UIElement
@@ -46,7 +46,7 @@ namespace FainCraft.UI
             StringBuilder sb = new(" --- Debug Statistics ---");
             sb.AppendLine($"Frames Per Second");
             sb.AppendLine($" - FPS: {1f / GameTime.DeltaTime:F2}");
-            sb.AppendLine($" - TPS: {1f / GameTime.FixedDeltaTime:F2}");
+            sb.AppendLine($" - TPS: {1f / GameTime.FixedDeltaTimeActual:F2}");
             sb.AppendLine($"");
             sb.AppendLine($"Frames Per Second");
             sb.AppendLine($"Player: {SharedVariables.PlayerPosition.Value.Position}");

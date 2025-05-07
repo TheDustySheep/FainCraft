@@ -169,9 +169,9 @@ internal class WorldData : IWorldData
     {
         var result = new ChunkData?[27];
         int i = 0;
-        for (int z = -1; z < 2; z++)
+        for (int y = -1; y < 2; y++)
         {
-            for (int y = -1; y < 2; y++)
+            for (int z = -1; z < 2; z++)
             {
                 for (int x = -1; x < 2; x++, i++)
                 {

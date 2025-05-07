@@ -34,6 +34,22 @@ public struct RegionCoord
         return (uint)(Math.Abs(X - other.X) + Math.Abs(Z - other.Z));
     }
 
+    public readonly uint OctileDistance(RegionCoord other)
+    {
+        int x2 = other.X;
+        int z2 = other.Z;
+
+        int dx = Math.Abs(X - x2);
+        int dy = Math.Abs(Z - z2);
+
+        // Number of diagonal steps is the smaller of dx, dy
+        int diagonalSteps = Math.Min(dx, dy);
+        // Remaining straight steps are the difference between dx and dy
+        int straightSteps = Math.Abs(dx - dy);
+
+        return (uint)((diagonalSteps * 14) + (straightSteps * 10)) / 10;
+    }
+
     public static bool operator ==(RegionCoord a, RegionCoord b)
     {
         return a.X == b.X && a.Z == b.Z;

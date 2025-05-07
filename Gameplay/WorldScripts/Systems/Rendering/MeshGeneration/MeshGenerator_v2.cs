@@ -21,13 +21,10 @@ public class MeshGenerator_v2 : IMeshGenerator
         this.voxelIndexer = voxelIndexer;
     }
 
-    public void GenerateMesh(ChunkDataCluster cluster, VoxelMeshData opaqueMeshData, VoxelMeshData transparentMeshData)
+    public void GenerateMesh(IChunkDataCluster cluster, VoxelMeshData opaqueMeshData, VoxelMeshData transparentMeshData)
     {
         opaqueMeshData.Clear();
         transparentMeshData.Clear();
-
-        if (cluster.CenterEmpty)
-            return;
 
         var tris  = opaqueMeshData.Triangles;
         var verts = opaqueMeshData.Vertices;
@@ -36,19 +33,19 @@ public class MeshGenerator_v2 : IMeshGenerator
 
         uint vertCount = 0;
 
-        for (uint y = 0; y < CHUNK_SIZE; y++)
+        for (int y = 0; y < CHUNK_SIZE; y++)
         {
-            for (uint z = 0; z < CHUNK_SIZE; z++)
+            for (int z = 0; z < CHUNK_SIZE; z++)
             {
-                for (uint x = 0; x < CHUNK_SIZE; x++)
+                for (int x = 0; x < CHUNK_SIZE; x++)
                 {
-                    var voxelData = cluster.GetCenterChunkVoxel(x, y, z);
+                    var voxelData = cluster.GetVoxel(x, y, z);
                     var voxelType = voxelIndexer.GetVoxelType(voxelData.Index);
 
                     if (!voxelType.DrawSelf)
                         continue;
 
-                    GetNeighbourVoxels((int)x, (int)y, (int)z);
+                    GetNeighbourVoxels(x, y, z);
 
                     uint surfaceFluid = Convert.ToUInt32(voxelType.Is_Fluid && !nVoxelTypes[VOXEL_UP].Is_Fluid);
 
@@ -71,9 +68,9 @@ public class MeshGenerator_v2 : IMeshGenerator
                         for (uint i = 0; i < 4; i++)
                         {
                             var vert = VERTICES[i + face * 4];
-                            vert.XPos += x;
-                            vert.YPos += y;
-                            vert.ZPos += z;
+                            vert.XPos += (uint)x;
+                            vert.YPos += (uint)y;
+                            vert.ZPos += (uint)z;
                             vert.SurfaceFluid = surfaceFluid;
 
                             vert.TexIndex = voxelType.TexIDs[face];
@@ -103,7 +100,7 @@ public class MeshGenerator_v2 : IMeshGenerator
         }
     }
 
-    private void SetVoxels(ChunkDataCluster cluster)
+    private void SetVoxels(IChunkDataCluster cluster)
     {
         int i = 0;
         Span<VoxelState> voxelDatas = allVoxelDatas;

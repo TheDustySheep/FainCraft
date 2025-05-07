@@ -22,18 +22,6 @@ public class WorldConstants
 
     #region Indexes
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int ChunkIndexOld(int x, int y, int z)
-    {
-        return z * CHUNK_SIZE * CHUNK_SIZE + y * CHUNK_SIZE + x;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static uint ChunkIndexOld(uint x, uint y, uint z)
-    {
-        return z * CHUNK_SIZE * CHUNK_SIZE + y * CHUNK_SIZE + x;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int ChunkIndex(int x, int y, int z)
     {
         return
@@ -51,10 +39,12 @@ public class WorldConstants
             (x & CHUNK_SIZE_MASK);
     }
 
+
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static uint ClusterIndex(uint x, uint y, uint z)
     {
-        return y * 9 + z * 3 + x;
+        return x + z * 3 + y * 9;
     }
     #endregion
 

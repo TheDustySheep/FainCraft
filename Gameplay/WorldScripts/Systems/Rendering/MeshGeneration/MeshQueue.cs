@@ -7,27 +7,28 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration
 {
     public class MeshQueue
     {
-        public int QueueCount => _toGenerate.Count;
+        public int BufferCount => _RequestInBuffer.Count;
 
-        readonly ObjectPool<ChunkDataCluster> _clusterPool  = new() { MaxItems = 128 };
+        readonly ObjectPoolFactory<IChunkDataCluster> _clusterPool = new(() => new ChunkDataClusterFull()) { MaxItems = 128 };
         readonly ObjectPool<VoxelMeshData>    _meshDataPool = new() { MaxItems = 128 };
 
-        readonly OrderedSet<ChunkCoord> _toGenerate = new();
-        readonly ConcurrentQueue<(ChunkCoord coord, ChunkDataCluster cluster)> _buffer = new();
-        readonly ConcurrentQueue<(ChunkCoord coord, ChunkDataCluster cluster, VoxelMeshData opaque, VoxelMeshData transparent)> complete = new();
+        readonly OrderedSet<ChunkCoord> _RequestInBuffer = new();
+        readonly ConcurrentQueue<(ChunkCoord coord, IChunkDataCluster cluster)> _GenInBuffer = new();
+        readonly ConcurrentQueue<(ChunkCoord coord, IChunkDataCluster cluster, VoxelMeshData opaque, VoxelMeshData transparent)> complete = new();
 
         #region Requests
         public void EnqueueRequest(ChunkCoord chunkCoord, bool important)
         {
             if (important)
-                _toGenerate.AddFirst(chunkCoord);
+                _RequestInBuffer.AddFirst(chunkCoord);
             else
-                _toGenerate.AddLast(chunkCoord);
+                _RequestInBuffer.AddLast(chunkCoord);
         }
 
-        public bool TryDequeueRequest(out ChunkCoord coord, out ChunkDataCluster cluster)
+        public bool TryDequeueRequest(out ChunkCoord coord, out IChunkDataCluster cluster)
         {
-            if (!_toGenerate.TryDequeue(out coord))
+            if (_GenInBuffer.Count >= SharedVariables.RenderSettings.Value.MeshQueueLimit ||
+                !_RequestInBuffer.TryDequeue(out coord))
             {
                 coord = default;
                 cluster = default!;
@@ -41,19 +42,19 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration
         
         #region Completed
         
-        public void EnqueueGeneration(ChunkCoord coord, ChunkDataCluster cluster)
+        public void EnqueueGeneration(ChunkCoord coord, IChunkDataCluster cluster)
         {
-            _buffer.Enqueue((coord, cluster));
+            _GenInBuffer.Enqueue((coord, cluster));
         }
 
         public bool TryDequeueGeneration(
             out ChunkCoord coord, 
-            out ChunkDataCluster cluster, 
+            out IChunkDataCluster cluster, 
             out VoxelMeshData meshData1,
             out VoxelMeshData meshData2
         )
         {
-            if (_buffer.TryDequeue(out var pair))
+            if (_GenInBuffer.TryDequeue(out var pair))
             {
                 coord     = pair.coord;
                 cluster   = pair.cluster;
@@ -74,8 +75,8 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration
 
         #region Completed
         public void EnqueueComplete(
-            ChunkCoord coord, 
-            ChunkDataCluster cluster,
+            ChunkCoord coord,
+            IChunkDataCluster cluster,
             VoxelMeshData meshData1,
             VoxelMeshData meshData2
         )

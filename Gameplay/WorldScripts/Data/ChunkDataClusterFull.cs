@@ -1,11 +1,11 @@
 ﻿using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Data;
-public class ChunkDataCluster
+public class ChunkDataClusterFull : IChunkDataCluster
 {
     readonly ChunkData[] nChunks = new ChunkData[27];
 
-    public ChunkDataCluster()
+    public ChunkDataClusterFull()
     {
         for (int i = 0; i < 27; i++)
         {
@@ -13,18 +13,23 @@ public class ChunkDataCluster
         }
     }
 
-    public bool CenterEmpty => nChunks[13].IsEmpty();
+    public bool IsEmpty => nChunks[13].IsEmpty();
 
     public void SetData(ChunkData?[] chunkDatas)
     {
         for (int i = 0; i < 27; i++)
         {
-            var chunk = chunkDatas[i];
+            var dst = nChunks[i].AsSpan();
 
-            if (chunk is null)
-                nChunks[i].Clear();
+            var chunk = chunkDatas[i];
+            if (chunk == null)
+                dst.Clear();
             else
-                nChunks[i].CopyFrom(chunk);
+            {
+                var src = chunk.AsSpan();
+                src.CopyTo(dst);
+            }
+
         }
     }
 
@@ -39,21 +44,12 @@ public class ChunkDataCluster
             nChunks[i].Clear();
     }
 
-    public VoxelState GetCenterChunkVoxel(uint x, uint y, uint z)
-    {
-        uint localIndex = ChunkIndex(x, y, z);
-
-        var chunkData = nChunks[13];
-
-        return chunkData[localIndex];
-    }
-
     public VoxelState GetVoxel(int x, int y, int z)
     {
         int chunkIndex = 13 +
             (x >> CHUNK_SIZE_POWER) +
-            (y >> CHUNK_SIZE_POWER) * 3 +
-            (z >> CHUNK_SIZE_POWER) * 9;
+            (z >> CHUNK_SIZE_POWER) * 3 +
+            (y >> CHUNK_SIZE_POWER) * 9;
 
         int localIndex = ChunkIndex
         (

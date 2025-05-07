@@ -63,14 +63,11 @@ internal class ThreadedMeshGenerationSystem : IMeshGenerationSystem
 
     public void Tick()
     {
-        DebugVariables.MeshQueueCount.Value = _queue.QueueCount;
+        DebugVariables.MeshQueueCount.Value = _queue.BufferCount;
 
         // Handle requests
-        for (int i = 0; i < _settings.Value.MeshesAppliedPerFrame; i++)
+        for (int i = 0; i < _settings.Value.MeshesAppliedPerFrame && _queue.TryDequeueRequest(out var coord, out var cluster); i++)
         {
-            if (!_queue.TryDequeueRequest(out var coord, out var cluster))
-                break;
-
             cluster.SetData(_worldData.GetCluster(coord));
             _queue.EnqueueGeneration(coord, cluster);
         }

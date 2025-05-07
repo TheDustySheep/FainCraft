@@ -13,7 +13,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.Lighting
             _indexer = indexer;
         }
 
-        public ChunkLightingData Calculate(ChunkDataCluster dataCluster, bool isTop)
+        public ChunkLightingData Calculate(IChunkDataCluster dataCluster, bool isTop)
         {
             bool[] solid = _indexer.CacheLightingSolid.Data;
 

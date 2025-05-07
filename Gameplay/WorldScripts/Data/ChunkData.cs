@@ -31,13 +31,20 @@ public class ChunkData
 
     public void Clear()
     {
-        Array.Clear(VoxelData);
+        Span<VoxelState> dst = VoxelData.AsSpan();
+        dst.Clear();
     }
 
     public void CopyFrom(ChunkData other)
     {
-        other.VoxelData.AsSpan().CopyTo(VoxelData);
+        Span<VoxelState> dst = VoxelData.AsSpan();
+        Span<VoxelState> src = other.VoxelData.AsSpan();
+        src.CopyTo(dst);
     }
+
+    public Span<VoxelState> AsSpan() => VoxelData.AsSpan();
+
+    public static readonly ChunkData Empty = new();
 
     public VoxelState this[int index]
     {
