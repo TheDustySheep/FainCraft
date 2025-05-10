@@ -44,6 +44,7 @@
     "Name": "Cobblestone",
     "Draw_Self": true,
     "Fully_Opaque": true,
+    "Emits_Light" :  15,
     "TexIDs": [ 224, 224, 224, 224, 224, 224 ],
     "Physics_Solid": true,
     "Biome_Blend": [ false, false, false, false, false, false ]

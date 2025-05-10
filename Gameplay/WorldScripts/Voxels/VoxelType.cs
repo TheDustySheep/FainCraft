@@ -9,6 +9,9 @@ public class VoxelType
     [JsonProperty("Draw_Self")]
     public bool DrawSelf { get; set; } = true;
 
+    [JsonProperty("EmitsLight")]
+    public byte Emits_Light { get; set; } = 0;
+
     [JsonProperty("Fully_Opaque")]
     public bool Fully_Opaque { get; set; } = true;
 
@@ -35,6 +38,8 @@ public class VoxelType
 
     [JsonProperty("Biome_Blend")]
     public bool[] Biome_Blend { get; set; } = [false, false, false, false, false, false];
+
+
 
     public override string ToString()
     {

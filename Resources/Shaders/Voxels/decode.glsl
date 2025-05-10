@@ -89,8 +89,9 @@ DecodeData DecodeVertex(int aData1, int aData2)
     // Tex coords
     dData.TexCoord = vec3(TEX_UV_LOOKUP[dData.Corner], float(aData2 & 65535));
     
-    uint light     = GetLight(dData.FaceCoord);
-    dData.LightSky = light & 31u;
+    uint light       = GetLight(dData.FaceCoord);
+    dData.LightSky   = light & 15u;
+    dData.LightVoxel = (light >> 4) & 15u;
 
     dData.AnimateFoliage = bool((aData1 >> 26) & 1);
     dData.BlendBiome     = bool((aData1 >> 27) & 1);

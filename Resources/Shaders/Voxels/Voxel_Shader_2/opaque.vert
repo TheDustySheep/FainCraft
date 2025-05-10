@@ -54,7 +54,7 @@ void main()
     vData.Normal     = mat3(transpose(inverse(uModel))) * dData.Normal;
     vData.FragPos    = vec3(uModel * vec4(dData.Position, 1.0));
     vData.AO         = dData.AO;
-    vData.Light      = float(dData.LightSky) / 31.0;
+    vData.Light      = float(max(dData.LightSky, dData.LightVoxel)) / 15.0;
     vData.BlendColor = GetBlendCol(dData);
 
 }
