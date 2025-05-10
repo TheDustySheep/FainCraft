@@ -22,4 +22,9 @@ public struct VoxelState
     {
         return unchecked((int)Index);
     }
+
+    public override string ToString()
+    {
+        return $"Voxel State Idx: {Index}";
+    }
 }

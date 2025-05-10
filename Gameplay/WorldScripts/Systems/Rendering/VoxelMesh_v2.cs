@@ -1,4 +1,5 @@
-﻿using FainEngine_v2.Rendering;
+﻿using FainCraft.Gameplay.WorldScripts.Systems.Rendering.Lighting;
+using FainEngine_v2.Rendering;
 using FainEngine_v2.Rendering.BoundingShapes;
 using FainEngine_v2.Rendering.Meshing;
 using Silk.NET.OpenGL;
@@ -20,6 +21,8 @@ public sealed class VoxelMesh_v2 : IMesh
     private BufferObject<VoxelVertex> VBO { get; }
     private BufferObject<uint> EBO { get; }
 
+    private ShaderStorageBufferObject<LightData> LightingSSBO { get; }
+
     public VoxelMesh_v2()
     {
         _gl = GameGraphics.GL;
@@ -27,6 +30,8 @@ public sealed class VoxelMesh_v2 : IMesh
         EBO = new BufferObject<uint>(BufferTargetARB.ElementArrayBuffer);
         VBO = new BufferObject<VoxelVertex>(BufferTargetARB.ArrayBuffer);
         VAO = new VertexArrayObject<VoxelVertex, uint>(_gl, VBO, EBO);
+
+        LightingSSBO = new ShaderStorageBufferObject<LightData>(PADDED_CHUNK_VOLUME);
 
         Bounds = new BoundingBox()
         {
@@ -49,6 +54,7 @@ public sealed class VoxelMesh_v2 : IMesh
     {
         triangleCount = 0;
 
+        LightingSSBO.Clear();
         VBO.SetData([]);
         EBO.SetData([]);
     }
@@ -59,16 +65,23 @@ public sealed class VoxelMesh_v2 : IMesh
             return;
 
         VAO.Bind();
-        //_gl.DrawElements(PrimitiveType.Triangles, triangleCount, DrawElementsType.UnsignedInt, (void*)0);
+        LightingSSBO.Bind(0);
 
         _gl.DrawElementsBaseVertex(PrimitiveType.Triangles, triangleCount, DrawElementsType.UnsignedInt, (void*)0, 0);
     }
 
     public void Dispose()
     {
+        LightingSSBO.Dispose();
         VAO.Dispose();
         VBO.Dispose();
         EBO.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
+    internal void UpdateLighting(ReadOnlySpan<LightData> span)
+    {
+        LightingSSBO.SetData(span);
     }
 
     ~VoxelMesh_v2() => Dispose();

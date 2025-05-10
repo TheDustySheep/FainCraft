@@ -1,15 +1,12 @@
 #version 330 core
 #extension GL_EXT_texture_array: enable
 
+#include "../common.glsl"
 #include "../water.glsl"
 
 out vec4 FragColor;
 
-in vec3 oTexCoord;
-in vec3 oVertexNormal;
-in vec3 oFragPos;
-in float oAO;
-in vec3 oBlendColor;
+in VertexData vData;
 
 uniform float cam_near;
 uniform float cam_far;
@@ -28,21 +25,23 @@ float linearizeDepth(float depth)
 void main() 
 {
     // Vertex Color
-    vec4 vertexColor = texture2DArray(albedoTexture, oTexCoord).rgba;
+    vec4 vertexColor = texture(albedoTexture, vData.TexCoord).rgba;
 
     //vertexColor.rgb *= oBlendColor;
     float sceneDepth = linearizeDepth(texture(depthTexture, gl_FragCoord.xy / screenSize).r);
-    float fragDepth = linearizeDepth(gl_FragCoord.z);
-    float depthDiff = sceneDepth - fragDepth;
+    float fragDepth  = linearizeDepth(gl_FragCoord.z);
+    float depthDiff  = sceneDepth - fragDepth;
 
     // Result
-    vec3 normal = normalize(oVertexNormal);
-    vec3 viewDir = normalize(viewPos - oFragPos);
-    vec4 result = shadeWater(oFragPos, viewDir, vertexColor.rgb, depthDiff, time);
-    
-    result.rgb *= oAO;
-    result.a *= 2;
-    result.a = clamp(result.a, 0.0, 1.0);
+    vec3 normal  = normalize(vData.Normal);
+    vec3 viewDir = normalize(viewPos - vData.FragPos);
+    vec4 result  = shadeWater(vData.FragPos, viewDir, vertexColor.rgb, depthDiff, time);
+    //vec4 result = vertexColor;
+
+    //result.rgb *= vData.AO;
+    //result.a   *= 2;
+    //result.a    = clamp(result.a, 0.0, 1.0);
+
     //FragColor = vec4(vec3(gl_FragCoord.z), 1.0);
 
     FragColor = result;

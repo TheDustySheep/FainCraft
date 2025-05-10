@@ -5,6 +5,7 @@
     "Fully_Opaque": false,
     "TexIDs": [ 160, 160, 160, 160, 160, 160 ],
     "Physics_Solid": false,
+    "Light_Pass_Through": true,
     "Biome_Blend": [ false, false, false, false, false, false ]
   },
   {
@@ -70,6 +71,7 @@
     "TexIDs": [ 196, 196, 196, 196, 196, 196 ],
     "Physics_Solid": true,
     "Animate_Foliage": true,
+    "Light_Pass_Through": true,
     "Biome_Blend": [ true, true, true, true, true, true ]
   },
   {
@@ -90,6 +92,7 @@
     "TexIDs": [ 193, 193, 193, 193, 193, 193 ],
     "Physics_Solid": true,
     "Skip_Draw_Similar": true,
+    "Light_Pass_Through": true,
     "Biome_Blend": [ false, false, false, false, false, false ]
   },
   {

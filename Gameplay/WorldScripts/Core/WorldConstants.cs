@@ -7,18 +7,24 @@ public class WorldConstants
     public const int CHUNK_SIZE_POWER = 5;
 
     public const int CHUNK_SIZE_MASK = CHUNK_SIZE - 1;
-    public const int CHUNK_SIZE = 1 << CHUNK_SIZE_POWER;
-    public const int CHUNK_SIZE_PAD = CHUNK_SIZE + 2;
+    public const int CHUNK_SIZE      = 1 << CHUNK_SIZE_POWER;
 
-    public const int CHUNK_AREA = CHUNK_SIZE * CHUNK_SIZE;
+    public const int CHUNK_AREA   = CHUNK_SIZE * CHUNK_SIZE;
     public const int CHUNK_VOLUME = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
 
-    public const int REGION_Y_POS_COUNT = 4;
-    public const int REGION_Y_NEG_COUNT = 2;
+    public const int PADDED_CHUNK_SIZE    = CHUNK_SIZE + 2;
+    public const int PADDED_CHUNK_AREA    = PADDED_CHUNK_SIZE * PADDED_CHUNK_SIZE;
+    public const int PADDED_CHUNK_VOLUME  = PADDED_CHUNK_SIZE * PADDED_CHUNK_SIZE * PADDED_CHUNK_SIZE;
+    public const int PADDED_REGION_VOLUME = PADDED_CHUNK_AREA * ((CHUNK_SIZE * REGION_Y_TOTAL_COUNT) + 2);
+
+    public const int REGION_Y_POS_COUNT   = 4;
+    public const int REGION_Y_NEG_COUNT   = 2;
     public const int REGION_Y_TOTAL_COUNT = REGION_Y_POS_COUNT + REGION_Y_NEG_COUNT;
 
-    public const int VOXEL_MAX_Y = REGION_Y_POS_COUNT * CHUNK_SIZE - 1;
-    public const int VOXEL_MIN_Y = -REGION_Y_NEG_COUNT * CHUNK_SIZE;
+    public const int VOXEL_Y_COUNT = REGION_Y_TOTAL_COUNT * CHUNK_SIZE;
+
+    public const int VOXEL_MAX_Y   = REGION_Y_POS_COUNT * CHUNK_SIZE - 1;
+    public const int VOXEL_MIN_Y   = -REGION_Y_NEG_COUNT * CHUNK_SIZE;
 
     #region Indexes
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

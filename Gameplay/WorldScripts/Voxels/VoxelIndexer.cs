@@ -9,7 +9,7 @@ public class VoxelIndexer : IVoxelIndexer
     readonly Dictionary<VoxelType, uint> TypeToIndex = new();
     readonly Dictionary<string, uint> NameToIndex = new();
 
-    public VoxelDataCache<bool> CacheLightingSolid { get; }
+    public VoxelDataCache<bool> CacheLightPassThrough { get; }
 
     private VoxelIndexer(VoxelType[] voxels)
     {
@@ -17,7 +17,7 @@ public class VoxelIndexer : IVoxelIndexer
 
         UpdateIndex();
 
-        CacheLightingSolid = new VoxelDataCache<bool>(Voxels, v => v.Physics_Solid);
+        CacheLightPassThrough = new VoxelDataCache<bool>(Voxels, v => v.LightPassThrough);
 
     }
 

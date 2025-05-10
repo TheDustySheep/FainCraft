@@ -72,9 +72,9 @@ public class MeshGenerator_v3 : IMeshGenerator
                         for (uint i = 0; i < 4; i++)
                         {
                             var vert = VERTICES[i + face * 4];
-                            vert.XPos += (uint)x;
-                            vert.YPos += (uint)y;
-                            vert.ZPos += (uint)z;
+                            vert.XPos = (uint)x;
+                            vert.YPos = (uint)y;
+                            vert.ZPos = (uint)z;
                             vert.SurfaceFluid = surfaceFluid;
 
                             vert.TexIndex = voxelType.TexIDs[face];
@@ -230,40 +230,40 @@ public class MeshGenerator_v3 : IMeshGenerator
     static readonly VoxelVertex[] VERTICES =
     {
         // X-
-        new VoxelVertex { XPos = 0, YPos = 0, ZPos = 1, Corner = 0, Normal = 1, },
-        new VoxelVertex { XPos = 0, YPos = 1, ZPos = 1, Corner = 1, Normal = 1, },
-        new VoxelVertex { XPos = 0, YPos = 1, ZPos = 0, Corner = 2, Normal = 1, },
-        new VoxelVertex { XPos = 0, YPos = 0, ZPos = 0, Corner = 3, Normal = 1, },
+        new VoxelVertex { Offset = 0b_001, Corner = 0, Normal = 0 },
+        new VoxelVertex { Offset = 0b_011, Corner = 1, Normal = 0 },
+        new VoxelVertex { Offset = 0b_010, Corner = 2, Normal = 0 },
+        new VoxelVertex { Offset = 0b_000, Corner = 3, Normal = 0 },
 
         // X+
-        new VoxelVertex { XPos = 1, YPos = 0, ZPos = 0, Corner = 0, Normal = 0, },
-        new VoxelVertex { XPos = 1, YPos = 1, ZPos = 0, Corner = 1, Normal = 0, },
-        new VoxelVertex { XPos = 1, YPos = 1, ZPos = 1, Corner = 2, Normal = 0, },
-        new VoxelVertex { XPos = 1, YPos = 0, ZPos = 1, Corner = 3, Normal = 0, },
+        new VoxelVertex { Offset = 0b_100, Corner = 0, Normal = 1 },
+        new VoxelVertex { Offset = 0b_110, Corner = 1, Normal = 1 },
+        new VoxelVertex { Offset = 0b_111, Corner = 2, Normal = 1 },
+        new VoxelVertex { Offset = 0b_101, Corner = 3, Normal = 1 },
 
         // Y-
-        new VoxelVertex { XPos = 1, YPos = 0, ZPos = 0, Corner = 0, Normal = 2, },
-        new VoxelVertex { XPos = 1, YPos = 0, ZPos = 1, Corner = 1, Normal = 2, },
-        new VoxelVertex { XPos = 0, YPos = 0, ZPos = 1, Corner = 2, Normal = 2, },
-        new VoxelVertex { XPos = 0, YPos = 0, ZPos = 0, Corner = 3, Normal = 2, },
+        new VoxelVertex { Offset = 0b_100, Corner = 0, Normal = 2 },
+        new VoxelVertex { Offset = 0b_101, Corner = 1, Normal = 2 },
+        new VoxelVertex { Offset = 0b_001, Corner = 2, Normal = 2 },
+        new VoxelVertex { Offset = 0b_000, Corner = 3, Normal = 2 },
 
         // Y+
-        new VoxelVertex { XPos = 0, YPos = 1, ZPos = 0, Corner = 0, Normal = 3, },
-        new VoxelVertex { XPos = 0, YPos = 1, ZPos = 1, Corner = 1, Normal = 3, },
-        new VoxelVertex { XPos = 1, YPos = 1, ZPos = 1, Corner = 2, Normal = 3, },
-        new VoxelVertex { XPos = 1, YPos = 1, ZPos = 0, Corner = 3, Normal = 3, },
+        new VoxelVertex { Offset = 0b_010, Corner = 0, Normal = 3 },
+        new VoxelVertex { Offset = 0b_011, Corner = 1, Normal = 3 },
+        new VoxelVertex { Offset = 0b_111, Corner = 2, Normal = 3 },
+        new VoxelVertex { Offset = 0b_110, Corner = 3, Normal = 3 },
 
         // Z-
-        new VoxelVertex { XPos = 0, YPos = 0, ZPos = 0, Corner = 0, Normal = 4, },
-        new VoxelVertex { XPos = 0, YPos = 1, ZPos = 0, Corner = 1, Normal = 4, },
-        new VoxelVertex { XPos = 1, YPos = 1, ZPos = 0, Corner = 2, Normal = 4, },
-        new VoxelVertex { XPos = 1, YPos = 0, ZPos = 0, Corner = 3, Normal = 4, },
+        new VoxelVertex { Offset = 0b_000, Corner = 0, Normal = 4 },
+        new VoxelVertex { Offset = 0b_010, Corner = 1, Normal = 4 },
+        new VoxelVertex { Offset = 0b_110, Corner = 2, Normal = 4 },
+        new VoxelVertex { Offset = 0b_100, Corner = 3, Normal = 4 },
 
         // Z+
-        new VoxelVertex { XPos = 1, YPos = 0, ZPos = 1, Corner = 0, Normal = 5, },
-        new VoxelVertex { XPos = 1, YPos = 1, ZPos = 1, Corner = 1, Normal = 5, },
-        new VoxelVertex { XPos = 0, YPos = 1, ZPos = 1, Corner = 2, Normal = 5, },
-        new VoxelVertex { XPos = 0, YPos = 0, ZPos = 1, Corner = 3, Normal = 5, },
+        new VoxelVertex { Offset = 0b_101, Corner = 0, Normal = 5 },
+        new VoxelVertex { Offset = 0b_111, Corner = 1, Normal = 5 },
+        new VoxelVertex { Offset = 0b_011, Corner = 2, Normal = 5 },
+        new VoxelVertex { Offset = 0b_001, Corner = 3, Normal = 5 },
     };
 
     static readonly uint[] TRIANGLES =

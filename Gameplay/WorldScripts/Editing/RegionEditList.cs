@@ -48,9 +48,8 @@ namespace FainCraft.Gameplay.WorldScripts.Editing
             foreach (var pair in list)
             {
                 var coord = pair.Coord;
-                var chunk = data.GetChunk(coord.Chunk_Y);
-
-                if (chunk == null)
+                
+                if (!data.GetChunk(coord.Chunk_Y, out var chunk))
                     continue;
 
                 // Update the voxel

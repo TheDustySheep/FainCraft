@@ -15,6 +15,9 @@ public class VoxelType
     [JsonProperty("TexIDs")]
     public uint[] TexIDs { get; set; } = [0, 0, 0, 0, 0, 0];
 
+    [JsonProperty("Light_Pass_Through")]
+    public bool LightPassThrough { get; set; }
+
     [JsonProperty("Physics_Solid")]
     public bool Physics_Solid { get; set; } = true;
 
@@ -32,4 +35,9 @@ public class VoxelType
 
     [JsonProperty("Biome_Blend")]
     public bool[] Biome_Blend { get; set; } = [false, false, false, false, false, false];
+
+    public override string ToString()
+    {
+        return $"Voxel Type: {Name}";
+    }
 }

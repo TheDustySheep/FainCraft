@@ -38,16 +38,14 @@ internal class WorldData : IWorldData
     public bool VoxelExists(VoxelCoordGlobal globalCoord)
     {
         ChunkCoord chunkCoord = (ChunkCoord)globalCoord;
-        return GetChunk(chunkCoord) is not null;
+        return GetChunk(chunkCoord, out var _);
     }
 
     public bool GetVoxelState(VoxelCoordGlobal globalCoord, out VoxelState voxelData)
     {
         ChunkCoord chunkCoord = (ChunkCoord)globalCoord;
 
-        var chunk = GetChunk(chunkCoord);
-
-        if (chunk is null)
+        if (!GetChunk(chunkCoord, out ChunkData chunk))
         {
             voxelData = default;
             return false;
@@ -61,9 +59,7 @@ internal class WorldData : IWorldData
     {
         ChunkCoord chunkCoord = (ChunkCoord)globalCoord;
 
-        var chunk = GetChunk(chunkCoord);
-
-        if (chunk is null)
+        if (!GetChunk(chunkCoord, out ChunkData chunk))
             return false;
 
         chunk[(VoxelCoordLocal)globalCoord] = voxelData;
@@ -89,12 +85,8 @@ internal class WorldData : IWorldData
     {
         ChunkCoord chunkCoord = (ChunkCoord)globalCoord;
 
-        var chunk = GetChunk(chunkCoord);
-
-        if (chunk is null)
-        {
+        if (!GetChunk(chunkCoord, out ChunkData chunk))
             return false;
-        }
 
         var oldVoxelData = chunk[(VoxelCoordLocal)globalCoord];
 
@@ -131,14 +123,13 @@ internal class WorldData : IWorldData
     #endregion
 
     #region Chunks
-    public ChunkData? GetChunk(ChunkCoord coord)
+    public bool GetChunk(ChunkCoord coord, out ChunkData chunkData)
     {
         if (regions.TryGetValue((RegionCoord)coord, out var regionData))
-        {
-            return regionData.GetChunk(coord.Y);
-        }
-
-        return null;
+            return regionData.GetChunk(coord.Y, out chunkData);
+    
+        chunkData = default!;
+        return false;
     }
 
     public bool UpdateChunk(ChunkCoord chunkCoord, ChunkData data)
@@ -177,7 +168,8 @@ internal class WorldData : IWorldData
                 {
                     var offset = new ChunkCoord(x, y, z);
                     var _coord = offset + coord;
-                    result[i] = GetChunk(_coord);
+
+                    result[i] = GetChunk(_coord, out var chunk) ? chunk : null;
                 }
             }
         }
@@ -187,19 +179,15 @@ internal class WorldData : IWorldData
     #endregion
 
     #region Regions
-    public RegionData? GetRegion(RegionCoord coord)
-    {
-        regions.TryGetValue(coord, out var regionData);
-        return regionData;
-    }
+    public bool GetRegion(RegionCoord coord, out RegionData region) => regions.TryGetValue(coord, out region!);
 
-    readonly RegionCoord[] REGION_OFFSETS = new[]
-    {
+    static readonly RegionCoord[] REGION_OFFSETS =
+    [
         new RegionCoord(-1, 0),
         new RegionCoord( 1, 0),
         new RegionCoord( 0,-1),
         new RegionCoord( 0, 1),
-    };
+    ];
 
     public bool RegionExists(RegionCoord coord)
     {

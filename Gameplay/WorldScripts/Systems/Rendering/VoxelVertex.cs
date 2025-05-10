@@ -6,11 +6,13 @@ public struct VoxelVertex
     /// </summary>
     public uint Data1;
 
-    static readonly uint MASK_XPOS        = 0b_0000_0000_0000_0000_0000_0000_0011_1111;
-    static readonly uint MASK_YPOS        = 0b_0000_0000_0000_0000_0000_1111_1100_0000;
-    static readonly uint MASK_ZPOS        = 0b_0000_0000_0000_0011_1111_0000_0000_0000;
+    static readonly uint MASK_XPOS        = 0b_0000_0000_0000_0000_0000_0000_0001_1111;
+    static readonly uint MASK_YPOS        = 0b_0000_0000_0000_0000_0000_0011_1110_0000;
+    static readonly uint MASK_ZPOS        = 0b_0000_0000_0000_0000_0111_1100_0000_0000;
+    static readonly uint MASK_OFFSET      = 0b_0000_0000_0000_0011_1000_0000_0000_0000;
     static readonly uint MASK_CORNER      = 0b_0000_0000_0000_1100_0000_0000_0000_0000;
     static readonly uint MASK_NORMAL      = 0b_0000_0000_0111_0000_0000_0000_0000_0000;
+
     static readonly uint MASK_IS_FLUID    = 0b_0000_0000_1000_0000_0000_0000_0000_0000;
     static readonly uint MASK_AO          = 0b_0000_0011_0000_0000_0000_0000_0000_0000;
     static readonly uint MASK_IS_FOLIAGE  = 0b_0000_0100_0000_0000_0000_0000_0000_0000;
@@ -20,19 +22,25 @@ public struct VoxelVertex
     public uint XPos
     {
         readonly get => Data1 & MASK_XPOS;
-        set => Data1 = Data1 & ~MASK_XPOS | value & 63u;
+        set => Data1 = Data1 & ~MASK_XPOS | value & 31u;
     }
 
     public uint YPos
     {
-        readonly get => (Data1 & MASK_YPOS) >> 6;
-        set => Data1 = Data1 & ~MASK_YPOS | (value & 63u) << 6;
+        readonly get => (Data1 & MASK_YPOS) >> 5;
+        set => Data1 = Data1 & ~MASK_YPOS | (value & 31u) << 5;
     }
 
     public uint ZPos
     {
-        readonly get => (Data1 & MASK_ZPOS) >> 12;
-        set => Data1 = Data1 & ~MASK_ZPOS | (value & 63u) << 12;
+        readonly get => (Data1 & MASK_ZPOS) >> 10;
+        set => Data1 = Data1 & ~MASK_ZPOS | (value & 31u) << 10;
+    }
+
+    public uint Offset
+    {
+        readonly get => (Data1 & MASK_OFFSET) >> 15;
+        set => Data1 = Data1 & ~MASK_OFFSET | (value & 7u) << 15;
     }
 
     public uint Corner

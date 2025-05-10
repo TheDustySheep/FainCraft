@@ -1,6 +1,18 @@
-#version 330 core
+#version 450 core
 
 #include "../vert_utils.glsl"
+
+layout(std430, binding = 0) buffer LightingBuffer {
+    uint lighting[];
+};
+
+uint GetLighting(vec3 pos) {
+
+    int index = int(pos.x) + int(pos.z) * 34 + int(pos.y) * 34 * 34;
+    int wordIndex = index / 4;
+    int byteOffset = index % 4;
+    return (lighting[wordIndex] >> (byteOffset * 8)) & 0xFFu;
+}
 
 layout (location = 0) in int aData1;
 layout (location = 1) in int aData2;
@@ -10,6 +22,7 @@ out vec3 oVertexNormal;
 out vec3 oFragPos;
 out float oAO;
 out vec3 oBlendColor;
+out float oVoxelLight;
 
 uniform mat4 uModel;
 uniform mat4 uProjection;
@@ -36,6 +49,8 @@ void main()
     oFragPos = vec3(uModel * vec4(aPosition, 1.0));
 
     oVertexNormal = mat3(transpose(inverse(uModel))) * aNormal;  // to world space
+
+    oVoxelLight = float(GetLighting(vertex_data.Position)) / 32;
 
     oTexCoord = aTexCoord;
     oAO = DecodeAO(vertex_data.AO);

@@ -12,14 +12,14 @@ public interface IWorldData
     public void AddRegionEdits(RegionEditList edits);
 
     // Chunk
-    public ChunkData? GetChunk(ChunkCoord coord);
+    public bool GetChunk(ChunkCoord coord, out ChunkData data);
     public bool UpdateChunk(ChunkCoord coord, ChunkData data);
 
     // Cluster
     public ChunkData?[] GetCluster(ChunkCoord coord);
 
     // Region
-    public RegionData? GetRegion(RegionCoord coord);
+    public bool GetRegion(RegionCoord coord, out RegionData region);
     public bool RegionExists(RegionCoord coord);
     public bool SetRegion(RegionCoord coord, RegionData data);
     public bool UnloadRegion(RegionCoord coord, out RegionData data);

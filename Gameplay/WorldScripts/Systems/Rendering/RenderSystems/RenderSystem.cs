@@ -1,8 +1,11 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Core;
+using FainCraft.Gameplay.WorldScripts.Systems.Rendering.Lighting;
 using FainEngine_v2.Collections;
 using FainEngine_v2.Rendering;
 using FainEngine_v2.Rendering.Materials;
+using System;
 using System.Numerics;
+using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.RenderSystems;
 internal class RenderSystem : IRenderSystem, IDisposable
@@ -14,16 +17,15 @@ internal class RenderSystem : IRenderSystem, IDisposable
     readonly Material _opaqueMaterial;
     readonly Material _transparentMaterial;
 
+    public event Action<ChunkCoord>? OnMeshAdded;
+
     public RenderSystem(Material opaqueMaterial, Material transparentMaterial)
     {
         _opaqueMaterial      = opaqueMaterial;
         _transparentMaterial = transparentMaterial;
     }
 
-    ~RenderSystem()
-    {
-        Dispose();
-    }
+    ~RenderSystem() => Dispose();
 
     public void Draw()
     {
@@ -93,6 +95,7 @@ internal class RenderSystem : IRenderSystem, IDisposable
                 mesh.UpdateData(opaque);
                 _opaqueMeshes[coord] = mesh;
                 DebugVariables.OpaqueMeshCount.Value = _opaqueMeshes.Count;
+                OnMeshAdded?.Invoke(coord);
             }
         }
 
@@ -112,6 +115,7 @@ internal class RenderSystem : IRenderSystem, IDisposable
                 mesh.UpdateData(transparent);
                 _transparentMeshes[coord] = mesh;
                 DebugVariables.OpaqueMeshCount.Value = _transparentMeshes.Count;
+                OnMeshAdded?.Invoke(coord);
             }
         }
     }
@@ -126,5 +130,22 @@ internal class RenderSystem : IRenderSystem, IDisposable
 
         foreach (var mesh in _transparentMeshes.Values)
             mesh.Dispose();
+
+        GC.SuppressFinalize(this);
+    }
+
+    public void UpdateLighting(RegionCoord rCoord, LightingRegionData data)
+    {
+        ChunkCoord chunkCoord = (ChunkCoord)rCoord;
+
+        for (int c_y = -REGION_Y_NEG_COUNT; c_y < REGION_Y_POS_COUNT; c_y++)
+        {
+            chunkCoord.Y = c_y;
+            if (!_opaqueMeshes.TryGetValue(chunkCoord, out var mesh))
+                continue;
+
+            ReadOnlySpan<LightData> span = data.GetSlice(c_y);
+            mesh.UpdateLighting(span);
+        }
     }
 }

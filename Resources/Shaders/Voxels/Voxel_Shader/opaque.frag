@@ -10,6 +10,7 @@ in vec3 oVertexNormal;
 in vec3 oFragPos;
 in float oAO;
 in vec3 oBlendColor;
+in float oVoxelLight;
 
 uniform vec3 viewPos;
 uniform sampler2DArray albedoTexture;
@@ -28,8 +29,10 @@ void main()
     vec3 normal = normalize(oVertexNormal);
     vec3 viewDir = normalize(viewPos - oFragPos);
     
-    color.rgb = CalcLighting(color.rgb, viewDir, normal);
+    //color.rgb = CalcLighting(color.rgb, viewDir, normal);
     
+    color.rgb *= oVoxelLight;
+
     color.rgb *= oAO;
     
     FragColor = color;

@@ -3,7 +3,7 @@
 namespace FainCraft.Gameplay.WorldScripts.Voxels;
 public interface IVoxelIndexer
 {
-    public VoxelDataCache<bool> CacheLightingSolid { get; }
+    public VoxelDataCache<bool> CacheLightPassThrough { get; }
 
     public uint GetIndex(string name);
     public uint GetIndex(VoxelType type);
