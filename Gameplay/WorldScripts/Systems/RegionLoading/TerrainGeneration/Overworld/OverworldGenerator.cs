@@ -44,9 +44,9 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.TerrainGeneratio
 
         private void HandlePainting(RegionData regionData, RegionCoord regionCoord)
         {
-            for (int y = 0; y < REGION_Y_TOTAL_COUNT; y++)
+            for (int y = 0; y < REGION_TOTAL_CHUNKS; y++)
             {
-                var chunkCoord = new ChunkCoord(regionCoord, y - REGION_Y_NEG_COUNT);
+                var chunkCoord = new ChunkCoord(regionCoord, y - REGION_NEG_CHUNKS);
                 PaintChunk(regionData.Chunks[y], chunkCoord);
             }
         }

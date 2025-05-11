@@ -205,12 +205,12 @@ internal class WorldData : IWorldData
             regionEditList.ApplyEdits(pair.Key, pair.Value);
         }
 
-        for (int y = 0; y < REGION_Y_TOTAL_COUNT; y++)
+        for (int y = 0; y < REGION_TOTAL_CHUNKS; y++)
         {
             OnChunkUpdate?.Invoke(new ChunkCoord()
             {
                 X = coord.X,
-                Y = y - REGION_Y_NEG_COUNT,
+                Y = y - REGION_NEG_CHUNKS,
                 Z = coord.Z,
             }, true);
         }
@@ -220,12 +220,12 @@ internal class WorldData : IWorldData
         {
             var offset_coord = REGION_OFFSETS[i] + coord;
 
-            for (int y = 0; y < REGION_Y_TOTAL_COUNT; y++)
+            for (int y = 0; y < REGION_TOTAL_CHUNKS; y++)
             {
                 OnChunkUpdate?.Invoke(new ChunkCoord()
                 {
                     X = offset_coord.X,
-                    Y = y - REGION_Y_NEG_COUNT,
+                    Y = y - REGION_NEG_CHUNKS,
                     Z = offset_coord.Z,
                 }, false);
             }
@@ -241,12 +241,12 @@ internal class WorldData : IWorldData
 
         DebugVariables.WorldLoadedRegions.Value = regions.Count;
 
-        for (int y = 0; y < REGION_Y_TOTAL_COUNT; y++)
+        for (int y = 0; y < REGION_TOTAL_CHUNKS; y++)
         {
             OnChunkUpdate?.Invoke(new ChunkCoord()
             {
                 X = coord.X,
-                Y = y - REGION_Y_NEG_COUNT,
+                Y = y - REGION_NEG_CHUNKS,
                 Z = coord.Z,
             }, true);
         }
@@ -256,12 +256,12 @@ internal class WorldData : IWorldData
         {
             var offset_coord = REGION_OFFSETS[i] + coord;
 
-            for (int y = 0; y < REGION_Y_TOTAL_COUNT; y++)
+            for (int y = 0; y < REGION_TOTAL_CHUNKS; y++)
             {
                 OnChunkUpdate?.Invoke(new ChunkCoord()
                 {
                     X = offset_coord.X,
-                    Y = y - REGION_Y_NEG_COUNT,
+                    Y = y - REGION_NEG_CHUNKS,
                     Z = offset_coord.Z,
                 }, false);
             }

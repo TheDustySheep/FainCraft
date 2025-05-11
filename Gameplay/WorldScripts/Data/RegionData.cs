@@ -8,8 +8,8 @@ public class RegionData
 
     public RegionData()
     {
-        Chunks = new ChunkData[REGION_Y_TOTAL_COUNT];
-        for (int y = 0; y < REGION_Y_TOTAL_COUNT; y++)
+        Chunks = new ChunkData[REGION_TOTAL_CHUNKS];
+        for (int y = 0; y < REGION_TOTAL_CHUNKS; y++)
         {
             Chunks[y] = new ChunkData();
         }
@@ -17,8 +17,8 @@ public class RegionData
 
     public RegionData(ChunkData[] _chunks)
     {
-        if (_chunks.Length != REGION_Y_TOTAL_COUNT)
-            throw new Exception($"Supplied region data array is incorrect. Expected {REGION_Y_TOTAL_COUNT}. Recieved {_chunks.Length}.");
+        if (_chunks.Length != REGION_TOTAL_CHUNKS)
+            throw new Exception($"Supplied region data array is incorrect. Expected {REGION_TOTAL_CHUNKS}. Recieved {_chunks.Length}.");
         Chunks = _chunks;
     }
 
@@ -26,8 +26,8 @@ public class RegionData
 
     public bool GetChunk(int c_y, out ChunkData chunkData)
     {
-        c_y += REGION_Y_NEG_COUNT;
-        if (c_y < 0 || c_y > REGION_Y_TOTAL_COUNT - 1)
+        c_y += REGION_NEG_CHUNKS;
+        if (c_y < 0 || c_y > REGION_TOTAL_CHUNKS - 1)
         {
             chunkData = default!;
             return false;
@@ -38,8 +38,8 @@ public class RegionData
 
     public bool SetChunk(int c_y, ChunkData data)
     {
-        c_y += REGION_Y_NEG_COUNT;
-        if (c_y < 0 || c_y > REGION_Y_TOTAL_COUNT - 1)
+        c_y += REGION_NEG_CHUNKS;
+        if (c_y < 0 || c_y > REGION_TOTAL_CHUNKS - 1)
             return false;
 
         Chunks[c_y] = data;
@@ -48,7 +48,7 @@ public class RegionData
 
     public bool GetVoxel(int l_x, int i_y, int l_z, out VoxelState voxelState)
     {
-        if (!GetChunk((i_y >> 5) - REGION_Y_NEG_COUNT, out var chunk))
+        if (!GetChunk((i_y >> 5) - REGION_NEG_CHUNKS, out var chunk))
         {
             voxelState = default;
             return false;

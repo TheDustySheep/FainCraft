@@ -44,24 +44,20 @@ vec3 GetBlendCol(DecodeData dData)
     return blendCol;
 }
 
-DecodeData ApplyFluid(DecodeData dData)
+float ApplyFluid(DecodeData dData)
 {
-    if (dData.Offset.y > 0)
-        dData.Position.y += sin(time) * 0.2;
+    //if (!dData.IsFluid)
+    //    return 0;
 
-    if (!dData.IsFluid)
-        return dData;
+    if (dData.Offset.y == 0)
+        return 0;
 
-    if (dData.Offset.y > 0)
-    {
-        //vec3 globalPos = vec3(uModel * vec4(dData.Position, 1.0));
-        vec3 globalPos = dData.Position;
-        //float waveHeight = GetWave(globalPos.xz, time);
-        float waveHeight = computeWaveHeight(globalPos.xz, time);
-        dData.Position.y += waveHeight - 0.2;
-    }
+    vec3 globalPos = vec3(uModel * vec4(dData.Position, 1.0));
+    //vec3 globalPos = dData.Position;
+    //float waveHeight = GetWave(globalPos.xz, time);
+    float waveHeight = computeWaveHeight(globalPos.xz, time);
 
-    return dData;
+    return waveHeight * 0.2 - 0.2;
 }
 
 
@@ -69,7 +65,7 @@ void main()
 {
     DecodeData dData = DecodeVertex(aData1, aData2);
 
-    dData = ApplyFluid(dData);
+    dData.Position.y += ApplyFluid(dData);
 
     // Outputs
     gl_Position = uProjection * uView * uModel * vec4(dData.Position, 1.0);

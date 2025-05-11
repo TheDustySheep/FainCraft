@@ -44,10 +44,10 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.TerrainGeneratio
         private VoxelCoordGlobal? FindTreeSpawn(RegionEditList edits, RegionData regionData, RegionCoord regionCoord, int l_x, int l_z)
         {
             // Iterate downwards from sky
-            for (int r_y = REGION_Y_TOTAL_COUNT - 1; r_y >= 0; r_y--)
+            for (int r_y = REGION_TOTAL_CHUNKS - 1; r_y >= 0; r_y--)
             {
                 var chunk = regionData.Chunks[r_y];
-                int c_y = r_y - REGION_Y_NEG_COUNT;
+                int c_y = r_y - REGION_NEG_CHUNKS;
 
                 for (int l_y = CHUNK_SIZE - 1; l_y >= 0; l_y--)
                 {

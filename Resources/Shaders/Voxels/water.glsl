@@ -14,7 +14,7 @@ float computeWaveHeight(vec2 pos, float time) {
     float w2 = sin(pos.y * 0.15 + time * waveSpeed * 1.3);
     float w3 = sin((pos.x + pos.y) * 0.07 + time * waveSpeed * 0.8);
     float w4 = sin((pos.x * 0.2 - pos.y * 0.1) + time * waveSpeed * 1.7);
-    return w1 + w2 + w3 + w4;
+    return (w1 + w2 + w3 + w4) * 0.25;
 }
 
 // Compute normal via central differences
@@ -61,7 +61,7 @@ vec4 shadeWater(
 
     float depthFade = clamp(depthDiff * depthFadeScale, 0.0, 1.0);
 
-    float alpha = mix(0.3, 1.0, fresnel) * depthFade;
+    float alpha = mix(0.6, 1.0, fresnel) * depthFade;
 
     return vec4(color, alpha);
 }

@@ -49,7 +49,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.Regi
 
                 // Write the relative position
                 writer.Write(0); // X Position
-                writer.Write(i - REGION_Y_NEG_COUNT); // Y Position
+                writer.Write(i - REGION_NEG_CHUNKS); // Y Position
                 writer.Write(0); // Z Position
 
                 // Write the compression algorithm
@@ -95,7 +95,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.Regi
 
             // Y Count incorrect for game
             int yChunkCount = reader.ReadInt32();
-            if (yChunkCount != REGION_Y_TOTAL_COUNT)
+            if (yChunkCount != REGION_TOTAL_CHUNKS)
                 return false;
 
             // Chunk Header Table

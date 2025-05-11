@@ -84,6 +84,7 @@
     "Skip_Draw_Similar": true,
     "Is_Fluid": true,
     "Is_Transparent": true,
+    "Light_Pass_Through": true,
     "Biome_Blend": [ false, false, false, false, false, false ]
   },
   {

@@ -75,7 +75,7 @@ DecodeData DecodeVertex(int aData1, int aData2)
         (aData1 >> 15u) & 1u
     );
 
-    dData.Position = vec3(ivec3(dData.Coord) + ivec3(dData.Offset));
+    dData.Position = vec3(dData.Coord + dData.Offset);
 
     dData.Corner = (aData1 >> 18) & 3;
 

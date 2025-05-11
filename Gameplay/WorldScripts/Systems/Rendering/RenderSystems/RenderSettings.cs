@@ -14,7 +14,7 @@
             RenderRadius = 4,
             MeshesAppliedPerFrame = 16,
             MeshQueueLimit = 4,
-            LightingUpdatesPerTick = 1,
+            LightingUpdatesPerTick = 4,
         };
     }
 }

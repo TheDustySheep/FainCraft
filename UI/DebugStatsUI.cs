@@ -73,7 +73,7 @@ namespace FainCraft.UI
             sb.AppendLine($"");
             sb.AppendLine($"World");
             sb.AppendLine($" - Loaded: {DebugVariables.WorldLoadedRegions} regions");
-            sb.AppendLine($" - Loaded: {DebugVariables.WorldLoadedRegions.Value * WorldConstants.REGION_Y_TOTAL_COUNT} chunks");
+            sb.AppendLine($" - Loaded: {DebugVariables.WorldLoadedRegions.Value * WorldConstants.REGION_TOTAL_CHUNKS} chunks");
 
             sb.AppendLine($"");
             sb.AppendLine($"Draw Calls");

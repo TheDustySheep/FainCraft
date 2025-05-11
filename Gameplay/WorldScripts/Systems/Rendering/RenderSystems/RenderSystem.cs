@@ -138,7 +138,7 @@ internal class RenderSystem : IRenderSystem, IDisposable
     {
         ChunkCoord chunkCoord = (ChunkCoord)rCoord;
 
-        for (int c_y = -REGION_Y_NEG_COUNT; c_y < REGION_Y_POS_COUNT; c_y++)
+        for (int c_y = -REGION_NEG_CHUNKS; c_y < REGION_POS_CHUNKS; c_y++)
         {
             chunkCoord.Y = c_y;
             if (!_opaqueMeshes.TryGetValue(chunkCoord, out var mesh))

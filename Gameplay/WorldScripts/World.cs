@@ -48,7 +48,7 @@ internal class World : GameObject
         // Rendering
         _renderSystem   = new RenderSystem(voxel_material_o, voxel_material_t);
         _meshSystem     = new ThreadedMeshGenerationSystem(WorldData, _renderSystem, () => new MeshGenerator_v3(indexer));
-        _lightingSystem = new LightingSystem(WorldData, _renderSystem, new BasicLightingCalculator(indexer));
+        _lightingSystem = new LightingSystem(WorldData, _renderSystem, new LightingCalculator(indexer));
 
         // Terrain / Loading
 

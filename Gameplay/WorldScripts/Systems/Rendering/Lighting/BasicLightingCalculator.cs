@@ -16,16 +16,17 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.Lighting
 
         public void Calculate(LightingRegionData data)
         {
-            bool[] lightPass = _indexer.CacheLightPassThrough.Data;
+            bool[] lightPass  = _indexer.CacheLightPassThrough.Data;
+            byte[] emitsLight = _indexer.CacheEmitsLight.Data;
 
             for (int x = 0; x < CHUNK_SIZE; x++)
             {
                 for (int z = 0; z < CHUNK_SIZE; z++)
                 {
                     byte sky = MAX_LIGHT;
-                    for (int y = VOXEL_Y_COUNT + 1; y >= 0; y--)
+                    for (int y = REGION_VOXEL_HEIGHT; y >= 1; y--)
                     {
-                        data.GetVoxel(x + 1, y + 1, z + 1, out var voxelState);
+                        data.GetVoxel(x, y, z, out var voxelState);
 
                         if (!lightPass[voxelState.Index])
                             break;
