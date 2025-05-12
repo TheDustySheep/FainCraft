@@ -39,11 +39,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.Lighting
 
         public void SetRegions(IEnumerable<RegionData> regions)
         {
-            Array.Clear(_ssboData, 0, SSBO_VOLUME);
-            Array.Clear(_calcData, 0, CALC_VOLUME);
-
-            TorchQueue.Clear();
-            SkyQueue.Clear();
+            ClearData();
 
             int i = 0;
             foreach (var reg in regions)
@@ -51,6 +47,15 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.Lighting
                 if (i >= _regions.Length) break;
                 _regions[i++] = reg;
             }
+        }
+
+        public void ClearData()
+        {
+            Array.Clear(_ssboData, 0, SSBO_VOLUME);
+            Array.Clear(_calcData, 0, CALC_VOLUME);
+
+            TorchQueue.Clear();
+            SkyQueue.Clear();
         }
 
         /// <summary>

@@ -6,7 +6,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.Lighting;
 
 public class LightingCalculator : ILightingCalculator
 {
-    private readonly VoxelIndexer _indexer;
+    private readonly IVoxelIndexer _indexer;
     private const byte MAX_LIGHT = 15;
 
     private const int CHUNK_SIZE = 32;
@@ -22,7 +22,7 @@ public class LightingCalculator : ILightingCalculator
         ( 0,  0,  1), ( 0,  0, -1)
     };
 
-    public LightingCalculator(VoxelIndexer indexer)
+    public LightingCalculator(IVoxelIndexer indexer)
     {
         _indexer = indexer;
     }

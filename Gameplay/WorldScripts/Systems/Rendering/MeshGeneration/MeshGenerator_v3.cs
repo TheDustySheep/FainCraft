@@ -140,10 +140,10 @@ public class MeshGenerator_v3 : IMeshGenerator
 
     private static uint GetBranchlessVertexAO(uint side1, uint side2, uint corner)
     {
-        uint s = side1 & side2;
-        uint result = 3 - (side1 + side2 + corner);
-        result *= (1 - s);
-        return result;
+        if (side1 + side2 > 0)
+            return 0;
+
+        return 3 - (side1 + side2 + corner);
     }
 
     private void GetNeighbourVoxels(int x, int y, int z)

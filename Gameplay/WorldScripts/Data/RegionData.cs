@@ -2,7 +2,7 @@
 
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
-public class RegionData
+public class RegionData : IRegionData
 {
     public readonly ChunkData[] Chunks;
 
@@ -57,5 +57,14 @@ public class RegionData
         int l_y = ConvertToLocalFromGlobal(i_y);
         voxelState = chunk[l_x, l_y, l_z];
         return true;
+    }
+
+    public void SetVoxel(int l_x, int i_y, int l_z, VoxelState voxelState)
+    {
+        if (!GetChunk((i_y >> 5) - REGION_NEG_CHUNKS, out var chunk))
+            return;
+
+        int l_y = ConvertToLocalFromGlobal(i_y);
+        chunk[l_x, l_y, l_z] = voxelState;
     }
 }

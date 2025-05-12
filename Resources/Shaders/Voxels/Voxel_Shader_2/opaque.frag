@@ -30,7 +30,7 @@ void main()
     
     //color.rgb *= oVoxelLight;
 
-    //color.rgb *= oAO;
+    color.rgb *= 1 - pow(1 - vData.AO, 6);
     
     FragColor = color;
 }

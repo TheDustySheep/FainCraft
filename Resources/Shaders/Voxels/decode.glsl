@@ -17,7 +17,7 @@ struct DecodeData
     bool IsFluid;
 
     // Light
-    uint AO;
+    float AO;
     uint LightSky;
     uint LightVoxel;
 
@@ -84,7 +84,7 @@ DecodeData DecodeVertex(int aData1, int aData2)
     // In cluster space
     dData.FaceCoord = ivec3(dData.Coord) + dData.Normal;
 
-    dData.AO = (aData1 >> 24) & 3;
+    dData.AO = float((aData1 >> 24) & 3) * 0.25 + 0.25;
 
     // Tex coords
     dData.TexCoord = vec3(TEX_UV_LOOKUP[dData.Corner], float(aData2 & 65535));
