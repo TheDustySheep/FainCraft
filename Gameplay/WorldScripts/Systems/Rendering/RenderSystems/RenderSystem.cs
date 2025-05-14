@@ -1,6 +1,7 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Core;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering.Lighting;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering.VoxelMeshes;
+using FainCraft.Gameplay.WorldScripts.Voxels;
 using FainEngine_v2.Collections;
 using FainEngine_v2.Rendering;
 using FainEngine_v2.Rendering.Materials;
@@ -21,9 +22,9 @@ internal class RenderSystem : IRenderSystem, IDisposable
 
     public event Action<ChunkCoord>? OnMeshAdded;
 
-    public RenderSystem(Material opaqueMaterial, Material transparentMaterial)
+    public RenderSystem(Material opaqueMaterial, Material transparentMaterial, IVoxelIndexer indexer)
     {
-        _buffer   = new MeshFaceBuffer();
+        _buffer   = new MeshFaceBuffer(indexer.MeshQuads);
         _meshPool = new(() => new VoxelMesh_v2(_buffer));
 
         _opaqueMaterial      = opaqueMaterial;

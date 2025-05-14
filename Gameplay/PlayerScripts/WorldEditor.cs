@@ -50,7 +50,7 @@ internal class WorldEditor
                         return;
                 }
 
-                EditVoxel(faceVox, new VoxelState() { Index = 5 });
+                EditVoxel(faceVox, new VoxelState() { Index = indexer.GetIndex("Cobblestone_Slab") });
             }
         }
     }

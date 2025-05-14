@@ -23,21 +23,21 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.TerrainGeneratio
         public readonly IBiome Desert;
         public readonly IBiome SandyShores;
 
-        public BiomesFactory(VoxelIndexer indexer, int seed)
+        public BiomesFactory(IVoxelIndexer indexer, int seed)
         {
             _decoratorNull = new NullDecorator();
             _decoratorTrees = new TreeDecorator(indexer, seed);
 
-            _oceanPainter = new PainterOcean(indexer);
+            _oceanPainter  = new PainterOcean(indexer);
             _plainsPainter = new PainterPlains(indexer);
-            _hillsPainter = new PainterHills(indexer, 70);
-            _sandyPainter = new PainterSandy(indexer);
+            _hillsPainter  = new PainterHills(indexer, 70);
+            _sandyPainter  = new PainterSandy(indexer);
 
-            Hills = new BiomeHills(_hillsPainter, _decoratorTrees);
-            Ocean = new Biome(_oceanPainter, _decoratorNull, new SimplexFBMTerrain(seed, -5f, 5f, 0.020f));
-            OceanDeep = new Biome(_oceanPainter, _decoratorNull, new SimplexFBMTerrain(seed, -30f, 15f, 0.020f));
-            Plains = new Biome(_plainsPainter, _decoratorTrees, new SimplexFBMTerrain(seed, 5f, 10f, 0.005f, minHeight: 1f));
-            Desert = new Biome(_sandyPainter, _decoratorNull, new SimplexFBMTerrain(seed, 5f, 10f, 0.007f, minHeight: 1f));
+            Hills       = new BiomeHills(_hillsPainter, _decoratorTrees);
+            Ocean       = new Biome(_oceanPainter, _decoratorNull, new SimplexFBMTerrain(seed, -5f, 5f, 0.020f));
+            OceanDeep   = new Biome(_oceanPainter, _decoratorNull, new SimplexFBMTerrain(seed, -30f, 15f, 0.020f));
+            Plains      = new Biome(_plainsPainter, _decoratorTrees, new SimplexFBMTerrain(seed, 5f, 10f, 0.005f, minHeight: 1f));
+            Desert      = new Biome(_sandyPainter, _decoratorNull, new SimplexFBMTerrain(seed, 5f, 10f, 0.007f, minHeight: 1f));
             SandyShores = new Biome(_sandyPainter, _decoratorNull, new SimplexFBMTerrain(seed, 2f, 1f, 0.010f, minHeight: 1f));
         }
     }

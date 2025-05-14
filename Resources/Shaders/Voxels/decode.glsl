@@ -31,25 +31,6 @@ struct DecodeData
     bool AnimateFoliage;
 };
 
-// Lookups
-const ivec3 NORMAL_LOOKUP[6] = ivec3[]
-(
-   ivec3(-1, 0, 0), 
-   ivec3( 1, 0, 0), 
-   ivec3( 0,-1, 0), 
-   ivec3( 0, 1, 0), 
-   ivec3( 0, 0,-1), 
-   ivec3( 0, 0, 1) 
-);
-
-const vec2 TEX_UV_LOOKUP[4] = vec2[]
-(
-    vec2(0.0, 0.0),
-    vec2(0.0, 1.0),
-    vec2(1.0, 1.0),
-    vec2(1.0, 0.0)
-);
-
 uint GetLight(ivec3 coord) {
     uint index = 
         (uint(coord.x + 1)) + 
@@ -69,10 +50,10 @@ DecodeData DecodeVertex(int aData1, int aData2)
     dData.AO        = float((aData1 >> 24) & 3) * 0.25 + 0.25;
 
     // Lookup the mesh face
-    MeshFace meshFace = meshFaces[dData.MeshIndex];
+    MeshVert meshVert = GetMeshVert(dData.MeshIndex, dData.Corner);
 
     // Normal lookup from face
-    dData.Normal = meshFace.Normal;
+    dData.Normal = meshVert.Normal;
 
     dData.Coord = ivec3
     (
@@ -81,13 +62,13 @@ DecodeData DecodeVertex(int aData1, int aData2)
         (aData1 >> 10u) & 31
     );
 
-    dData.Position = vec3(dData.Coord) + LookupFaceVert(meshFace, dData.Corner);
+    dData.Position = vec3(dData.Coord) + meshVert.Position;
 
     // In cluster space
-    dData.FaceCoord = dData.Coord + NORMAL_LOOKUP[meshFace.FaceCoord];
+    dData.FaceCoord = dData.Coord + meshVert.FaceCoord;
         
     // Tex coords
-    dData.TexCoord  = vec3(TEX_UV_LOOKUP[dData.Corner], float(aData2 & 65535));
+    dData.TexCoord  = vec3(meshVert.UV, float(aData2 & 65535));
     
     // Lighting
     uint light       = GetLight(dData.FaceCoord);

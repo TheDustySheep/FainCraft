@@ -15,7 +15,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.TerrainGeneratio
 
         readonly RegionMaps _maps = new();
 
-        public OverworldGenerator(VoxelIndexer indexer, int seed = 1337)
+        public OverworldGenerator(IVoxelIndexer indexer, int seed = 1337)
         {
             _biomeFactory = new BiomesFactory(indexer, seed);
             _biomeDecider = new BiomesDecider(_biomeFactory, seed);

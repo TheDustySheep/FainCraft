@@ -4,52 +4,58 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.VoxelMeshes
 {
     public class MeshFaceBuffer : IDisposable
     {
-        ShaderStorageBufferObject<MeshFace> _ssbo;
+        ShaderStorageBufferObject<MeshQuad> _ssbo;
 
-        private readonly MeshFace[] meshFaces;
+        private readonly MeshQuad[] meshFaces;
 
-        public MeshFaceBuffer()
+        public MeshFaceBuffer(MeshQuad[] customQuads)
         {
-            meshFaces = StandardFaces;
+            meshFaces = StandardFaces.Concat(customQuads).ToArray();
 
             _ssbo = new((uint)meshFaces.Length);
             _ssbo.SetData(meshFaces);
         }
 
-        private static readonly MeshFace[] StandardFaces =
+        private static readonly MeshQuad[] StandardFaces =
         {
             // X-
-            new MeshFace()
+            new MeshQuad()
             {
                 VertA     = new( 0, 0, 1),
                 VertB     = new( 0, 1, 1),
                 VertC     = new( 0, 1, 0),
                 VertD     = new( 0, 0, 0),
                 Normal    = new(-1, 0, 0),
+                UVMin     = new( 0, 0),
+                UVMax     = new( 1, 1),
                 FaceCoord = 0,
             },
             // X+
-            new MeshFace()
+            new MeshQuad()
             {
                 VertA     = new( 1, 0, 0),
                 VertB     = new( 1, 1, 0),
                 VertC     = new( 1, 1, 1),
                 VertD     = new( 1, 0, 1),
                 Normal    = new( 1, 1, 0),
+                UVMin     = new( 0, 0),
+                UVMax     = new( 1, 1),
                 FaceCoord = 1,
             },
             // Y-
-            new MeshFace()
+            new MeshQuad()
             {
                 VertA     = new( 1, 0, 0),
                 VertB     = new( 1, 0, 1),
                 VertC     = new( 0, 0, 1),
                 VertD     = new( 0, 0, 0),
                 Normal    = new( 0,-1, 0),
+                UVMin     = new( 0, 0),
+                UVMax     = new( 1, 1),
                 FaceCoord = 2,
             },
             // Y+
-            new MeshFace()
+            new MeshQuad()
             {
 
                 VertA     = new( 0, 1, 0),
@@ -57,26 +63,32 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.VoxelMeshes
                 VertC     = new( 1, 1, 1),
                 VertD     = new( 1, 1, 0),
                 Normal    = new( 0, 1, 0),
+                UVMin     = new( 0, 0),
+                UVMax     = new( 1, 1),
                 FaceCoord = 3,
             },
             // Z-
-            new MeshFace()
+            new MeshQuad()
             {
                 VertA     = new( 0, 0, 0),
                 VertB     = new( 0, 1, 0),
                 VertC     = new( 1, 1, 0),
                 VertD     = new( 1, 0, 0),
                 Normal    = new( 0, 0,-1),
+                UVMin     = new( 0, 0),
+                UVMax     = new( 1, 1),
                 FaceCoord = 4,
             },
             // Z+
-            new MeshFace()
+            new MeshQuad()
             {
                 VertA     = new( 1, 0, 1),
                 VertB     = new( 1, 1, 1),
                 VertC     = new( 0, 1, 1),
                 VertD     = new( 0, 0, 1),
                 Normal    = new( 0, 0, 1),
+                UVMin     = new( 0, 0),
+                UVMax     = new( 1, 1),
                 FaceCoord = 5,
             }
         };

@@ -20,7 +20,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.TerrainGeneratio
         readonly int _snowLine;
         readonly int _grassLine = 40;
 
-        public PainterHills(VoxelIndexer indexer, int snowLine)
+        public PainterHills(IVoxelIndexer indexer, int snowLine)
         {
             _snowLine = snowLine;
 

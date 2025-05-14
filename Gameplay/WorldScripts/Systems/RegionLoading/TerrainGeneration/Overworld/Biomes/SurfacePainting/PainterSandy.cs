@@ -12,10 +12,10 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.TerrainGeneratio
         readonly VoxelState SAND;
         readonly VoxelState STONE;
 
-        public PainterSandy(VoxelIndexer indexer)
+        public PainterSandy(IVoxelIndexer indexer)
         {
-            AIR = new() { Index = indexer.GetIndex("Air") };
-            SAND = new() { Index = indexer.GetIndex("Sand") };
+            AIR   = new() { Index = indexer.GetIndex("Air") };
+            SAND  = new() { Index = indexer.GetIndex("Sand") };
             STONE = new() { Index = indexer.GetIndex("Stone") };
         }
 

@@ -83,6 +83,9 @@
     <None Update="Resources\Textures\Screenshot_1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Voxels\Meshes\half_slab.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Voxels\Voxels.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -95,6 +98,10 @@
     <None Update="Resources\Textures\grass.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\Voxels\Meshes\" />
   </ItemGroup>
 
 </Project>

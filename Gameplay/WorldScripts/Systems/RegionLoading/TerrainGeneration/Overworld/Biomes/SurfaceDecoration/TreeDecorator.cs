@@ -15,13 +15,13 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.TerrainGeneratio
         readonly VoxelState LOG;
         readonly VoxelState LEAVES;
 
-        public TreeDecorator(VoxelIndexer indexer, int seed)
+        public TreeDecorator(IVoxelIndexer indexer, int seed)
         {
             random = new Random(seed);
 
-            AIR = new() { Index = indexer.GetIndex("Air") };
-            GRASS = new() { Index = indexer.GetIndex("Grass") };
-            LOG = new() { Index = indexer.GetIndex("Log") };
+            AIR    = new() { Index = indexer.GetIndex("Air") };
+            GRASS  = new() { Index = indexer.GetIndex("Grass") };
+            LOG    = new() { Index = indexer.GetIndex("Log") };
             LEAVES = new() { Index = indexer.GetIndex("Leaves") };
         }
 

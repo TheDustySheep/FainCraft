@@ -1,28 +1,29 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Data;
-using Newtonsoft.Json;
+using FainCraft.Gameplay.WorldScripts.Systems.Rendering.VoxelMeshes;
 using System.Runtime.CompilerServices;
 
 namespace FainCraft.Gameplay.WorldScripts.Voxels;
 public class VoxelIndexer : IVoxelIndexer
 {
+    public MeshQuad[] MeshQuads { get; }
     readonly VoxelType[] Voxels;
     readonly Dictionary<VoxelType, uint> TypeToIndex = new();
     readonly Dictionary<string, uint> NameToIndex = new();
 
     public VoxelDataCache<bool> CacheLightPassThrough { get; }
     public VoxelDataCache<byte> CacheEmitsLight { get; }
-
     public VoxelDataCache<bool> CustomMesh { get; }
 
-    private VoxelIndexer(VoxelType[] voxels)
+    public VoxelIndexer(VoxelType[] voxels, MeshQuad[] meshQuads)
     {
+        MeshQuads = meshQuads;
         Voxels = voxels;
 
         UpdateIndex();
 
-        CacheLightPassThrough = new VoxelDataCache<bool>(Voxels, v => v.LightPassThrough);
-        CacheEmitsLight       = new VoxelDataCache<byte>(Voxels, v => v.Emits_Light);
-        CustomMesh            = new VoxelDataCache<bool>(Voxels, v => v.Custom_Mesh);
+        CacheLightPassThrough = new VoxelDataCache<bool>(Voxels, v => v.Light_Solid);
+        CacheEmitsLight       = new VoxelDataCache<byte>(Voxels, v => v.Light_Emission);
+        CustomMesh            = new VoxelDataCache<bool>(Voxels, v => v.Custom_Mesh != null);
     }
 
     private void UpdateIndex()
@@ -68,29 +69,4 @@ public class VoxelIndexer : IVoxelIndexer
     }
 
     #endregion
-
-    public static class Builder
-    {
-        private static VoxelType[] LoadFile(string filePath)
-        {
-            string voxel_text = File.ReadAllText(filePath);
-            var voxels = JsonConvert.DeserializeObject<VoxelType[]>(voxel_text);
-
-            if (voxels is not null)
-                return voxels;
-
-            Console.WriteLine("Could not load voxels");
-            return [];
-        }
-
-        public static VoxelIndexer FromFilePath(string filePath = @"Resources\Voxels\Voxels.json")
-        {
-            return new VoxelIndexer(LoadFile(filePath));
-        }
-
-        public static VoxelIndexer FromVoxelTypes(VoxelType[] types)
-        {
-            return new VoxelIndexer(types);
-        }
-    }
 }

@@ -37,7 +37,7 @@ internal class World : GameObject
         var voxel_material_o = new VoxelMaterial           (ResourceLoader.LoadShader(@"Resources\Shaders\Voxels\Voxel_Shader_2\"), voxel_atlas);
         var voxel_material_t = new VoxelMaterialTransparent(ResourceLoader.LoadShader(@"Resources\Shaders\Voxels\Voxel_Shader_Transparent\"), voxel_atlas);
 
-        var indexer = VoxelIndexer.Builder.FromFilePath();
+        IVoxelIndexer indexer = VoxelTypeLoader.LoadIndexer();
 
         // Entities
         WorldEntityController = new WorldEntityController();
@@ -46,7 +46,7 @@ internal class World : GameObject
         WorldData = new WorldData(indexer);
 
         // Rendering
-        _renderSystem   = new RenderSystem(voxel_material_o, voxel_material_t);
+        _renderSystem   = new RenderSystem(voxel_material_o, voxel_material_t, indexer);
         _meshSystem     = new ThreadedMeshGenerationSystem(WorldData, _renderSystem, () => new MeshGenerator_v3(indexer));
         _lightingSystem = new LightingSystem(WorldData, _renderSystem, new LightingCalculator(indexer));
 

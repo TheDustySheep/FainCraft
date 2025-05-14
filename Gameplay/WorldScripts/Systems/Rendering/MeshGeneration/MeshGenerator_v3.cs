@@ -1,5 +1,6 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Data;
 using FainCraft.Gameplay.WorldScripts.Voxels;
+using Silk.NET.Assimp;
 using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration;
@@ -45,15 +46,47 @@ public class MeshGenerator_v3 : IMeshGenerator
                 {
                     var voxelData = cluster.GetVoxel(x, y, z);
 
-                    if (customMeshLookup[voxelData.Index])
-                        throw new NotImplementedException("Custom Voxel Meshes are not yet implemented");
-
                     var voxelType = _voxelIndexer.GetVoxelType(voxelData.Index);
 
-                    if (!voxelType.DrawSelf)
+                    // Handle Custom Mesh
+                    if (customMeshLookup[voxelData.Index] && voxelType.Custom_Mesh != null)
+                    {
+                        int face_idx = 0;
+                        foreach (var quadIdx in voxelType.Custom_Mesh.QuadIndexes)
+                        {
+                            for (uint i = 0; i < 4; i++)
+                            {
+                                var vert = new VoxelVertex()
+                                {
+                                    Corner = i,
+                                    MeshIndex = quadIdx,
+                                    XPos = (uint)x,
+                                    YPos = (uint)y,
+                                    ZPos = (uint)z,
+                                    TexIndex = voxelType.TexIDs[face_idx]
+                                };
+
+                                o_verts.Add(vert);
+                            }
+
+                            o_tris.Add(TRIANGLES[0] + o_vertCount);
+                            o_tris.Add(TRIANGLES[1] + o_vertCount);
+                            o_tris.Add(TRIANGLES[2] + o_vertCount);
+                            o_tris.Add(TRIANGLES[3] + o_vertCount);
+                            o_tris.Add(TRIANGLES[4] + o_vertCount);
+                            o_tris.Add(TRIANGLES[5] + o_vertCount);
+
+                            o_vertCount += 4;
+                            face_idx++;
+                        }
+
+                        continue;
+                    }
+
+                    if (!voxelType.Draw_Self)
                         continue;
 
-                    var verts = voxelType.Is_Transparent ? t_verts : o_verts;
+                    var verts = voxelType.Draw_Transparent ? t_verts : o_verts;
 
                     GetNeighbourVoxels(x, y, z);
 
@@ -66,14 +99,14 @@ public class MeshGenerator_v3 : IMeshGenerator
                         var faceVoxelType = nVoxelTypes[faceIndex];
 
                         // If the face voxel is see through then draw
-                        if (faceVoxelType.Fully_Opaque)
+                        if (faceVoxelType.Draw_Opaque)
                             continue;
 
-                        if (voxelType.Skip_Draw_Similar && voxelData.Index == faceVoxelData.Index)
+                        if (!voxelType.Draw_Similar && voxelData.Index == faceVoxelData.Index)
                             continue;
 
-                        uint animate_foliage = Convert.ToUInt32(voxelType.Animate_Foliage);
-                        uint blend_biome     = Convert.ToUInt32(voxelType.Biome_Blend[face]);
+                        uint animate_foliage = Convert.ToUInt32(voxelType.Foliage_Animate);
+                        uint blend_biome     = Convert.ToUInt32(voxelType.Foliage_Biome_Blend[face]);
 
                         for (uint i = 0; i < 4; i++)
                         {
@@ -88,9 +121,9 @@ public class MeshGenerator_v3 : IMeshGenerator
                                 TexIndex = voxelType.TexIDs[face]
                             };
 
-                            uint side1 = Convert.ToUInt32(nVoxelTypes[AO_LOOKUP[face * 12 + i * 3 + 0]].Fully_Opaque);
-                            uint cornr = Convert.ToUInt32(nVoxelTypes[AO_LOOKUP[face * 12 + i * 3 + 1]].Fully_Opaque);
-                            uint side2 = Convert.ToUInt32(nVoxelTypes[AO_LOOKUP[face * 12 + i * 3 + 2]].Fully_Opaque);
+                            uint side1 = Convert.ToUInt32(nVoxelTypes[AO_LOOKUP[face * 12 + i * 3 + 0]].Draw_Opaque);
+                            uint cornr = Convert.ToUInt32(nVoxelTypes[AO_LOOKUP[face * 12 + i * 3 + 1]].Draw_Opaque);
+                            uint side2 = Convert.ToUInt32(nVoxelTypes[AO_LOOKUP[face * 12 + i * 3 + 2]].Draw_Opaque);
                             vert.AO = GetBranchlessVertexAO(side1, side2, cornr);
 
                             vert.Biome_Blend = blend_biome;
@@ -99,7 +132,7 @@ public class MeshGenerator_v3 : IMeshGenerator
                             verts.Add(vert);
                         }
 
-                        if (voxelType.Is_Transparent)
+                        if (voxelType.Draw_Transparent)
                         {
                             t_tris.Add(TRIANGLES[0] + t_vertCount);
                             t_tris.Add(TRIANGLES[1] + t_vertCount);

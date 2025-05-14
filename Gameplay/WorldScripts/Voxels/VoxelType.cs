@@ -1,21 +1,36 @@
-﻿using Newtonsoft.Json;
+﻿using FainCraft.Gameplay.WorldScripts.Systems.Rendering.VoxelMeshes;
+using Newtonsoft.Json;
 
 namespace FainCraft.Gameplay.WorldScripts.Voxels;
 public class VoxelType
 {
-    [JsonProperty("Name")]               public required string Name;
-    [JsonProperty("Draw_Self")]          public bool DrawSelf = true;
-    [JsonProperty("EmitsLight")]         public byte Emits_Light = 0;
-    [JsonProperty("Fully_Opaque")]       public bool Fully_Opaque = true;
-    [JsonProperty("TexIDs")]             public uint[] TexIDs = [0, 0, 0, 0, 0, 0];
-    [JsonProperty("Light_Pass_Through")] public bool LightPassThrough;
-    [JsonProperty("Physics_Solid")]      public bool Physics_Solid = true;
-    [JsonProperty("Is_Fluid")]           public bool Is_Fluid;
-    [JsonProperty("Is_Transparent")]     public bool Is_Transparent;
-    [JsonProperty("Skip_Draw_Similar")]  public bool Skip_Draw_Similar;
-    [JsonProperty("Animate_Foliage")]    public bool Animate_Foliage;
-    [JsonProperty("Biome_Blend")]        public bool[] Biome_Blend = [false, false, false, false, false, false];
-    [JsonProperty("Custom_Mesh")]        public bool Custom_Mesh;
+    public required string Name;
+    
+    // Drawing
+    public required bool Draw_Self;
+    public required bool Draw_Opaque;
+    public required bool Draw_Transparent;
+    public required bool Draw_Similar;
+
+    // Foliage
+    public required bool   Foliage_Animate;
+    public required bool[] Foliage_Biome_Blend;
+
+    // Physics
+    public required bool Physics_Solid = true;
+
+    // Fluid
+    public required bool Is_Fluid;
+
+    // Textures
+    public required uint[] TexIDs;
+
+    // Meshing
+    public required CustomVoxel? Custom_Mesh;
+    
+    // Lighting
+    public byte Light_Emission;
+    public bool Light_Solid;
 
     public override string ToString()
     {
