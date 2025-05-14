@@ -1,7 +1,8 @@
 #version 450 core
 
-layout(std430, binding = 0) buffer LightingBuffer { uint lighting[]; };
+layout(std430, binding = 1) buffer LightingBuffer { uint lighting[]; };
 
+#include "../custom_meshes.glsl"
 #include "../common.glsl"
 #include "../decode.glsl"
 

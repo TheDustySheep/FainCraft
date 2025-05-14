@@ -1,5 +1,6 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Core;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering.Lighting;
+using FainCraft.Gameplay.WorldScripts.Systems.Rendering.VoxelMeshes;
 using FainEngine_v2.Collections;
 using FainEngine_v2.Rendering;
 using FainEngine_v2.Rendering.Materials;
@@ -10,7 +11,8 @@ using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.RenderSystems;
 internal class RenderSystem : IRenderSystem, IDisposable
 {
-    readonly ObjectPool<VoxelMesh_v2> _meshPool = new();
+    readonly MeshFaceBuffer _buffer;
+    readonly ObjectPoolFactory<VoxelMesh_v2> _meshPool;
     readonly Dictionary<ChunkCoord, VoxelMesh_v2> _opaqueMeshes      = new();
     readonly Dictionary<ChunkCoord, VoxelMesh_v2> _transparentMeshes = new();
 
@@ -21,6 +23,9 @@ internal class RenderSystem : IRenderSystem, IDisposable
 
     public RenderSystem(Material opaqueMaterial, Material transparentMaterial)
     {
+        _buffer   = new MeshFaceBuffer();
+        _meshPool = new(() => new VoxelMesh_v2(_buffer));
+
         _opaqueMaterial      = opaqueMaterial;
         _transparentMaterial = transparentMaterial;
     }

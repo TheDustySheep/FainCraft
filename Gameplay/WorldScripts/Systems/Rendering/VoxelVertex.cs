@@ -9,9 +9,8 @@ public struct VoxelVertex
     static readonly uint MASK_XPOS        = 0b_0000_0000_0000_0000_0000_0000_0001_1111;
     static readonly uint MASK_YPOS        = 0b_0000_0000_0000_0000_0000_0011_1110_0000;
     static readonly uint MASK_ZPOS        = 0b_0000_0000_0000_0000_0111_1100_0000_0000;
-    static readonly uint MASK_OFFSET      = 0b_0000_0000_0000_0011_1000_0000_0000_0000;
-    static readonly uint MASK_CORNER      = 0b_0000_0000_0000_1100_0000_0000_0000_0000;
-    static readonly uint MASK_NORMAL      = 0b_0000_0000_0111_0000_0000_0000_0000_0000;
+    static readonly uint MASK_FLIP_FACE   = 0b_0000_0000_0000_0000_1000_0000_0000_0000;
+    static readonly uint MASK_CORNER      = 0b_0000_0000_0000_0011_0000_0000_0000_0000;
 
     static readonly uint MASK_IS_FLUID    = 0b_0000_0000_1000_0000_0000_0000_0000_0000;
     static readonly uint MASK_AO          = 0b_0000_0011_0000_0000_0000_0000_0000_0000;
@@ -37,22 +36,16 @@ public struct VoxelVertex
         set => Data1 = Data1 & ~MASK_ZPOS | (value & 31u) << 10;
     }
 
-    public uint Offset
+    public uint FlipFace
     {
-        readonly get => (Data1 & MASK_OFFSET) >> 15;
-        set => Data1 = Data1 & ~MASK_OFFSET | (value & 7u) << 15;
+        readonly get => (Data1 & MASK_FLIP_FACE) >> 15;
+        set => Data1 = Data1 & ~MASK_FLIP_FACE | (value & 1u) << 15;
     }
 
     public uint Corner
     {
-        readonly get => (Data1 & MASK_CORNER) >> 18;
-        set => Data1 = Data1 & ~MASK_CORNER | (value & 3u) << 18;
-    }
-
-    public uint Normal
-    {
-        readonly get => (Data1 & MASK_NORMAL) >> 20;
-        set => Data1 = Data1 & ~MASK_NORMAL | (value & 7u) << 20;
+        readonly get => (Data1 & MASK_CORNER) >> 16;
+        set => Data1 = Data1 & ~MASK_CORNER | (value & 3u) << 16;
     }
 
     public uint SurfaceFluid
@@ -87,15 +80,24 @@ public struct VoxelVertex
 
     /// <summary>
     /// Data 2
+    /// - Texture Indexes
+    /// - Mesh Faces
     /// </summary>
     public uint Data2;
 
-    static readonly uint MASK_TEXID = 0b_0000_0000_0000_0000_1111_1111_1111_1111;
+    static readonly uint MASK_TEX_ID  = 0b_0000_0000_0000_0000_1111_1111_1111_1111;
+    static readonly uint MASK_MESH_ID = 0b_1111_1111_1111_1111_0000_0000_0000_0000;
 
     public uint TexIndex
     {
-        readonly get => Data2 & MASK_TEXID;
-        set => Data2 = Data2 & ~MASK_TEXID | value & 65535u;
+        readonly get => Data2 & MASK_TEX_ID;
+        set => Data2 = Data2 & ~MASK_TEX_ID | value & 65535u;
+    }
+
+    public uint MeshIndex
+    {
+        readonly get => Data2 & MASK_MESH_ID >> 16;
+        set => Data2 = Data2 & ~MASK_MESH_ID | (value & 65535u) << 16;
     }
 
     public override string ToString()

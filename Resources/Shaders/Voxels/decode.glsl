@@ -1,20 +1,22 @@
+#include "./custom_meshes.glsl"
+
 struct DecodeData 
 {
     // Positions
-     vec3 Position;
-    uvec3 Coord;
-    uvec3 Offset;
+    ivec3 Coord;
+    vec3 Position;
 
     // Normals
-    ivec3 Normal;
+    vec3 Normal;
     ivec3 FaceCoord;
 
     // Textures
+    uint MeshIndex;
     uint Corner;
     vec3 TexCoord;
     
     // Fluid
-    bool IsFluid;
+    bool ApplyFluid;
 
     // Light
     float AO;
@@ -61,34 +63,33 @@ DecodeData DecodeVertex(int aData1, int aData2)
 {
     DecodeData dData;
 
-    dData.Coord = uvec3
+    // Basic Data Extraction
+    dData.Corner    = (aData1 >> 16) & 3;
+    dData.MeshIndex = (aData2 >> 16) & 65535;
+    dData.AO        = float((aData1 >> 24) & 3) * 0.25 + 0.25;
+
+    // Lookup the mesh face
+    MeshFace meshFace = meshFaces[dData.MeshIndex];
+
+    // Normal lookup from face
+    dData.Normal = meshFace.Normal;
+
+    dData.Coord = ivec3
     (
-        (aData1 >>  0u) & 31u,
-        (aData1 >>  5u) & 31u,
-        (aData1 >> 10u) & 31u
+        (aData1 >>  0u) & 31,
+        (aData1 >>  5u) & 31,
+        (aData1 >> 10u) & 31
     );
 
-    dData.Offset = uvec3
-    (
-        (aData1 >> 17u) & 1u,
-        (aData1 >> 16u) & 1u,
-        (aData1 >> 15u) & 1u
-    );
-
-    dData.Position = vec3(dData.Coord + dData.Offset);
-
-    dData.Corner = (aData1 >> 18) & 3;
-
-    dData.Normal = NORMAL_LOOKUP[(aData1 >> 20) & 7];
+    dData.Position = vec3(dData.Coord) + LookupFaceVert(meshFace, dData.Corner);
 
     // In cluster space
-    dData.FaceCoord = ivec3(dData.Coord) + dData.Normal;
-
-    dData.AO = float((aData1 >> 24) & 3) * 0.25 + 0.25;
-
+    dData.FaceCoord = dData.Coord + NORMAL_LOOKUP[meshFace.FaceCoord];
+        
     // Tex coords
-    dData.TexCoord = vec3(TEX_UV_LOOKUP[dData.Corner], float(aData2 & 65535));
+    dData.TexCoord  = vec3(TEX_UV_LOOKUP[dData.Corner], float(aData2 & 65535));
     
+    // Lighting
     uint light       = GetLight(dData.FaceCoord);
     dData.LightSky   = light & 15u;
     dData.LightVoxel = (light >> 4) & 15u;

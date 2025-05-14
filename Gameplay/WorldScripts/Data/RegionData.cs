@@ -1,6 +1,6 @@
 ﻿namespace FainCraft.Gameplay.WorldScripts.Data;
 
-using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
+using static global::FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 public class RegionData : IRegionData
 {

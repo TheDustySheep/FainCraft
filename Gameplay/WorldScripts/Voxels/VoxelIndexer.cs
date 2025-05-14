@@ -12,6 +12,8 @@ public class VoxelIndexer : IVoxelIndexer
     public VoxelDataCache<bool> CacheLightPassThrough { get; }
     public VoxelDataCache<byte> CacheEmitsLight { get; }
 
+    public VoxelDataCache<bool> CustomMesh { get; }
+
     private VoxelIndexer(VoxelType[] voxels)
     {
         Voxels = voxels;
@@ -20,6 +22,7 @@ public class VoxelIndexer : IVoxelIndexer
 
         CacheLightPassThrough = new VoxelDataCache<bool>(Voxels, v => v.LightPassThrough);
         CacheEmitsLight       = new VoxelDataCache<byte>(Voxels, v => v.Emits_Light);
+        CustomMesh            = new VoxelDataCache<bool>(Voxels, v => v.Custom_Mesh);
     }
 
     private void UpdateIndex()

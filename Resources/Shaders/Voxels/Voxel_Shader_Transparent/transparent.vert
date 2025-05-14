@@ -46,10 +46,7 @@ vec3 GetBlendCol(DecodeData dData)
 
 float ApplyFluid(DecodeData dData)
 {
-    //if (!dData.IsFluid)
-    //    return 0;
-
-    if (dData.Offset.y == 0)
+    if (!dData.ApplyFluid)
         return 0;
 
     vec3 globalPos = vec3(uModel * vec4(dData.Position, 1.0));

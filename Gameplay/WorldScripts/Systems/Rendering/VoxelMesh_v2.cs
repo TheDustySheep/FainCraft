@@ -1,4 +1,5 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Systems.Rendering.Lighting;
+using FainCraft.Gameplay.WorldScripts.Systems.Rendering.VoxelMeshes;
 using FainEngine_v2.Rendering;
 using FainEngine_v2.Rendering.BoundingShapes;
 using FainEngine_v2.Rendering.Meshing;
@@ -21,17 +22,20 @@ public sealed class VoxelMesh_v2 : IMesh
     private BufferObject<VoxelVertex> VBO { get; }
     private BufferObject<uint> EBO { get; }
 
-    private ShaderStorageBufferObject<LightData> LightingSSBO { get; }
+    private ShaderStorageBufferObject<LightData> _lightingSSBO { get; }
+    private MeshFaceBuffer _meshFaceBuffer;
 
-    public VoxelMesh_v2()
+    public VoxelMesh_v2(MeshFaceBuffer meshFaceBuffer)
     {
         _gl = GameGraphics.GL;
+
+        _meshFaceBuffer = meshFaceBuffer;
 
         EBO = new BufferObject<uint>(BufferTargetARB.ElementArrayBuffer);
         VBO = new BufferObject<VoxelVertex>(BufferTargetARB.ArrayBuffer);
         VAO = new VertexArrayObject<VoxelVertex, uint>(_gl, VBO, EBO);
 
-        LightingSSBO = new ShaderStorageBufferObject<LightData>(PADDED_CHUNK_VOLUME);
+        _lightingSSBO = new ShaderStorageBufferObject<LightData>(PADDED_CHUNK_VOLUME);
 
         Bounds = new BoundingBox()
         {
@@ -54,7 +58,7 @@ public sealed class VoxelMesh_v2 : IMesh
     {
         triangleCount = 0;
 
-        LightingSSBO.Clear();
+        _lightingSSBO.Clear();
         VBO.SetData([]);
         EBO.SetData([]);
     }
@@ -65,14 +69,15 @@ public sealed class VoxelMesh_v2 : IMesh
             return;
 
         VAO.Bind();
-        LightingSSBO.Bind(0);
+        _meshFaceBuffer.Bind(0);
+        _lightingSSBO.Bind(1);
 
         _gl.DrawElementsBaseVertex(PrimitiveType.Triangles, triangleCount, DrawElementsType.UnsignedInt, (void*)0, 0);
     }
 
     public void Dispose()
     {
-        LightingSSBO.Dispose();
+        _lightingSSBO.Dispose();
         VAO.Dispose();
         VBO.Dispose();
         EBO.Dispose();
@@ -81,7 +86,7 @@ public sealed class VoxelMesh_v2 : IMesh
 
     internal void UpdateLighting(ReadOnlySpan<LightData> span)
     {
-        LightingSSBO.SetData(span);
+        _lightingSSBO.SetData(span);
     }
 
     ~VoxelMesh_v2() => Dispose();

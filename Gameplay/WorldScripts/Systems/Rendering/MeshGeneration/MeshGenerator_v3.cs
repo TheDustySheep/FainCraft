@@ -5,18 +5,18 @@ using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration;
 public class MeshGenerator_v3 : IMeshGenerator
 {
-    readonly IVoxelIndexer voxelIndexer;
+    readonly IVoxelIndexer _voxelIndexer;
     readonly VoxelState[] nVoxelDatas = new VoxelState[27];
-    readonly VoxelType[] nVoxelTypes = new VoxelType[27];
+    readonly  VoxelType[] nVoxelTypes = new  VoxelType[27];
 
     readonly VoxelState[] allVoxelDatas = new VoxelState[(CHUNK_SIZE + 2) * (CHUNK_SIZE + 2) * (CHUNK_SIZE + 2)];
-    readonly VoxelType[] allVoxelTypes = new VoxelType[(CHUNK_SIZE + 2) * (CHUNK_SIZE + 2) * (CHUNK_SIZE + 2)];
+    readonly  VoxelType[] allVoxelTypes = new  VoxelType[(CHUNK_SIZE + 2) * (CHUNK_SIZE + 2) * (CHUNK_SIZE + 2)];
 
     const uint VOXEL_UP = 22;
 
     public MeshGenerator_v3(IVoxelIndexer voxelIndexer)
     {
-        this.voxelIndexer = voxelIndexer;
+        _voxelIndexer = voxelIndexer;
     }
 
     public void GenerateMesh(IChunkDataCluster cluster, VoxelMeshData opaqueMeshData, VoxelMeshData transparentMeshData)
@@ -35,6 +35,8 @@ public class MeshGenerator_v3 : IMeshGenerator
         uint o_vertCount = 0;
         uint t_vertCount = 0;
 
+        bool[] customMeshLookup = _voxelIndexer.CustomMesh.Data;
+
         for (int y = 0; y < CHUNK_SIZE; y++)
         {
             for (int z = 0; z < CHUNK_SIZE; z++)
@@ -42,7 +44,11 @@ public class MeshGenerator_v3 : IMeshGenerator
                 for (int x = 0; x < CHUNK_SIZE; x++)
                 {
                     var voxelData = cluster.GetVoxel(x, y, z);
-                    var voxelType = voxelIndexer.GetVoxelType(voxelData.Index);
+
+                    if (customMeshLookup[voxelData.Index])
+                        throw new NotImplementedException("Custom Voxel Meshes are not yet implemented");
+
+                    var voxelType = _voxelIndexer.GetVoxelType(voxelData.Index);
 
                     if (!voxelType.DrawSelf)
                         continue;
@@ -53,7 +59,7 @@ public class MeshGenerator_v3 : IMeshGenerator
 
                     uint surfaceFluid = Convert.ToUInt32(voxelType.Is_Fluid && !nVoxelTypes[VOXEL_UP].Is_Fluid);
 
-                    for (int face = 0; face < 6; face++)
+                    for (uint face = 0; face < 6; face++)
                     {
                         uint faceIndex    = FACE_N_INDEX[face];
                         var faceVoxelData = nVoxelDatas[faceIndex];
@@ -71,13 +77,16 @@ public class MeshGenerator_v3 : IMeshGenerator
 
                         for (uint i = 0; i < 4; i++)
                         {
-                            var vert = VERTICES[i + face * 4];
-                            vert.XPos = (uint)x;
-                            vert.YPos = (uint)y;
-                            vert.ZPos = (uint)z;
-                            vert.SurfaceFluid = surfaceFluid;
-
-                            vert.TexIndex = voxelType.TexIDs[face];
+                            var vert = new VoxelVertex()
+                            {
+                                Corner = i,
+                                MeshIndex = face,
+                                XPos = (uint)x,
+                                YPos = (uint)y,
+                                ZPos = (uint)z,
+                                SurfaceFluid = surfaceFluid,
+                                TexIndex = voxelType.TexIDs[face]
+                            };
 
                             uint side1 = Convert.ToUInt32(nVoxelTypes[AO_LOOKUP[face * 12 + i * 3 + 0]].Fully_Opaque);
                             uint cornr = Convert.ToUInt32(nVoxelTypes[AO_LOOKUP[face * 12 + i * 3 + 1]].Fully_Opaque);
@@ -132,7 +141,7 @@ public class MeshGenerator_v3 : IMeshGenerator
                 {
                     var voxelData = cluster.GetVoxel(x, y, z);
                     voxelDatas[i] = voxelData;
-                    voxelTypes[i] = voxelIndexer.GetVoxelType(voxelData.Index);
+                    voxelTypes[i] = _voxelIndexer.GetVoxelType(voxelData.Index);
                 }
             }
         }
@@ -225,45 +234,6 @@ public class MeshGenerator_v3 : IMeshGenerator
         ClusterIndex(2, 1, 2), ClusterIndex(2, 2, 2), ClusterIndex(1, 2, 2),
         ClusterIndex(1, 2, 2), ClusterIndex(0, 2, 2), ClusterIndex(0, 1, 2),
         ClusterIndex(0, 1, 2), ClusterIndex(0, 0, 2), ClusterIndex(1, 0, 2),
-    };
-
-    static readonly VoxelVertex[] VERTICES =
-    {
-        // X-
-        new VoxelVertex { Offset = 0b_001, Corner = 0, Normal = 0 },
-        new VoxelVertex { Offset = 0b_011, Corner = 1, Normal = 0 },
-        new VoxelVertex { Offset = 0b_010, Corner = 2, Normal = 0 },
-        new VoxelVertex { Offset = 0b_000, Corner = 3, Normal = 0 },
-
-        // X+
-        new VoxelVertex { Offset = 0b_100, Corner = 0, Normal = 1 },
-        new VoxelVertex { Offset = 0b_110, Corner = 1, Normal = 1 },
-        new VoxelVertex { Offset = 0b_111, Corner = 2, Normal = 1 },
-        new VoxelVertex { Offset = 0b_101, Corner = 3, Normal = 1 },
-
-        // Y-
-        new VoxelVertex { Offset = 0b_100, Corner = 0, Normal = 2 },
-        new VoxelVertex { Offset = 0b_101, Corner = 1, Normal = 2 },
-        new VoxelVertex { Offset = 0b_001, Corner = 2, Normal = 2 },
-        new VoxelVertex { Offset = 0b_000, Corner = 3, Normal = 2 },
-
-        // Y+
-        new VoxelVertex { Offset = 0b_010, Corner = 0, Normal = 3 },
-        new VoxelVertex { Offset = 0b_011, Corner = 1, Normal = 3 },
-        new VoxelVertex { Offset = 0b_111, Corner = 2, Normal = 3 },
-        new VoxelVertex { Offset = 0b_110, Corner = 3, Normal = 3 },
-
-        // Z-
-        new VoxelVertex { Offset = 0b_000, Corner = 0, Normal = 4 },
-        new VoxelVertex { Offset = 0b_010, Corner = 1, Normal = 4 },
-        new VoxelVertex { Offset = 0b_110, Corner = 2, Normal = 4 },
-        new VoxelVertex { Offset = 0b_100, Corner = 3, Normal = 4 },
-
-        // Z+
-        new VoxelVertex { Offset = 0b_101, Corner = 0, Normal = 5 },
-        new VoxelVertex { Offset = 0b_111, Corner = 1, Normal = 5 },
-        new VoxelVertex { Offset = 0b_011, Corner = 2, Normal = 5 },
-        new VoxelVertex { Offset = 0b_001, Corner = 3, Normal = 5 },
     };
 
     static readonly uint[] TRIANGLES =

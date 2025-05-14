@@ -8,7 +8,7 @@ using FainEngine_v2.UI.Elements;
 using FainEngine_v2.Utils;
 using System.Text;
 
-namespace FainCraft.UI
+namespace FainCraft.UI.Overlays
 {
     public class DebugStatsUI : UIElement
     {
