@@ -10,8 +10,8 @@
 
         public static readonly RenderSettings Default = new()
         {
-            LoadRadius = 6,
-            RenderRadius = 4,
+            LoadRadius = 16,
+            RenderRadius = 12,
             MeshesAppliedPerFrame = 16,
             MeshQueueLimit = 4,
             LightingUpdatesPerTick = 4,

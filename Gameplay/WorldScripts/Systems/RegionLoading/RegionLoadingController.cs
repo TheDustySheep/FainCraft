@@ -77,6 +77,15 @@ internal class RegionLoadingController : IRegionLoadingController
             if (promise.IsCancelled)
                 continue;
 
+            // Failed to load the data from file
+            if (data is null)
+            {
+                // Fallback - Generate
+                _terrainGenerator.Request(coord);
+                _promises[coord] = new GeneratePromise(GeneratePromise.System.TerrainGenerator);
+                continue;
+            }
+
             // Handle the loaded data        
             _worldData.SetRegion(coord, data);
         }

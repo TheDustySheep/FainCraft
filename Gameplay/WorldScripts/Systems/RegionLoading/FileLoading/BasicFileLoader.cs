@@ -52,14 +52,14 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading
                 string filePath = RegionFilePath(coord);
                 using FileStream fs = new(filePath, FileMode.Open);
 
-                _regionSerializer.Deserialize(fs, out _, out var data);
+                _regionSerializer.Deserialize(fs, coord, out var data);
                 Console.WriteLine("Yep, deserialized");
 
                 _queue.LoadResult(coord, data);
             }
         }
 
-        public IEnumerable<(RegionCoord, RegionData)> GetComplete()
+        public IEnumerable<(RegionCoord, RegionData?)> GetComplete()
         {
             while (_queue.TryDequeueLoadResult(out var coord, out var data))
             {

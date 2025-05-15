@@ -15,6 +15,7 @@ using FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.RegionSe
 using FainCraft.Gameplay.WorldScripts.Core;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering.Materials;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering.Lighting;
+using FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.RegionFileWriter;
 
 namespace FainCraft.Gameplay.WorldScripts;
 internal class World : GameObject
@@ -55,10 +56,10 @@ internal class World : GameObject
 
         _terrainSystem     = new ThreadedTerrainGenerationSystem(new OverworldGenerator(indexer));
 
-        bool enableSaving = false;
+        bool enableSaving = true;
 
         if (enableSaving)
-            _fileLoadingSystem = new BasicFileLoader("Save_1", new RegionSerializer_v1());
+            _fileLoadingSystem = new FileLoadingSystem("Save_1", new RegionSerializer_v2());
         else
             _fileLoadingSystem = new NullFileLoader();
 
