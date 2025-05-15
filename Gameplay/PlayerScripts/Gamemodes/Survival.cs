@@ -1,94 +1,56 @@
 ﻿using FainCraft.Gameplay.Motors;
-using FainEngine_v2.Core;
+using FainCraft.Gameplay.PlayerScripts.MovementState;
 using FainEngine_v2.Core.GameObjects;
-using FainEngine_v2.Extensions;
-using FainEngine_v2.Utils;
-using Silk.NET.Input;
 using System.Numerics;
 
 namespace FainCraft.Gameplay.PlayerScripts.Gamemodes
 {
-    public class Survival : IGamemode
+    public class Survival : IState<Vector2>
     {
-        readonly EntityMotor motor;
-        readonly Transform camTransform;
+        private readonly EntityMotor _motor;
+        private readonly Transform   _camTransform;
+        private readonly StateMachine<Vector2> _movementStateMachine;
 
-        bool _isSprinting;
-        float jumpCooldown = 0f;
-
-        readonly float jumpPeriod = 0.5f;
-        readonly float moveSpeed = 4.3f;
-        readonly float sprintSpeed = 5.6f;
+        private readonly Swimming _swimming;
+        private readonly Walking  _walking;
 
         public Survival(EntityMotor motor, Transform camTransform)
         {
-            this.motor = motor;
-            this.camTransform = camTransform;
+            _motor = motor;
+            _camTransform = camTransform;
+
+            _swimming = new Swimming(_motor, _camTransform);
+            _walking  = new Walking (_motor, _camTransform);
+
+            _movementStateMachine = new StateMachine<Vector2>(
+                _walking
+            );
         }
 
-        public void EnterState()
+        public void OnEnter()
         {
-            motor.EnableGravity = true;
-            motor.EnableCollision = true;
+            _motor.EnableGravity = true;
+            _motor.EnableCollision = true;
         }
 
-        public void UpdatePosition(Vector2 moveInputs)
+        public IState<Vector2> Tick(Vector2 moveInputs)
         {
-            Vector3 velocity = motor.Velocity;
-
-            // Movement
-            Vector3 movements = Movement(moveInputs);
-            velocity.X = movements.X;
-            velocity.Z = movements.Z;
-
-            if (GameInputs.IsKeyHeld(Key.ControlLeft))
-                _isSprinting = true;
-
-            // Jumping
-            if (GameInputs.IsKeyHeld(Key.Space) && motor.GroundedState.IsGrounded && jumpCooldown == 0f)
+            if (_motor.IsOverlapping(i => i.Is_Fluid))
             {
-                float force = MathF.Sqrt(2 * motor.Gravity * 1.25f);
-                velocity.Y = force;
-                jumpCooldown = jumpPeriod;
-            }
-            jumpCooldown = MathUtils.Max(0f, jumpCooldown - GameTime.DeltaTime);
-
-            // Flying
-            if (GameInputs.IsKeyHeld(Key.F))
-            {
-                velocity = camTransform.Forward * 100f;
-            }
-
-            motor.Velocity = velocity;
-
-            if (GameInputs.IsKeyDown(Key.Escape))
-                GameInputs.ExitProgram();
-        }
-
-        public void ExitState()
-        {
-
-        }
-
-        private Vector3 Movement(Vector2 inputs)
-        {
-            Vector2 forward = camTransform.Forward.ToXZ().Normalized();
-            Vector2 right = camTransform.Right.ToXZ().Normalized();
-
-            if (_isSprinting)
-            {
-                inputs.Y *= sprintSpeed;
-                inputs.X *= moveSpeed;
+                _movementStateMachine.EnterState(_swimming);
             }
             else
             {
-                inputs *= moveSpeed;
+                _movementStateMachine.EnterState(_walking);
             }
 
-            Vector2 moveVector = Vector2.Zero;
-            moveVector += inputs.Y * forward;
-            moveVector += inputs.X * right;
-            return moveVector.ToXZ();
+            _movementStateMachine.Tick(moveInputs);
+            return this;
+        }
+
+        public void OnExit()
+        {
+
         }
     }
 }

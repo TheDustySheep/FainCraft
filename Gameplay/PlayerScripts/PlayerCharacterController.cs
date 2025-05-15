@@ -16,21 +16,10 @@ internal class PlayerCharacterController
     readonly float lookSensitivity = 0.1f;
     Vector2 CameraRotation;
 
-    IGamemode _survival;
-    IGamemode _noclip;
+    StateMachine<Vector2> _gamemodeStateMachine;
 
-    IGamemode _gamemode;
-    IGamemode Gamemode
-    {
-        get => _gamemode;
-        set
-        {
-            _gamemode.ExitState();
-            _gamemode = value;
-            value.EnterState();
-        }
-    }
-
+    private readonly Survival _survival;
+    private readonly NoClip   _noclip;
 
     public PlayerCharacterController(Transform camTransform, EntityMotor motor)
     {
@@ -38,10 +27,11 @@ internal class PlayerCharacterController
         this.motor = motor;
 
         _survival = new Survival(motor, camTransform);
-        _noclip   = new NoClip(motor, camTransform);
+        _noclip   = new NoClip  (motor, camTransform);
 
-        _gamemode = _survival;
-        _gamemode.EnterState();
+        _gamemodeStateMachine = new StateMachine<Vector2>(
+            _survival
+        );
     }
 
     public void Update()
@@ -57,14 +47,14 @@ internal class PlayerCharacterController
     private void UpdateGamemode()
     {
         if (GameInputs.IsKeyDown(Key.G))
-            Gamemode = _survival;
+            _gamemodeStateMachine.EnterState(_survival);
         else if (GameInputs.IsKeyDown(Key.H))
-            Gamemode = _noclip;
+            _gamemodeStateMachine.EnterState(_noclip);
     }
 
     private void UpdatePosition()
     {
-        _gamemode.UpdatePosition(MovementInputs());
+        _gamemodeStateMachine.Tick(MovementInputs());
     }
 
     private void UpdateRotation()

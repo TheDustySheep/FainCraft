@@ -1,4 +1,5 @@
-﻿using FainEngine_v2.Core;
+﻿using FainCraft.Gameplay.WorldScripts.Voxels;
+using FainEngine_v2.Core;
 using FainEngine_v2.Core.GameObjects;
 using FainEngine_v2.Extensions;
 using FainEngine_v2.Physics.AABB;
@@ -44,6 +45,8 @@ public class EntityMotor
 
     float _lastTime;
     float _gravity = 27f;
+
+    public static readonly float DEFAULT_GRAVITY = 27f;
 
     GroundedState _groundedState;
     Vector3 _currentPosition;
@@ -129,5 +132,15 @@ public class EntityMotor
             _currentVelocity.Y -= GameTime.FixedDeltaTime * Gravity;
 
         _currentVelocity = _currentVelocity.ClampMagnitude(MAX_STABLE_MOVE_SPEED);
+    }
+
+    public bool IsOverlapping(Func<VoxelType, bool> func)
+    {
+        StaticAABB playerAABB = new StaticAABB()
+        {
+            Position = _currentPosition,
+            Size = _playerSize,
+        };
+        return _collisionHandler.IsOverlapping(playerAABB, func);
     }
 }

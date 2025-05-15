@@ -93,13 +93,13 @@ public class CollisionHandler
         entity.Delta /= IterationCount;
 
         for (int i = 0; i < IterationCount; i++)
-            PhysicsStep(ref entity, indexer);
+            PhysicsStep(ref entity);
 
         entity.Delta *= IterationCount;
     }
 
     readonly List<StaticAABB> colliders = new();
-    private void PhysicsStep(ref DynamicAABB playerAABB, IVoxelIndexer indexer)
+    private void PhysicsStep(ref DynamicAABB playerAABB)
     {
         VoxelCoordGlobal playerCoord = new VoxelCoordGlobal(playerAABB.Position);
         VoxelCoordGlobal minVoxel = playerCoord + new VoxelCoordGlobal(-1, -1, -1);
@@ -134,5 +134,46 @@ public class CollisionHandler
         playerAABB = AABBResolver.ResolveCollision(playerAABB, colliders, CollisionMode.Slide);
 
         playerAABB.Position += playerAABB.Delta;
+    }
+
+    public bool IsOverlapping(IAABB playerAABB, Func<VoxelType, bool> func)
+    {
+        VoxelCoordGlobal playerCoord = new VoxelCoordGlobal(playerAABB.Position);
+        VoxelCoordGlobal minVoxel    = playerCoord + new VoxelCoordGlobal(-1, -1, -1);
+        VoxelCoordGlobal maxVoxel    = playerCoord + new VoxelCoordGlobal( 1,  2,  1);
+
+        // Add walls to the nearby colliders to _coords
+        for (var i_y = minVoxel.Y; i_y <= maxVoxel.Y; i_y++)
+        {
+            for (var i_z = minVoxel.Z; i_z <= maxVoxel.Z; i_z++)
+            {
+                for (var i_x = minVoxel.X; i_x <= maxVoxel.X; i_x++)
+                {
+                    VoxelCoordGlobal voxelCoord = new VoxelCoordGlobal(i_x, i_y, i_z);
+
+                    worldData.GetVoxelState(voxelCoord, out var voxelData);
+
+                    var type = indexer.GetVoxelType(voxelData.Index);
+
+                    // Discard non-solid voxels
+                    if (!func.Invoke(type))
+                        continue;
+
+                    bool result = AABBResolver.IsOverlapping(
+                        playerAABB, 
+                        new StaticAABB()
+                        {
+                            Position = (Vector3)voxelCoord,
+                            Size = Vector3.One
+                        }
+                    );
+
+                    if (result)
+                        return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

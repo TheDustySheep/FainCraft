@@ -90,7 +90,7 @@ public class MeshGenerator_v3 : IMeshGenerator
 
                     GetNeighbourVoxels(x, y, z);
 
-                    uint surfaceFluid = Convert.ToUInt32(voxelType.Is_Fluid && !nVoxelTypes[VOXEL_UP].Is_Fluid);
+                    uint isFluidBlock = Convert.ToUInt32(voxelType.Is_Fluid && !nVoxelTypes[22].Is_Fluid);
 
                     for (uint face = 0; face < 6; face++)
                     {
@@ -110,6 +110,8 @@ public class MeshGenerator_v3 : IMeshGenerator
 
                         for (uint i = 0; i < 4; i++)
                         {
+                            uint isFluidVert = isFluidBlock * FLUID_LOOKUP[face * 4 + i];
+                            
                             var vert = new VoxelVertex()
                             {
                                 Corner = i,
@@ -117,7 +119,7 @@ public class MeshGenerator_v3 : IMeshGenerator
                                 XPos = (uint)x,
                                 YPos = (uint)y,
                                 ZPos = (uint)z,
-                                SurfaceFluid = surfaceFluid,
+                                IsFluid = isFluidVert,
                                 TexIndex = voxelType.TexIDs[face]
                             };
 
@@ -272,5 +274,16 @@ public class MeshGenerator_v3 : IMeshGenerator
     static readonly uint[] TRIANGLES =
     {
           0,  1,  2,  2,  3,  0,
+    };
+
+    static readonly uint[] FLUID_LOOKUP =
+    {
+        // Face -> Vert
+        0, 1, 1, 0,
+        0, 1, 1, 0,
+        0, 0, 0, 0,
+        1, 1, 1, 1,
+        0, 1, 1, 0,
+        0, 1, 1, 0,
     };
 }

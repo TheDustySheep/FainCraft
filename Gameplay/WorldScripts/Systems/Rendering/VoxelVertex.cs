@@ -48,7 +48,7 @@ public struct VoxelVertex
         set => Data1 = Data1 & ~MASK_CORNER | (value & 3u) << 16;
     }
 
-    public uint SurfaceFluid
+    public uint IsFluid
     {
         readonly get => (Data1 & MASK_IS_FLUID) >> 23;
         set => Data1 = Data1 & ~MASK_IS_FLUID | (value & 1u) << 23;

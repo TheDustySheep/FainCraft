@@ -63,6 +63,8 @@ DecodeData DecodeVertex(int aData1, int aData2)
     );
 
     dData.Position = vec3(dData.Coord) + meshVert.Position;
+    
+    dData.ApplyFluid = bool((aData1 >> 23) & 1);
 
     // In cluster space
     dData.FaceCoord = dData.Coord + meshVert.FaceCoord;

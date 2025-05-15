@@ -1,14 +1,12 @@
 ﻿using FainCraft.Gameplay.Motors;
 using FainEngine_v2.Core;
 using FainEngine_v2.Core.GameObjects;
-using FainEngine_v2.Extensions;
-using FainEngine_v2.Utils;
 using Silk.NET.Input;
 using System.Numerics;
 
 namespace FainCraft.Gameplay.PlayerScripts.Gamemodes
 {
-    public class NoClip : IGamemode
+    public class NoClip : IState<Vector2>
     {
         readonly EntityMotor motor;
         readonly Transform camTransform;
@@ -21,13 +19,13 @@ namespace FainCraft.Gameplay.PlayerScripts.Gamemodes
             this.camTransform = camTransform;
         }
 
-        public void EnterState()
+        public void OnEnter()
         {
             motor.EnableGravity = false;
             motor.EnableCollision = false;
         }
 
-        public void UpdatePosition(Vector2 moveInputs)
+        public IState<Vector2> Tick(Vector2 moveInputs)
         {
             float speed = GameInputs.IsKeyHeld(Key.ControlLeft) ? sprintSpeed : moveSpeed;
 
@@ -37,9 +35,11 @@ namespace FainCraft.Gameplay.PlayerScripts.Gamemodes
             velocity += Vector3.UnitY        * VerticalInput() * speed;
 
             motor.Velocity = velocity;
+
+            return this;
         }
 
-        public void ExitState()
+        public void OnExit()
         {
 
         }

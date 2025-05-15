@@ -50,7 +50,6 @@
     "Name": "Leaves",
 
     "Draw_Opaque": false,
-    "Draw_Similar" : true,
 
     "Foliage_Biome_Blend": [ true ],
     "Foliage_Animate": true,
@@ -64,13 +63,14 @@
 
     "Draw_Opaque": false,
     "Draw_Transparent": true,
+    "Draw_Similar": false,
 
     "Textures": [ 179 ],
     "Physics_Solid": false,
 
     "Is_Fluid": true,
 
-    "Light_Opaque": true,
+    "Light_Opaque": false,
 
     "Foliage_Biome_Blend": [ false ]
   },

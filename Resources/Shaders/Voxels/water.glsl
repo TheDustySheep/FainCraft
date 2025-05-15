@@ -1,6 +1,6 @@
 #include "Resources/ShaderUtils/Lighting.glsl"
 
-const float waveSpeed      =  1.0;
+const float waveSpeed      =  0.8;
 const float waveScale      =  0.5;
 const float specularPower  = 64.0;   
 const float fresnelBias    =  0.02;  

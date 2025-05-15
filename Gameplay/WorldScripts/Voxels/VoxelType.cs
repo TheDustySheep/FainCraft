@@ -17,7 +17,7 @@ public class VoxelType
     public required bool[] Foliage_Biome_Blend;
 
     // Physics
-    public required bool Physics_Solid = true;
+    public required bool Physics_Solid;
 
     // Fluid
     public required bool Is_Fluid;

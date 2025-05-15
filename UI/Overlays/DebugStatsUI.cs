@@ -53,7 +53,7 @@ namespace FainCraft.UI.Overlays
             sb.AppendLine($"");
             sb.AppendLine($"Mesh Generation");
             sb.AppendLine($" - Loaded (O): {DebugVariables.OpaqueMeshCount}");
-            sb.AppendLine($" - Loaded (T): {DebugVariables.TransparentMeshCount}");
+            sb.AppendLine($" - Loaded (TState): {DebugVariables.TransparentMeshCount}");
             sb.AppendLine($" - Queue:  {DebugVariables.MeshQueueCount}");
             if (MeshTimes.Count > 0)
             {
