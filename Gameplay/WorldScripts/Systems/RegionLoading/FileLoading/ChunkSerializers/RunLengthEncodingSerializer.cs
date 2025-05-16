@@ -96,7 +96,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.Chun
             byte[] buffer = new byte[totalBytes];
             Span<byte> span = buffer;
 
-            // Serialize: first indexes, then counts (alternating pairs)
+            // Save: first indexes, then counts (alternating pairs)
             int offset = 0;
             for (int i = 0; i < runCount; i++)
             {

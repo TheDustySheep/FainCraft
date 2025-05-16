@@ -12,7 +12,7 @@ public class RegionSerializer_v1 : IRegionSerializer
 
     SerializerSelector selector = new();
 
-    public void Serialize(FileStream stream, RegionCoord coord, RegionData data)
+    public void Save(FileStream stream, RegionCoord coord, RegionData data)
     {
         using BinaryWriter writer = new(stream, System.Text.Encoding.Default, leaveOpen: true);
 
@@ -75,7 +75,7 @@ public class RegionSerializer_v1 : IRegionSerializer
         }
     }
 
-    public bool Deserialize(FileStream stream, RegionCoord coord, out RegionData data)
+    public bool Load(FileStream stream, RegionCoord coord, out RegionData data)
     {
         using BinaryReader reader = new(stream, System.Text.Encoding.Default, leaveOpen: true);
 

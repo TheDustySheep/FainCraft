@@ -94,7 +94,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading
                                              bufferSize: 4096,
                                              useAsync: true);
             await Task.Yield();
-            if (_regionSerializer.Deserialize(stream, target, out var data))
+            if (_regionSerializer.Load(stream, target, out var data))
                 return data;
             return null;
         }
@@ -115,7 +115,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading
             await Task.Yield();
 
             foreach (var kv in toAppend)
-                _regionSerializer.Serialize(stream, kv.Key, kv.Value);
+                _regionSerializer.Save(stream, kv.Key, kv.Value);
 
             await stream.FlushAsync();
         }

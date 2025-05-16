@@ -40,7 +40,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading
                 string filePath = RegionFilePath(coord);
                 using FileStream fs = new (filePath, FileMode.Create);
 
-                _regionSerializer.Serialize(fs, coord, data);
+                _regionSerializer.Save(fs, coord, data);
                 Console.WriteLine("Handling save request");
             }
 
@@ -52,7 +52,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading
                 string filePath = RegionFilePath(coord);
                 using FileStream fs = new(filePath, FileMode.Open);
 
-                _regionSerializer.Deserialize(fs, coord, out var data);
+                _regionSerializer.Load(fs, coord, out var data);
                 Console.WriteLine("Yep, deserialized");
 
                 _queue.LoadResult(coord, data);

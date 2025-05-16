@@ -12,7 +12,7 @@ public class RegionSerializer_v2 : IRegionSerializer
     private const int REGION_TABLE_ENTRY_SIZE = sizeof(int) + sizeof(long) * 2;
     private SerializerSelector selector = new SerializerSelector();
 
-    public void Serialize(FileStream stream, RegionCoord regionCoord, RegionData data)
+    public void Save(FileStream stream, RegionCoord regionCoord, RegionData data)
     {
         using var writer = new BinaryWriter(stream, System.Text.Encoding.Default, leaveOpen: true);
         using var reader = new BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true);
@@ -38,7 +38,7 @@ public class RegionSerializer_v2 : IRegionSerializer
             }
         }
 
-        // Serialize region to block
+        // Save region to block
         byte[] block = SerializeRegionBlock(regionCoord, data);
         long blockOffset = stream.Length;
 
@@ -73,7 +73,7 @@ public class RegionSerializer_v2 : IRegionSerializer
         }
     }
 
-    public bool Deserialize(FileStream stream, RegionCoord target, out RegionData data)
+    public bool Load(FileStream stream, RegionCoord target, out RegionData data)
     {
         data = default!;
         using var reader = new BinaryReader(stream, System.Text.Encoding.Default, leaveOpen: true);
