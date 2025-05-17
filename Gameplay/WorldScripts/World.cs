@@ -56,10 +56,10 @@ internal class World : GameObject
 
         _terrainSystem     = new ThreadedTerrainGenerationSystem(new OverworldGenerator(indexer));
 
-        bool enableSaving = true;
+        bool enableSaving = false;
 
         if (enableSaving)
-            _fileLoadingSystem = new FileLoadingSystem("Save_1", new RegionSerializer_v2());
+            _fileLoadingSystem = new FileLoadingSystem("Save_1", new RegionSerializer_v3());
         else
             _fileLoadingSystem = new NullFileLoader();
 

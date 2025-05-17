@@ -44,8 +44,8 @@ namespace FainCraft.Gameplay.WorldScripts.Voxels
 
             var meshes = voxels
                 .Where(i => i.Custom_Mesh != null)
-                .ToDictionary(i => i, i => MeshResourceLoader.LoadMeshQuads(i.Custom_Mesh!));
-
+                .ToDictionary(i => i, i => MeshResourceLoader.LoadMeshQuads(i.Custom_Mesh!))
+                .Where(i => i.Value.Count > 0);
 
             // 1) Prepare containers
             var uniqueMeshQuads = new List<MeshQuad>();

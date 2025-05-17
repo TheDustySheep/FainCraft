@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.ChunkSerializers
 {
-    public class NoCompressionSerializer : IChunkSerializer
+    public class NoCompressionEncoder : IChunkEncoder
     {
         public ChunkData Deserialize(ReadOnlySpan<byte> chunkData)
         {

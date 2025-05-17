@@ -12,6 +12,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FainEngine_v2", "..\FainEng
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FainEngine_v2.Tests", "..\FainEngine_v2.Tests\FainEngine_v2.Tests.csproj", "{BE796DF3-0CCE-43BF-A04E-5ECF38DB20EA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FainCraft.Tests", "..\FainCraft.Tests\FainCraft.Tests.csproj", "{06C42A48-E561-417D-B9DD-BBC139852484}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1436053C-7E26-4E3F-96A1-5C92880BECB3} = {1436053C-7E26-4E3F-96A1-5C92880BECB3}
+		{BDFD83ED-8CC1-4912-8C7B-DD628FA0AF1E} = {BDFD83ED-8CC1-4912-8C7B-DD628FA0AF1E}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +36,10 @@ Global
 		{BE796DF3-0CCE-43BF-A04E-5ECF38DB20EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE796DF3-0CCE-43BF-A04E-5ECF38DB20EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE796DF3-0CCE-43BF-A04E-5ECF38DB20EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06C42A48-E561-417D-B9DD-BBC139852484}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06C42A48-E561-417D-B9DD-BBC139852484}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06C42A48-E561-417D-B9DD-BBC139852484}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06C42A48-E561-417D-B9DD-BBC139852484}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

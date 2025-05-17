@@ -2,13 +2,13 @@
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.ChunkSerializers
 {
-    public class SerializerSelector
+    public class ChunkEncoder
     {
-        IChunkSerializer serializer_0 = new NullSerializer();
-        IChunkSerializer serializer_1 = new NoCompressionSerializer();
-        IChunkSerializer serializer_2 = new RunLengthEncodingSerializer();
+        IChunkEncoder serializer_0 = new NullSerializer();
+        IChunkEncoder serializer_1 = new NoCompressionEncoder();
+        IChunkEncoder serializer_2 = new RunLengthEncoder();
 
-        public ChunkData Deserialize(int algorithm, ReadOnlySpan<byte> chunkData)
+        public ChunkData Deserialize(ReadOnlySpan<byte> chunkData, int algorithm)
         {
             return GetSerializer(algorithm).Deserialize(chunkData);
         }
@@ -25,7 +25,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.Chun
             return GetSerializer(algorithm).Serialize(chunkData);
         }
 
-        private IChunkSerializer GetSerializer(int algorithm)
+        private IChunkEncoder GetSerializer(int algorithm)
         {
             return algorithm switch
             {

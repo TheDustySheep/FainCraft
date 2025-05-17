@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.ChunkSerializers
 {
-    public interface IChunkSerializer
+    public interface IChunkEncoder
     {
         public ChunkData Deserialize(ReadOnlySpan<byte> chunkData);
         public ReadOnlySpan<byte> Serialize(ChunkData chunkData);

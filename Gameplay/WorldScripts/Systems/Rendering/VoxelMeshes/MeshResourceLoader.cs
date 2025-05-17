@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -29,15 +30,20 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.VoxelMeshes
 
         public static List<MeshQuad> LoadMeshQuads(string fileName)
         {
-            var quads = LoadFromFile(fileName);
+            if (!LoadFromFile(fileName, out var quads))
+                return new List<MeshQuad>();
             return quads.ConvertAll(i => new MeshQuad(i.A, i.B, i.C, i.D, i.UV_Min, i.UV_Max));
         }
 
-        private static List<Quad> LoadFromFile(string fileName)
+        private static bool LoadFromFile(string fileName, out List<Quad> quadList)
         {
             string relativePath = Path.Combine("Resources", "Voxels", "Meshes", fileName);
             if (!File.Exists(relativePath))
-                throw new FileNotFoundException($"OBJ file not found at '{relativePath}'");
+            {
+                Debug.WriteLine($"OBJ file not found at '{relativePath}'");
+                quadList = [];
+                return false;
+            }
 
             var verts = new List<Vector3>();
             var uvs = new List<Vector2>();
@@ -92,7 +98,8 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.VoxelMeshes
                 }
             }
 
-            return quads;
+            quadList = quads;
+            return true;
         }
     }
 }

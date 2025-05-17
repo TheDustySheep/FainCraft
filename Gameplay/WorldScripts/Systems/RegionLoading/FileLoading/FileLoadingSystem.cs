@@ -1,5 +1,6 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Core;
 using FainCraft.Gameplay.WorldScripts.Data;
+using FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.RegionFileWriter;
 using FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.RegionSerialization;
 using System;
 using System.Collections.Concurrent;
@@ -94,8 +95,14 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading
                                              bufferSize: 4096,
                                              useAsync: true);
             await Task.Yield();
-            if (_regionSerializer.Load(stream, target, out var data))
-                return data;
+
+            var result = _regionSerializer.Load(new LoadRequest() 
+            { 
+                SaveCoord = saveCoord,
+                RegionCoords = [target],
+                Stream = stream,
+            });
+
             return null;
         }
 
@@ -110,12 +117,15 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading
                                              FileShare.None,
                                              bufferSize: 4096,
                                              useAsync: true);
-            // Seek to end to append
-            stream.Seek(0, SeekOrigin.End);
+            
             await Task.Yield();
 
-            foreach (var kv in toAppend)
-                _regionSerializer.Save(stream, kv.Key, kv.Value);
+            var result = _regionSerializer.Save(new SaveRequest()
+            {
+                SaveCoord = saveCoord,
+                Regions = toAppend.ToDictionary(),
+                Stream = stream,
+            });
 
             await stream.FlushAsync();
         }

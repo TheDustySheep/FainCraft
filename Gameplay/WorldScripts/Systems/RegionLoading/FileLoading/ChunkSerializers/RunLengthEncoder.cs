@@ -4,7 +4,7 @@ using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.ChunkSerializers
 {
-    public class RunLengthEncodingSerializer : IChunkSerializer
+    public class RunLengthEncoder : IChunkEncoder
     {
         public ChunkData Deserialize(ReadOnlySpan<byte> chunkData)
         {

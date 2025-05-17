@@ -2,7 +2,7 @@
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.ChunkSerializers
 {
-    public class NullSerializer : IChunkSerializer
+    public class NullSerializer : IChunkEncoder
     {
         public ChunkData Deserialize(ReadOnlySpan<byte> chunkData)
         {

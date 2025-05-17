@@ -1,15 +1,11 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Core;
 using FainCraft.Gameplay.WorldScripts.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.RegionFileWriter;
 
 public struct LoadRequest
 {
+    public required SaveCoord SaveCoord;
     public required Stream Stream;
     public required RegionCoord[] RegionCoords;
 }
