@@ -145,7 +145,7 @@ namespace FainCraft.Gameplay.WorldScripts.Voxels
             [JsonProperty("Draw_Self")]           public bool Draw_Self = true;
             [JsonProperty("Draw_Similar")]        public bool Draw_Similar = true;
             [JsonProperty("Draw_Opaque")]         public bool Draw_Opaque = true;
-            [JsonProperty("Draw_Transparent")]    public bool Draw_Transparent;
+            [JsonProperty("Draw_Transparent")]    public bool Draw_Transparent = false;
 
             // Foliage
             [JsonProperty("Foliage_Animate")]     public bool   Foliage_Animate;

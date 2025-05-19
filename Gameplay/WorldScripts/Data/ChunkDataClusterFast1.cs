@@ -5,7 +5,7 @@ public class ChunkDataClusterFast1 : IChunkDataCluster
 {
     VoxelState[] _internalData = new VoxelState[34 * 34 * 34];
 
-    public void SetData(ChunkData[] nChunks)
+    public void SetData(ChunkData?[] nChunks)
     {
         int newSize = CHUNK_SIZE + 2;                   // 34
 
@@ -35,7 +35,7 @@ public class ChunkDataClusterFast1 : IChunkDataCluster
 
                     // flat index in output (also X→Z→Y, but size=PADDED_SIZE)
                     int outIdx = gx + gz * newSize + gy * newSize * newSize;
-                    _internalData[outIdx] = chunk[idxInChunk];
+                    _internalData[outIdx] = chunk![idxInChunk];
                 }
     }
 

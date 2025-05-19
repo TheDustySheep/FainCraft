@@ -5,8 +5,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading
 {
     public interface IFileLoadingSystem
     {
-        public bool Request(RegionCoord coord);
-        public IEnumerable<(RegionCoord, RegionData?)> GetComplete();
-        public void Save(RegionCoord coord, RegionData region);
+        public Task<RegionData?> LoadAsync(RegionCoord coord);
+        public Task<bool> SaveAsync(RegionCoord coord, RegionData region);
     }
 }

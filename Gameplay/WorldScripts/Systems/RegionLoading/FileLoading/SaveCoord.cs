@@ -32,7 +32,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading
             };
         }
 
-        public static int Convert_Region_Coord_To_Save_Coord(int coord) => coord >> REGION_SIZE_POWER;
-        public static int Convert_Region_Coord_To_Offset(int coord) => coord.Mod(REGION_SIZE_XZ);
+        public static  int Convert_Region_Coord_To_Save_Coord(int coord) => coord >> REGION_SIZE_POWER;
+        public static uint Convert_Region_Coord_To_Offset(int coord) => (uint)coord.Mod(REGION_SIZE_XZ);
     }
 }

@@ -10,8 +10,14 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading
 {
     public class NullFileLoader : IFileLoadingSystem
     {
-        public IEnumerable<(RegionCoord, RegionData)> GetComplete() { yield break; }
-        public bool Request(RegionCoord coord) => false;
-        public void Save(RegionCoord coord, RegionData region) { }
+        public Task<RegionData?> LoadAsync(RegionCoord coord)
+        {
+            return Task.FromResult<RegionData?>(null);
+        }
+
+        public Task<bool> SaveAsync(RegionCoord coord, RegionData region)
+        {
+            return Task.FromResult(false);
+        }
     }
 }

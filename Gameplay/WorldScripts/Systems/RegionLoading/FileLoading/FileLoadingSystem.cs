@@ -2,12 +2,7 @@
 using FainCraft.Gameplay.WorldScripts.Data;
 using FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.RegionFileWriter;
 using FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.RegionSerialization;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading
 {
@@ -16,16 +11,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading
         private readonly IRegionSerializer _regionSerializer;
         private readonly string _folderPath;
 
-        // Completed load results
-        private readonly ConcurrentQueue<(RegionCoord, RegionData?)> _completed = new();
-        // Deduplication for load requests
-        private readonly ConcurrentDictionary<RegionCoord, bool> _requested = new();
-        // Pending region saves, grouped by SaveCoord
-        private readonly ConcurrentDictionary<SaveCoord, ConcurrentDictionary<RegionCoord, RegionData>> _saveQueues = new();
-        // One semaphore per SaveCoord
         private readonly ConcurrentDictionary<SaveCoord, SemaphoreSlim> _fileLocks = new();
-        // One background save task per SaveCoord
-        private readonly ConcurrentDictionary<SaveCoord, Task> _saveTasks = new();
 
         public FileLoadingSystem(string saveFileName, IRegionSerializer regionSerializer)
         {
@@ -35,142 +21,90 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading
             Directory.CreateDirectory(_folderPath);
         }
 
-        public bool Request(RegionCoord coord)
+        public async Task<RegionData?> LoadAsync(RegionCoord rCoord)
         {
-            if (!_requested.TryAdd(coord, true))
-                return false;
+            var saveCoord = (SaveCoord)rCoord;
+            var sem = _fileLocks.GetOrAdd(saveCoord, _ => new SemaphoreSlim(1, 1));
 
-            var saveCoord = (SaveCoord)coord;
-            _ = Task.Run(async () =>
+            await sem.WaitAsync();
+            try
             {
-                var sem = _fileLocks.GetOrAdd(saveCoord, _ => new SemaphoreSlim(1, 1));
-                await sem.WaitAsync();
-                try
+                LoadResult? result = await Task.Run(() =>
                 {
-                    var data = await LoadRegionFromFileAsync(saveCoord, coord);
-                    _completed.Enqueue((coord, data));
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Load error {coord}: {ex}");
-                    _completed.Enqueue((coord, null));
-                }
-                finally
-                {
-                    sem.Release();
-                }
-            });
+                    var path = GetFilePath(saveCoord);
 
-            return true;
-        }
+                    if (!File.Exists(path))
+                        return (LoadResult?)null;
 
-        public void Save(RegionCoord coord, RegionData region)
-        {
-            var saveCoord = (SaveCoord)coord;
-            var map = _saveQueues.GetOrAdd(saveCoord, _ => new ConcurrentDictionary<RegionCoord, RegionData>());
-            map[coord] = region;
-            StartSaveLoop(saveCoord);
-        }
+                    using var stream = new FileStream(
+                        path,
+                        FileMode.Open,
+                        FileAccess.Read,
+                        FileShare.Read,
+                        bufferSize: 4096);
 
-        public IEnumerable<(RegionCoord, RegionData?)> GetComplete()
-        {
-            while (_completed.TryDequeue(out var item))
+                    return _regionSerializer.Load(new LoadRequest()
+                    {
+                        SaveCoord = saveCoord,
+                        RegionCoords = [rCoord],
+                        Stream = stream,
+                    });
+                });
+
+                return result == null ? null : result?.Regions[rCoord];
+            }
+            catch (Exception ex)
             {
-                _requested.TryRemove(item.Item1, out _);
-                yield return item;
+                Console.WriteLine($"Load error {rCoord}: {ex}");
+                return null;
+            }
+            finally
+            {
+                sem.Release();
             }
         }
 
-        //—— Helpers ——//
-
-        private async Task<RegionData?> LoadRegionFromFileAsync(SaveCoord saveCoord, RegionCoord target)
+        public async Task<bool> SaveAsync(RegionCoord rCoord, RegionData region)
         {
-            var path = GetFilePath(saveCoord);
-            if (!File.Exists(path)) return null;
+            var saveCoord = (SaveCoord)rCoord;
+            var sem = _fileLocks.GetOrAdd(saveCoord, _ => new SemaphoreSlim(1, 1));
 
-            using var stream = new FileStream(path,
-                                             FileMode.Open,
-                                             FileAccess.ReadWrite,
-                                             FileShare.Read,
-                                             bufferSize: 4096,
-                                             useAsync: true);
-            await Task.Yield();
-
-            var result = _regionSerializer.Load(new LoadRequest() 
-            { 
-                SaveCoord = saveCoord,
-                RegionCoords = [target],
-                Stream = stream,
-            });
-
-            return null;
-        }
-
-        private async Task AppendRegionsToFileAsync(SaveCoord saveCoord, IDictionary<RegionCoord, RegionData> toAppend)
-        {
-            var path = GetFilePath(saveCoord);
-            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-
-            using var stream = new FileStream(path,
-                                             FileMode.OpenOrCreate,
-                                             FileAccess.ReadWrite,
-                                             FileShare.None,
-                                             bufferSize: 4096,
-                                             useAsync: true);
-            
-            await Task.Yield();
-
-            var result = _regionSerializer.Save(new SaveRequest()
+            await sem.WaitAsync();
+            try
             {
-                SaveCoord = saveCoord,
-                Regions = toAppend.ToDictionary(),
-                Stream = stream,
-            });
+                SaveResult result = await Task.Run(() =>
+                {
+                    var path = GetFilePath(saveCoord);
 
-            await stream.FlushAsync();
+                    using var stream = new FileStream(
+                        path,
+                        FileMode.OpenOrCreate,
+                        FileAccess.ReadWrite,
+                        FileShare.Read,
+                        bufferSize: 4096);
+
+                    return _regionSerializer.Save(new SaveRequest()
+                    {
+                        SaveCoord = saveCoord,
+                        Regions = new() { [rCoord] = region },
+                        Stream = stream,
+                    });
+                });
+
+                return result.Regions[rCoord];
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Load error {rCoord}: {ex}");
+                return false;
+            }
+            finally
+            {
+                sem.Release();
+            }
         }
 
         private string GetFilePath(SaveCoord saveCoord)
             => Path.Combine(_folderPath, $"region_{saveCoord.X}_{saveCoord.Z}.fcr");
-
-        private void StartSaveLoop(SaveCoord saveCoord)
-        {
-            if (_saveTasks.ContainsKey(saveCoord))
-                return;
-
-            var task = Task.Run(async () =>
-            {
-                var sem = _fileLocks.GetOrAdd(saveCoord, _ => new SemaphoreSlim(1, 1));
-
-                while (true)
-                {
-                    if (!_saveQueues.TryRemove(saveCoord, out var pending) || pending.IsEmpty)
-                        break;
-
-                    await sem.WaitAsync();
-                    try
-                    {
-                        // Append only the changed regions
-                        await AppendRegionsToFileAsync(saveCoord, pending);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Save error {saveCoord}: {ex}");
-                        break;
-                    }
-                    finally
-                    {
-                        sem.Release();
-                    }
-
-                    // Batch rapid saves
-                    await Task.Delay(50);
-                }
-
-                _saveTasks.TryRemove(saveCoord, out _);
-            });
-
-            _saveTasks[saveCoord] = task;
-        }
     }
 }

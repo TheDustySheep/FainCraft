@@ -1,51 +1,139 @@
-﻿using FainCraft.Gameplay.WorldScripts.Core;
+﻿using FainCraft.Gameplay.PlayerScripts;
+using FainCraft.Gameplay.WorldScripts.Core;
+using FainCraft.Gameplay.WorldScripts.Data;
+using FainCraft.Gameplay.WorldScripts.Editing;
 using FainCraft.Signals.Gameplay.WorldScripts;
 using FainEngine_v2.Utils;
-using System.Collections.Concurrent;
+using FainEngine_v2.Utils.Variables;
 using System.Diagnostics;
+using System.Reflection.Emit;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.TerrainGeneration;
-internal class ThreadedTerrainGenerationSystem : ITerrainGenerationSystem
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
+
+internal class ThreadedTerrainGenerationSystem : ITerrainGenerationSystem, IDisposable
 {
-    readonly WorkerThread workerThread;
+    private readonly ReferenceVariable<PlayerPosition> _playerPosition = SharedVariables.PlayerPosition;
+    private readonly ITerrainGenerator _generator;
 
-    readonly ConcurrentQueue<RegionGenerationResult> complete = new();
+    // Internal queue item
+    private class Request
+    {
+        public RegionCoord Coord { get; }
+        public TaskCompletionSource<RegionGenerationResult?> Tcs { get; }
+        public CancellationToken Token { get; }
 
-    readonly TerrainQueue _queue = new();
+        public Request(RegionCoord coord,
+                       TaskCompletionSource<RegionGenerationResult?> tcs,
+                       CancellationToken token)
+        {
+            Coord = coord;
+            Tcs = tcs;
+            Token = token;
+        }
+    }
+
+    // Priority queue keyed by distance (uint)
+    private readonly PriorityQueue<Request, uint> _queue = new PriorityQueue<Request, uint>();
+    private readonly object _lock = new object();
+    private readonly AutoResetEvent _signal = new AutoResetEvent(false);
+    private readonly Thread _workerThread;
+    private bool _disposed;
 
     public ThreadedTerrainGenerationSystem(ITerrainGenerator generator)
     {
-        workerThread = new WorkerThread("Terrain Generation Thread 1", () =>
+        _generator = generator;
+        _workerThread = new Thread(WorkLoop)
         {
-            var sw = new Stopwatch();
-
-            foreach (var coord in _queue.Dequeue(SharedVariables.PlayerPosition.Value.RegionCoord, 64))
-            {
-                sw.Restart();
-                var data = generator.Generate(coord);
-                complete.Enqueue(data);
-                sw.Stop();
-                DebugGenerationTimeSignals.TerrainGenerate(sw.Elapsed);
-                DebugVariables.TerrainQueueCount.Value = _queue.Count;
-            }
-        });
+            IsBackground = true,
+            Name = "TerrainGenWorker"
+        };
+        _workerThread.Start();
     }
 
-    ~ThreadedTerrainGenerationSystem()
+    public Task<RegionGenerationResult?> GenerateAsync(RegionCoord coord, CancellationToken token)
     {
-        workerThread.Dispose();
-    }
+        if (token.IsCancellationRequested)
+            return Task.FromCanceled<RegionGenerationResult?>(token);
 
-    public void Request(RegionCoord coord)
-    {
-        _queue.Enqueue(coord);
-    }
+        var tcs = new TaskCompletionSource<RegionGenerationResult?>(
+                      TaskCreationOptions.RunContinuationsAsynchronously);
+        var request = new Request(coord, tcs, token);
+        var priority = Distance(coord);
 
-    public IEnumerable<RegionGenerationResult> GetComplete()
-    {
-        while (complete.TryDequeue(out var result))
+        lock (_lock)
         {
-            yield return result;
+            _queue.Enqueue(request, priority);
+            _signal.Set();
         }
+
+        return tcs.Task;
+    }
+
+    private void WorkLoop()
+    {
+        while (true)
+        {
+            Request next = null;
+
+            lock (_lock)
+            {
+                if (_disposed)
+                    return;
+
+                if (_queue.Count == 0)
+                {
+                    // wait until there's something new (or Dispose signals)
+                    Monitor.Exit(_lock);
+                    _signal.WaitOne();
+                    Monitor.Enter(_lock);
+                }
+
+                if (_disposed)
+                    return;
+
+                if (_queue.Count > 0)
+                    next = _queue.Dequeue();
+            }
+
+            if (next != null)
+            {
+                // honor individual cancellation
+                if (next.Token.IsCancellationRequested)
+                {
+                    next.Tcs.TrySetCanceled(next.Token);
+                    continue;
+                }
+
+                try
+                {
+                    var result = _generator.Generate(next.Coord);
+                    next.Tcs.TrySetResult(result);
+                }
+                catch (Exception ex)
+                {
+                    next.Tcs.TrySetException(ex);
+                }
+            }
+        }
+    }
+
+    private uint Distance(RegionCoord coord)
+        => _playerPosition.Value.RegionCoord.ManhattenDistance(coord);
+
+    public void Dispose()
+    {
+        lock (_lock)
+        {
+            if (_disposed) return;
+            _disposed = true;
+            _signal.Set();
+        }
+        _workerThread.Join();
+        _signal.Dispose();
     }
 }

@@ -8,12 +8,12 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.Chun
         IChunkEncoder serializer_1 = new NoCompressionEncoder();
         IChunkEncoder serializer_2 = new RunLengthEncoder();
 
-        public ChunkData Deserialize(ReadOnlySpan<byte> chunkData, int algorithm)
+        public ChunkData Decode(ReadOnlySpan<byte> chunkData, short algorithm)
         {
-            return GetSerializer(algorithm).Deserialize(chunkData);
+            return GetEncoder(algorithm).Deserialize(chunkData);
         }
 
-        public ReadOnlySpan<byte> Serialize(ChunkData chunkData, out int algorithm)
+        public ReadOnlySpan<byte> Encode(ChunkData chunkData, out byte algorithm)
         {
             if (chunkData.IsEmpty())
             {
@@ -22,17 +22,17 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.Chun
             }
 
             algorithm = 2;
-            return GetSerializer(algorithm).Serialize(chunkData);
+            return GetEncoder(algorithm).Serialize(chunkData);
         }
 
-        private IChunkEncoder GetSerializer(int algorithm)
+        private IChunkEncoder GetEncoder(int algorithm)
         {
             return algorithm switch
             {
                 0 => serializer_0,
                 1 => serializer_1,
                 2 => serializer_2,
-                _ => serializer_1,
+                _ => throw new NotImplementedException($"Encoder not implemented {algorithm}"),
             };
         }
     }

@@ -37,7 +37,9 @@ uint GetLight(ivec3 coord) {
         (uint(coord.z + 1) * 34u) + 
         (uint(coord.y + 1) * 34u * 34u);
 
-    return lighting[index];
+    uint word = lighting[index / 4u];
+    uint shift = (index % 4u) * 8u;
+    return (word >> shift) & 0xFFu;
 }
 
 DecodeData DecodeVertex(int aData1, int aData2)

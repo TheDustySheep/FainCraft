@@ -22,7 +22,7 @@ public sealed class VoxelMesh_v2 : IMesh
     private BufferObject<VoxelVertex> VBO { get; }
     private BufferObject<uint> EBO { get; }
 
-    private ShaderStorageBufferObject<LightData> _lightingSSBO { get; }
+    private LightingSSBO _lightingSSBO { get; }
     private MeshFaceBuffer _meshFaceBuffer;
 
     public VoxelMesh_v2(MeshFaceBuffer meshFaceBuffer)
@@ -35,7 +35,7 @@ public sealed class VoxelMesh_v2 : IMesh
         VBO = new BufferObject<VoxelVertex>(BufferTargetARB.ArrayBuffer);
         VAO = new VertexArrayObject<VoxelVertex, uint>(_gl, VBO, EBO);
 
-        _lightingSSBO = new ShaderStorageBufferObject<LightData>(PADDED_CHUNK_VOLUME);
+        _lightingSSBO = new LightingSSBO();
 
         Bounds = new BoundingBox()
         {
@@ -58,7 +58,9 @@ public sealed class VoxelMesh_v2 : IMesh
     {
         triangleCount = 0;
 
-        _lightingSSBO.Clear();
+        //_lightingSSBO.Clear();
+        _lightingSSBO.FillDefault(); // Max lighting
+
         VBO.SetData([]);
         EBO.SetData([]);
     }

@@ -83,7 +83,7 @@ internal class World : GameObject
         if (!WorldData.GetRegion(regionCoord, out var data))
             return;
 
-        _fileLoadingSystem.Save(regionCoord, data);
+        _ = Task.Run(() => _fileLoadingSystem.SaveAsync(regionCoord, data));
     }
 
     public override void Update()

@@ -3,172 +3,202 @@ using FainCraft.Gameplay.WorldScripts.Core;
 using FainCraft.Gameplay.WorldScripts.Data;
 using FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.ChunkSerializers;
 using FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.RegionSerialization;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.RegionLoading.FileLoading.RegionFileWriter;
 
 public class RegionSerializer_v3 : IRegionSerializer
 {
+    static readonly Encoding ENCODING = Encoding.UTF8; 
     const uint VERSION = 3;
     private ChunkEncoder selector = new ChunkEncoder();
 
     public LoadResult Load(LoadRequest request)
     {
-        var result = new LoadResult
-        {
-            Regions = new Dictionary<RegionCoord, RegionData?>()
-        };
-
-        // 1) Read header
-        using var reader = new BinaryReader(request.Stream, Encoding.Default, leaveOpen: true);
+        Stream stream = request.Stream;
+        using var reader = new BinaryReader(request.Stream, ENCODING, leaveOpen: true);
         var header = FileHeader.Read(reader);
 
         if (!header.CompareIsValid(request.SaveCoord))
             throw new InvalidDataException("Region file version or size mismatch");
 
-        // 3) Read chunk‐table metadata
-        long tableLocation = request.Stream.Position;
-        var table = new ChunkTable
+        var tableHeader = new ChunkTable()
         {
-            Location = tableLocation,
-            Stream = request.Stream
+            Stream = stream,
+            Location = stream.Position,
         };
-        var allRows = table.ReadAllRows(reader);
 
-        // 4) Initialize RegionData for each requested region
-        foreach (var coord in request.RegionCoords)
+        var tableRows = tableHeader.ReadRows(reader);
+
+        var result = new LoadResult
         {
-            var region = new RegionData();
-            result.Regions[coord] = region;
+            Regions = new Dictionary<RegionCoord, RegionData?>()
+        };
 
-            foreach (var row in allRows)
-            {
-                if (!row.IsValid)
-                    continue;
-
-                var rCoord = new RegionCoord(row.XPos, row.ZPos);
-
-                if (coord != rCoord)
-                    continue;
-
-                // compute chunk-index from YPos
-                int yIndex = row.YPos + WorldConstants.REGION_NEG_CHUNKS;
-
-                // seek & read raw data
-                request.Stream.Position = row.Location;
-                byte[] raw = reader.ReadBytes((int)row.Length);
-
-                // deserialize chunk
-                var data = selector.Deserialize(raw, row.Encoding);
-
-                // store in RegionData
-                region.Chunks[yIndex] = data;
-            }
+        foreach (var rCoord in request.RegionCoords)
+        {
+            RegionData? data = LoadRegion(tableRows, reader, stream, rCoord);
+            result.Regions.Add(rCoord, data);
         }
 
         return result;
     }
 
+    private RegionData? LoadRegion(
+        List<ChunkTable.TableRow> tableRows, 
+        BinaryReader reader,
+        Stream stream,
+        RegionCoord rCoord)
+    {
+        ChunkData[] cDatas = new ChunkData[REGION_TOTAL_CHUNKS];
+        for (uint y = 0; y < REGION_TOTAL_CHUNKS; y++)
+        {
+            SaveCoordOffset offset = new SaveCoordOffset(rCoord, y);
+
+            // Try to find the existingRow row
+            int existingIndex = tableRows.FindIndex(r =>
+                r.SaveCoord == offset &&
+                r.Encoding >= 0
+            );
+
+            // Missing chunk
+            if (existingIndex == -1)
+                return null;
+
+            // Data index
+            var row = tableRows[existingIndex];
+            stream.Position = row.Location;
+
+            // Load data
+            ReadOnlySpan<byte> span = reader.ReadBytes(row.Length);
+            cDatas[y] = selector.Decode(span, row.Encoding);
+        }
+
+        return new RegionData(cDatas);
+    }
 
     public SaveResult Save(SaveRequest request)
     {
         Stream stream = request.Stream;
-        bool isNewFile = stream.Length == 0;
-        using var writer = new BinaryWriter(stream, Encoding.Default, leaveOpen: true);
-        using var reader = new BinaryReader(stream, Encoding.Default, leaveOpen: true);
 
-        // (1) Write header
-        var header = new FileHeader
-        {
-            Version = VERSION,
-            SaveCoordX = request.SaveCoord.X,
-            SaveCoordZ = request.SaveCoord.Z,
-            SaveRegionSizeXZ = SaveCoord.REGION_SIZE_XZ,
-            SaveRegionSizePY = WorldConstants.REGION_POS_CHUNKS,
-            SaveRegionSizeNY = WorldConstants.REGION_NEG_CHUNKS,
-        };
-        header.Write(writer);
+        if (stream.Length == 0)
+            return SaveNewFile(request);
+        else
+            return UpdateSaveFile(request);
+    }
 
-        // (2) Prepare chunk‐table metadata
+    public SaveResult UpdateSaveFile(SaveRequest request)
+    {
+        Stream stream = request.Stream;
+        using var writer = new BinaryWriter(stream, ENCODING, leaveOpen: true);
+        using var reader = new BinaryReader(stream, ENCODING, leaveOpen: true);
+
+        var header = FileHeader.Read(reader);
+        if (!header.CompareIsValid(request.SaveCoord))
+            throw new InvalidDataException($"SaveAsync coord was not valid for this region Request: ({request.SaveCoord.X}, {request.SaveCoord.Z}) File: ({header.SaveCoordX}, {header.SaveCoordZ})");
+
+        // Header Table Data
         var chunkTable = new ChunkTable
         {
             Location = stream.Position,
             Stream = stream,
         };
 
-        // (3) If brand‐new file, reserve & write empty table once
-        if (isNewFile)
-        {
-            var empty = new ChunkTable.TableRow
-            {
-                IsValid = false,
-                XPos = 0,
-                YPos = 0,
-                ZPos = 0,
-                Encoding = 0,
-                Location = 0,
-                Length = 0
-            };
+        var chunkTableRows = chunkTable.ReadRows(reader);
 
-            // Write REGION_AREA * TOTAL_CHUNKS empty rows
-            int totalRows = SaveCoord.REGION_AREA * WorldConstants.REGION_TOTAL_CHUNKS;
-            for (int i = 0; i < totalRows; i++)
-                empty.Write(writer);
-        }
-
-        // (4) Read the full table exactly once into memory
-        var allRows = chunkTable.ReadAllRows(reader);
-
-        // (5) Now serialize each chunk, updating in‐memory table and on‐disk row
-        foreach (var kv in request.Regions)
-        {
-            var rCoord = kv.Key;
-            var region = kv.Value;
-
-            for (int y = 0; y < WorldConstants.REGION_TOTAL_CHUNKS; y++)
-            {
-                // Serialize chunk
-                var span = selector.Serialize(region.Chunks[y], out int algorithm);
-
-                // Find free spot using cached rows
-                long dataLoc = chunkTable.FindFreeSpace(allRows, span.Length);
-
-                // Write data blob
-                stream.Position = dataLoc;
-                stream.Write(span);
-
-                // Build TableRow
-                var cCoord = (ChunkCoord)rCoord;
-                cCoord.Y = y - WorldConstants.REGION_NEG_CHUNKS;
-
-                var row = new ChunkTable.TableRow
-                {
-                    IsValid = true,
-                    XPos = cCoord.X,
-                    YPos = cCoord.Y,
-                    ZPos = cCoord.Z,
-                    Encoding = algorithm,
-                    Location = dataLoc,
-                    Length = span.Length
-                };
-
-                // Update in-memory
-                int xIdx = SaveCoord.Convert_Region_Coord_To_Offset(cCoord.X);
-                int yIdx = cCoord.Y + WorldConstants.REGION_NEG_CHUNKS;
-                int zIdx = SaveCoord.Convert_Region_Coord_To_Offset(cCoord.Z);
-                int rowIdx = yIdx + xIdx * SaveCoord.REGION_SIZE_XZ + zIdx * SaveCoord.REGION_AREA;
-                allRows[rowIdx] = row;
-
-                // Overwrite just that row on disk
-                chunkTable.WriteRow(writer, request.SaveCoord, cCoord, row);
-            }
-        }
+        UpdateChunkData(request, stream, writer, chunkTable, chunkTableRows);
 
         return new SaveResult
         {
             Regions = request.Regions.Keys.ToDictionary(c => c, _ => true)
         };
+    }
+
+    public SaveResult SaveNewFile(SaveRequest request)
+    {
+        Stream stream = request.Stream;
+        using var writer = new BinaryWriter(stream, ENCODING, leaveOpen: true);
+        using var reader = new BinaryReader(stream, ENCODING, leaveOpen: true);
+
+        // General Headers
+        var header = new FileHeader
+        {
+            Version = VERSION,
+            SaveCoordX = request.SaveCoord.X,
+            SaveCoordZ = request.SaveCoord.Z,
+            SaveRegionSizeXZ = SaveCoord.REGION_SIZE_XZ,
+            SaveRegionSizePY = REGION_POS_CHUNKS,
+            SaveRegionSizeNY = REGION_NEG_CHUNKS,
+            LastModifiedUTC = DateTime.UtcNow.Ticks,
+        };
+        header.Write(writer);
+
+        // Header Table Data
+        var chunkTable = new ChunkTable
+        {
+            Location = stream.Position,
+            Stream = stream,
+        };
+
+        var chunkTableRows = new List<ChunkTable.TableRow>(SaveCoord.REGION_AREA * REGION_TOTAL_CHUNKS);
+
+        for (uint x = 0; x < SaveCoord.REGION_SIZE_XZ; x++)
+        {
+            for (uint z = 0; z < SaveCoord.REGION_SIZE_XZ; z++)
+            {
+                for (uint y = 0; y < REGION_TOTAL_CHUNKS; y++)
+                {
+                    chunkTableRows.Add(new ChunkTable.TableRow()
+                    {
+                        SaveCoord = new SaveCoordOffset(x, y, z),
+                        Encoding = -1, // No Data
+                        Length   =  0,
+                        Location =  0,
+                    });
+                }
+            }
+        }
+
+        UpdateChunkData(request, stream, writer, chunkTable, chunkTableRows);
+
+        return new SaveResult
+        {
+            Regions = request.Regions.Keys.ToDictionary(c => c, _ => true)
+        };
+    }
+
+    private void UpdateChunkData(SaveRequest request, Stream stream, BinaryWriter writer, ChunkTable chunkTable, List<ChunkTable.TableRow> chunkTableRows)
+    {
+        foreach (var kv in request.Regions)
+        {
+            var rCoord = kv.Key;
+            var region = kv.Value;
+
+            for (uint y = 0; y < REGION_TOTAL_CHUNKS; y++)
+            {
+                SaveCoordOffset offset = new SaveCoordOffset(rCoord, y);
+
+                var span = selector.Encode(region.Chunks[y], out byte algorithm);
+
+                var row = new ChunkTable.TableRow
+                {
+                    SaveCoord = offset,
+                    Encoding  = algorithm,
+                    Length    = span.Length
+                };
+
+                // Find a free spot
+                long dataLoc = chunkTable.UpdateOrAddRow(chunkTableRows, row);
+
+                // Write data blob
+                stream.Position = dataLoc;
+                stream.Write(span);
+            }
+        }
+        chunkTable.WriteRows(writer, chunkTableRows);
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -182,6 +212,8 @@ public class RegionSerializer_v3 : IRegionSerializer
         public required  int SaveRegionSizePY;
         public required  int SaveRegionSizeNY;
 
+        public required long LastModifiedUTC;
+
         public readonly void Write(BinaryWriter writer)
         {
             writer.Write(Version);
@@ -190,6 +222,7 @@ public class RegionSerializer_v3 : IRegionSerializer
             writer.Write(SaveRegionSizeXZ);
             writer.Write(SaveRegionSizePY);
             writer.Write(SaveRegionSizeNY);
+            writer.Write(LastModifiedUTC);
         }
 
         public static FileHeader Read(BinaryReader reader) => new()
@@ -200,6 +233,7 @@ public class RegionSerializer_v3 : IRegionSerializer
             SaveRegionSizeXZ = reader.ReadUInt32(),
             SaveRegionSizePY = reader.ReadInt32 (),
             SaveRegionSizeNY = reader.ReadInt32 (),
+            LastModifiedUTC  = reader.ReadInt64 (),
         };
 
         public readonly bool CompareIsValid(SaveCoord coord)
@@ -209,8 +243,8 @@ public class RegionSerializer_v3 : IRegionSerializer
                 SaveCoordX       == coord.X &&
                 SaveCoordZ       == coord.Z &&
                 SaveRegionSizeXZ == SaveCoord.REGION_SIZE_XZ &&
-                SaveRegionSizePY == WorldConstants.REGION_POS_CHUNKS &&
-                SaveRegionSizeNY == WorldConstants.REGION_NEG_CHUNKS;
+                SaveRegionSizePY == REGION_POS_CHUNKS &&
+                SaveRegionSizeNY == REGION_NEG_CHUNKS;
         }
     }
 
@@ -220,112 +254,109 @@ public class RegionSerializer_v3 : IRegionSerializer
         public required long Location;
         public required Stream Stream;
 
-        public static long Size => Marshal.SizeOf<TableRow>() * SaveCoord.REGION_AREA * WorldConstants.REGION_TOTAL_CHUNKS;
+        public const long Size = TableRow.Size * SaveCoord.REGION_AREA * REGION_TOTAL_CHUNKS;
 
-        public readonly TableRow[] ReadAllRows(BinaryReader reader)
+        public readonly void WriteRows(BinaryWriter writer, List<TableRow> rows)
         {
+            if (rows.Count != SaveCoord.REGION_AREA * REGION_TOTAL_CHUNKS)
+                throw new InvalidDataException($"Number of rows should equal constant length {rows.Count} / {SaveCoord.REGION_AREA * REGION_TOTAL_CHUNKS}");
+
             Stream.Position = Location;
+            for (int i = 0; i < rows.Count; i++)
+                rows[i].Write(writer);
+        }
 
-            TableRow[] rows = new TableRow[SaveCoord.REGION_AREA * WorldConstants.REGION_TOTAL_CHUNKS];
+        public readonly List<TableRow> ReadRows(BinaryReader reader)
+        {
+            List<TableRow> rows = new (SaveCoord.REGION_AREA * REGION_TOTAL_CHUNKS);
 
-            int i = 0;
-            for (int z = 0; z < SaveCoord.REGION_SIZE_XZ; z++)
-            {
-                for (int x = 0; x < SaveCoord.REGION_SIZE_XZ; x++)
-                {
-                    for (int y = 0; y < WorldConstants.REGION_TOTAL_CHUNKS; y++, i++)
-                    {
-                        rows[i] = TableRow.Read(reader);
-                    }
-                }
-            }
+            Stream.Position = Location;
+            for (int i = 0; i < SaveCoord.REGION_AREA * REGION_TOTAL_CHUNKS; i++)
+                rows.Add(TableRow.Read(reader));
 
             return rows;
         }
 
-        public readonly void WriteRow(BinaryWriter writer, SaveCoord sCoord, ChunkCoord cCoord, TableRow row)
+        public long UpdateOrAddRow(
+            List<TableRow> rows,
+            TableRow newRow
+            )
         {
-            int xIDx = SaveCoord.Convert_Region_Coord_To_Offset(cCoord.X);
-            int yIdx = cCoord.Y + WorldConstants.REGION_NEG_CHUNKS;
-            int zIDx = SaveCoord.Convert_Region_Coord_To_Offset(cCoord.Z);
-            int rowIdx = 
-                yIdx + 
-                xIDx * SaveCoord.REGION_SIZE_XZ + 
-                zIDx * SaveCoord.REGION_AREA;
+            long minDataLocation = Location + Size;
 
-            Stream.Position = Location + Marshal.SizeOf<TableRow>() * rowIdx;
+            // Try to find the existingRow row
+            int existingIndex = rows.FindIndex(r => 
+                r.SaveCoord == newRow.SaveCoord
+            );
 
-            row.Write(writer);
-        }
-
-        public long FindFreeSpace(IEnumerable<TableRow> table, long requiredLength)
-        {
-            long tableEndOffset = Location + Size;
-
-            // Step 1: Sort the table rows by their Location (ascending)
-            var sortedTable = table.OrderBy(row => row.Location).ToList();
-
-            // Step 2: Check between the table end and the first chunk
-            if (sortedTable.Count > 0)
-            {
-                long firstChunkStart = sortedTable[0].Location;
-                if (firstChunkStart - tableEndOffset >= requiredLength)
-                    return tableEndOffset;
-            }
+            if (existingIndex < 0)
+                throw new InvalidDataException("Table row could not be located");
             else
             {
-                // Table is empty, place directly after the table
-                return tableEndOffset;
+                TableRow existingRow = rows[existingIndex];
+
+                // Is this a valid row and can we use it?
+                if (existingRow.Encoding >= 0 &&                // Actually exists
+                    existingRow.Location >= minDataLocation &&  // Location is valid
+                    existingRow.Length   >= newRow.Length)      // Size is large enough
+                {
+                    newRow.Location = existingRow.Location;
+                    rows[existingIndex] = newRow;
+                    return newRow.Location;
+                }
             }
 
-            // Step 3: Iterate and check gaps between existing chunks
-            for (int i = 0; i < sortedTable.Count - 1; i++)
+            // Could not find a valid row to overwrite - Search for a new spot
+            var list = rows
+                .Where(i => 
+                    i.Encoding >= 0 && 
+                    i.Location >= minDataLocation && 
+                    i.Length > 0)
+                .OrderBy(r => r.Location);
+
+            // Search for a gap between rows big enough for newSize
+            long prevEnd = minDataLocation;
+            foreach (var row in list)
             {
-                long currentChunkEnd = sortedTable[i].Location + sortedTable[i].Length;
-                long nextChunkStart = sortedTable[i + 1].Location;
-
-                long gap = nextChunkStart - currentChunkEnd;
-
-                if (gap >= requiredLength)
-                    return currentChunkEnd;
+                long gap = row.Location - prevEnd;
+                if (gap >= newRow.Length)
+                {
+                    newRow.Location = prevEnd;
+                    rows[existingIndex] = newRow;
+                    return newRow.Location;
+                }
+                prevEnd = row.Location + row.Length;
             }
 
-            // Step 4: No suitable gap found, append at the end of the last chunk
-            var lastChunk = sortedTable.Last();
-            return lastChunk.Location + lastChunk.Length;
+            newRow.Location = prevEnd;
+            rows[existingIndex] = newRow;
+            return newRow.Location;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public struct TableRow
         {
-            public bool  IsValid;
-            public int   XPos;
-            public int   YPos;
-            public int   ZPos;
-            public int   Encoding;
-            public long  Location;
-            public long  Length;
+            public const int Size = 2 + 2 + 8 + 4; // 16 bytes
+
+            public SaveCoordOffset SaveCoord;
+            public short Encoding;
+            public  long Location;
+            public   int Length;
 
             public static TableRow Read(BinaryReader reader) => new TableRow()
             {
-                IsValid  = reader.ReadBoolean(),
-                XPos     = reader.ReadInt32(),
-                YPos     = reader.ReadInt32(),
-                ZPos     = reader.ReadInt32(),
-                Encoding = reader.ReadInt32(),
-                Location = reader.ReadInt64(),
-                Length   = reader.ReadInt64(),
+                SaveCoord = new SaveCoordOffset(reader.ReadUInt16()),
+                Encoding  = reader.ReadInt16(),
+                Location  = reader.ReadInt64(),
+                Length    = reader.ReadInt32(),
             };
 
             public readonly void Write(BinaryWriter writer)
             {
-                writer.Write(IsValid );
-                writer.Write(XPos    );
-                writer.Write(YPos    );
-                writer.Write(ZPos    );
+                writer.Write(SaveCoord.Index);
                 writer.Write(Encoding);
                 writer.Write(Location);
-                writer.Write(Length  );
+                writer.Write(Length);
             }
         }
     }
