@@ -1,5 +1,5 @@
 ﻿using FainCraft.Gameplay;
-using FainCraft.Gameplay.WorldScripts.Core;
+using FainCraft.Gameplay.WorldScripts;
 using FainCraft.Signals.Gameplay.WorldScripts;
 using FainEngine_v2.Core;
 using FainEngine_v2.Rendering;

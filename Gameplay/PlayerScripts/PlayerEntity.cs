@@ -1,11 +1,12 @@
 ﻿using FainCraft.Gameplay.Motors;
 using FainCraft.Gameplay.WorldEntities;
-using FainCraft.Gameplay.WorldScripts;
+using FainCraft.Gameplay.OldWorldScripts;
 using FainEngine_v2.Core.GameObjects;
 using FainEngine_v2.Entities;
 using FainEngine_v2.Physics.AABB;
 using FainEngine_v2.Rendering.Cameras;
 using System.Numerics;
+using FainCraft.Gameplay.WorldScripts;
 
 namespace FainCraft.Gameplay.PlayerScripts;
 internal class PlayerEntity : GameObject, IWorldEntity
@@ -22,7 +23,7 @@ internal class PlayerEntity : GameObject, IWorldEntity
         Size = Motor.PlayerSize,
     };
 
-    public PlayerEntity(World world)
+    public PlayerEntity(Level level)
     {
         Transform.LocalPosition = new Vector3(-300, 130, 100);
         camTransform.LocalPosition = new Vector3(0, 0.85f, 0);
@@ -31,11 +32,11 @@ internal class PlayerEntity : GameObject, IWorldEntity
         camera = new Camera3D(camTransform);
         camera.SetMainCamera();
 
-        Motor = new EntityMotor(new CollisionHandler(world.WorldData), Transform);
-        worldEditor = new WorldEditor(camTransform, world);
+        Motor = new EntityMotor(new CollisionHandler(level.Provider), Transform);
+        worldEditor = new WorldEditor(camTransform, level.Provider);
         controller = new PlayerCharacterController(camTransform, Motor);
         Motor.EnableGravity = false;
-        world.WorldEntityController.RegisterEntity(this);
+        level.Provider.Get<IWorldEntityController>().RegisterEntity(this);
 
         Task.Run(async () =>
         {

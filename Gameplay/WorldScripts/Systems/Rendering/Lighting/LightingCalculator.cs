@@ -1,6 +1,5 @@
-﻿using FainCraft.Gameplay.WorldScripts.Data;
-using FainCraft.Gameplay.WorldScripts.Voxels;
-using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
+﻿using FainCraft.Gameplay.WorldScripts.Data.Voxels;
+using static FainCraft.Gameplay.WorldScripts.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.Lighting;
 
@@ -108,7 +107,7 @@ public class LightingCalculator : ILightingCalculator
                 if (!lightPass[st.Index]) continue;
 
                 // no attenuation downwards
-                byte next = (dy == -1) ? curr : (byte)(curr > 0 ? curr - 1 : 0);
+                byte next = dy == -1 ? curr : (byte)(curr > 0 ? curr - 1 : 0);
                 var nCell = data[nx, ny, nz];
                 if (nCell.Sky < next)
                 {

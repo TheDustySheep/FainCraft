@@ -1,5 +1,7 @@
-﻿using FainCraft.Gameplay.WorldScripts.Core;
+﻿using FainCraft.Gameplay.WorldScripts.Coords;
 using FainCraft.Gameplay.WorldScripts.Data;
+using FainCraft.Gameplay.WorldScripts.Data.Clusters;
+using FainCraft.Gameplay.WorldScripts.Systems.Rendering.VoxelMeshes;
 using FainEngine_v2.Collections;
 using System.Collections.Concurrent;
 
@@ -17,12 +19,9 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration
         readonly ConcurrentQueue<(ChunkCoord coord, IChunkDataCluster cluster, VoxelMeshData opaque, VoxelMeshData transparent)> complete = new();
 
         #region Requests
-        public void EnqueueRequest(ChunkCoord chunkCoord, bool important)
+        public void EnqueueRequest(ChunkCoord chunkCoord)
         {
-            if (important)
-                _RequestInBuffer.AddFirst(chunkCoord);
-            else
-                _RequestInBuffer.AddLast(chunkCoord);
+            _RequestInBuffer.AddLast(chunkCoord);
         }
 
         public bool TryDequeueRequest(out ChunkCoord coord, out IChunkDataCluster cluster)

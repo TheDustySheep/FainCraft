@@ -1,4 +1,4 @@
-﻿using FainCraft.Gameplay.WorldScripts.Core;
+﻿using FainCraft.Gameplay.WorldScripts.Coords;
 using System.Numerics;
 
 namespace FainCraft.Gameplay.PlayerScripts

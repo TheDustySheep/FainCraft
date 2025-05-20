@@ -1,6 +1,5 @@
-﻿using FainCraft.Gameplay.WorldScripts.Data;
-using FainCraft.Gameplay.WorldScripts.Voxels;
-using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
+﻿using FainCraft.Gameplay.WorldScripts.Data.Voxels;
+using static FainCraft.Gameplay.WorldScripts.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.Lighting
 {

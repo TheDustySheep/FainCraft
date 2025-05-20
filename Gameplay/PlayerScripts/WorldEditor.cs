@@ -1,8 +1,5 @@
 ﻿using FainCraft.Gameplay.WorldEntities;
-using FainCraft.Gameplay.WorldScripts;
-using FainCraft.Gameplay.WorldScripts.Core;
-using FainCraft.Gameplay.WorldScripts.Data;
-using FainCraft.Gameplay.WorldScripts.Voxels;
+using FainCraft.Gameplay.OldWorldScripts;
 using FainEngine_v2.Core;
 using FainEngine_v2.Core.GameObjects;
 using FainEngine_v2.Physics;
@@ -10,22 +7,25 @@ using FainEngine_v2.Physics.AABB;
 using FainEngine_v2.Utils;
 using Silk.NET.Input;
 using Silk.NET.Maths;
+using FainCraft.Gameplay.WorldScripts.Coords;
+using FainCraft.Gameplay.WorldScripts.Data.Voxels;
+using FainCraft.Gameplay.WorldScripts.Storage;
 
 namespace FainCraft.Gameplay.PlayerScripts;
 
 internal class WorldEditor
 {
-    readonly IVoxelIndexer indexer;
-    readonly IWorldData worldData;
-    readonly Transform camTransform;
-    readonly IWorldEntityController entityController;
+    private readonly Transform _camTransform;
+    private readonly IVoxelIndexer _indexer;
+    private readonly IVoxelDataStore _voxelDataStore;
+    private readonly IWorldEntityController _entityController;
 
-    public WorldEditor(Transform camTransform, World world)
+    public WorldEditor(Transform camTransform, IServiceProvider provider)
     {
-        this.worldData = world.WorldData;
-        this.entityController = world.WorldEntityController;
-        this.camTransform = camTransform;
-        indexer = worldData.Indexer;
+        _camTransform = camTransform;
+        _indexer = provider.Get<IVoxelIndexer>();
+        _voxelDataStore = provider.Get<IVoxelDataStore>();
+        _entityController = provider.Get<IWorldEntityController>();
     }
 
     public void Update()
@@ -44,13 +44,13 @@ internal class WorldEditor
 
                 var voxelAABB = new StaticAABB(faceVox);
 
-                foreach (var entity in entityController.Entities)
+                foreach (var entity in _entityController.Entities)
                 {
                     if (AABBResolver.IsOverlapping(voxelAABB, entity.Bounds))
                         return;
                 }
 
-                EditVoxel(faceVox, new VoxelState() { Index = indexer.GetIndex("Cobblestone_Slab") });
+                EditVoxel(faceVox, new VoxelState() { Index = _indexer.GetIndex("Cobblestone_Slab") });
             }
         }
     }
@@ -58,7 +58,7 @@ internal class WorldEditor
     private void EditVoxel(Vector3D<int> coord, VoxelState newVoxel)
     {
         VoxelCoordGlobal voxCoord = new VoxelCoordGlobal(coord);
-        worldData.EditVoxelState(voxCoord, oldVoxel =>
+        _voxelDataStore.EditVoxelState(voxCoord, oldVoxel =>
         {
             return newVoxel;
         });
@@ -70,18 +70,18 @@ internal class WorldEditor
         (
             new Ray()
             {
-                Direction = camTransform.Forward,
-                Origin = camTransform.GlobalPosition
+                Direction = _camTransform.Forward,
+                Origin = _camTransform.GlobalPosition
             },
             10f,
             voxPos =>
             {
                 VoxelCoordGlobal coord = new VoxelCoordGlobal(voxPos);
 
-                if (!worldData.GetVoxelState(coord, out var voxelData))
+                if (!_voxelDataStore.GetVoxelState(coord, out var voxelData))
                     return false;
 
-                var type = indexer.GetVoxelType(voxelData.Index);
+                var type = _indexer.GetVoxelType(voxelData.Index);
 
                 return type.Physics_Solid;
             },

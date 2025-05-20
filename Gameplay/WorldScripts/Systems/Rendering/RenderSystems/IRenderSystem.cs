@@ -1,5 +1,6 @@
-﻿using FainCraft.Gameplay.WorldScripts.Core;
+﻿using FainCraft.Gameplay.WorldScripts.Coords;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering.Lighting;
+using FainCraft.Gameplay.WorldScripts.Systems.Rendering.VoxelMeshes;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.RenderSystems;
 public interface IRenderSystem

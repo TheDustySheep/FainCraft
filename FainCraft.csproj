@@ -9,11 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Gameplay\WorldScripts\Systems\RegionLoading\TerrainGeneration\StructureEdit\**" />
     <Compile Remove="Resources\Debug\**" />
-    <EmbeddedResource Remove="Gameplay\WorldScripts\Systems\RegionLoading\TerrainGeneration\StructureEdit\**" />
     <EmbeddedResource Remove="Resources\Debug\**" />
-    <None Remove="Gameplay\WorldScripts\Systems\RegionLoading\TerrainGeneration\StructureEdit\**" />
     <None Remove="Resources\Debug\**" />
   </ItemGroup>
 
@@ -101,6 +98,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Gameplay\WorldScripts\Systems\Loading\Network\" />
     <Folder Include="Resources\Voxels\Meshes\" />
   </ItemGroup>
 

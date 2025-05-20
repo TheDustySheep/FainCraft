@@ -1,6 +1,6 @@
-﻿using FainCraft.Gameplay.WorldScripts.Core;
-using FainCraft.Gameplay.WorldScripts.Data;
-using FainCraft.Gameplay.WorldScripts.Voxels;
+﻿using FainCraft.Gameplay.WorldScripts.Coords;
+using FainCraft.Gameplay.WorldScripts.Data.Voxels;
+using FainCraft.Gameplay.WorldScripts.Storage;
 using FainEngine_v2.Extensions;
 using FainEngine_v2.Physics.AABB;
 using System.Numerics;
@@ -10,13 +10,13 @@ public class CollisionHandler
 {
     public const int IterationCount = 10;
 
-    readonly IVoxelIndexer indexer;
-    readonly IWorldData worldData;
+    private readonly IVoxelIndexer _indexer;
+    private readonly IVoxelDataStore _voxelData;
 
-    public CollisionHandler(IWorldData worldData)
+    public CollisionHandler(IServiceProvider serviceProvider)
     {
-        this.worldData = worldData;
-        indexer = worldData.Indexer;
+        _indexer   = serviceProvider.Get<IVoxelIndexer>();
+        _voxelData = serviceProvider.Get<IVoxelDataStore>();
     }
 
     public GroundedState UpdateGrounded(StaticAABB entity)
@@ -41,10 +41,10 @@ public class CollisionHandler
                 {
                     VoxelCoordGlobal voxelCoord = new VoxelCoordGlobal(i_x, i_y, i_z);
 
-                    worldData.GetVoxelState(voxelCoord, out var voxelData);
+                    _voxelData.GetVoxelState(voxelCoord, out var voxelState);
 
                     // Discard non-solid voxels
-                    if (!indexer.GetVoxelType(voxelData.Index).Physics_Solid)
+                    if (!_indexer.GetVoxelType(voxelState.Index).Physics_Solid)
                         continue;
 
                     var voxel = new StaticAABB()
@@ -116,10 +116,10 @@ public class CollisionHandler
                 {
                     VoxelCoordGlobal voxelCoord = new VoxelCoordGlobal(i_x, i_y, i_z);
 
-                    worldData.GetVoxelState(voxelCoord, out var voxelData);
+                    _voxelData.GetVoxelState(voxelCoord, out var voxelState);
 
                     // Discard non-solid voxels
-                    if (!indexer.GetVoxelType(voxelData.Index).Physics_Solid)
+                    if (!_indexer.GetVoxelType(voxelState.Index).Physics_Solid)
                         continue;
 
                     colliders.Add(new StaticAABB()
@@ -151,9 +151,9 @@ public class CollisionHandler
                 {
                     VoxelCoordGlobal voxelCoord = new VoxelCoordGlobal(i_x, i_y, i_z);
 
-                    worldData.GetVoxelState(voxelCoord, out var voxelData);
+                    _voxelData.GetVoxelState(voxelCoord, out var voxelState);
 
-                    var type = indexer.GetVoxelType(voxelData.Index);
+                    var type = _indexer.GetVoxelType(voxelState.Index);
 
                     // Discard non-solid voxels
                     if (!func.Invoke(type))

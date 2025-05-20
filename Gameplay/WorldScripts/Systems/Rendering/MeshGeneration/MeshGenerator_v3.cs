@@ -1,7 +1,8 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Data;
-using FainCraft.Gameplay.WorldScripts.Voxels;
+using FainCraft.Gameplay.WorldScripts.Data.Voxels;
+using FainCraft.Gameplay.WorldScripts.Systems.Rendering.VoxelMeshes;
 using Silk.NET.Assimp;
-using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
+using static FainCraft.Gameplay.WorldScripts.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration;
 public class MeshGenerator_v3 : IMeshGenerator
@@ -15,9 +16,9 @@ public class MeshGenerator_v3 : IMeshGenerator
 
     const uint VOXEL_UP = 22;
 
-    public MeshGenerator_v3(IVoxelIndexer voxelIndexer)
+    public MeshGenerator_v3(IServiceProvider provider)
     {
-        _voxelIndexer = voxelIndexer;
+        _voxelIndexer = provider.Get<IVoxelIndexer>();
     }
 
     public void GenerateMesh(IChunkDataCluster cluster, VoxelMeshData opaqueMeshData, VoxelMeshData transparentMeshData)

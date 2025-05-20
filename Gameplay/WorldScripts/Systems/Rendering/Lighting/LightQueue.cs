@@ -1,5 +1,5 @@
-﻿using FainCraft.Gameplay.WorldScripts.Core;
-using FainCraft.Gameplay.WorldScripts.Data;
+﻿using FainCraft.Gameplay.WorldScripts.Coords;
+using FainCraft.Gameplay.WorldScripts.Data.Regions;
 using FainEngine_v2.Collections;
 using FainEngine_v2.Extensions;
 using System;

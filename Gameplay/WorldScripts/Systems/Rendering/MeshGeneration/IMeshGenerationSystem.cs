@@ -1,8 +1,7 @@
-﻿using FainCraft.Gameplay.WorldScripts.Core;
+﻿using FainCraft.Gameplay.WorldScripts.Coords;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration;
 internal interface IMeshGenerationSystem
 {
-    public void Generate(ChunkCoord coord, bool important);
     public void Tick();
 }

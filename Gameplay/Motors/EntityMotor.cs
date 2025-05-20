@@ -1,4 +1,4 @@
-﻿using FainCraft.Gameplay.WorldScripts.Voxels;
+﻿using FainCraft.Gameplay.WorldScripts.Data.Voxels;
 using FainEngine_v2.Core;
 using FainEngine_v2.Core.GameObjects;
 using FainEngine_v2.Extensions;

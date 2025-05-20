@@ -1,5 +1,6 @@
-﻿using FainCraft.Gameplay.WorldScripts.Data;
-using static FainCraft.Gameplay.WorldScripts.Core.WorldConstants;
+﻿using FainCraft.Gameplay.WorldScripts.Data.Regions;
+using FainCraft.Gameplay.WorldScripts.Data.Voxels;
+using static FainCraft.Gameplay.WorldScripts.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.Lighting
 {
@@ -59,7 +60,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.Lighting
         }
 
         /// <summary>
-        /// Unified indexer: accepts x/z in [-15 .. CHUNK_SIZE+14], y in [-1 .. REGION_HEIGHT].
+        /// Unified _indexer: accepts x/z in [-15 .. CHUNK_SIZE+14], y in [-1 .. REGION_HEIGHT].
         /// Reads always from calc buffer; writes update both calc and padded SSBO buffers.
         /// </summary>
         public LightData this[int x, int y, int z]
@@ -86,13 +87,13 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.Lighting
 
         // Compute flat index for calc buffer
         private static int CalcIndex(int x, int y, int z)
-            => (x + CALC_PADDING_XZ)
+            => x + CALC_PADDING_XZ
              + (z + CALC_PADDING_XZ) * CALC_SIZE_X
              + (y + CALC_PADDING_Y) * CALC_SIZE_X * CALC_SIZE_Z;
 
         // Compute flat index for SSBO buffer
         private static int SsboIndex(int x, int y, int z)
-            => (x + SSBO_PADDING)
+            => x + SSBO_PADDING
              + (z + SSBO_PADDING) * SSBO_SIZE_X
              + (y + SSBO_PADDING) * SSBO_SIZE_X * SSBO_SIZE_Z;
 
