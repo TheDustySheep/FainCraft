@@ -11,9 +11,7 @@ namespace FainCraft.Gameplay.WorldScripts.Storage
     public interface IRegionDataStore
     {
         public bool GetRegion(RegionCoord coord, out RegionData data);
-        public bool SetRegion(RegionCoord coord, RegionData data);
+        public bool SetRegion(RegionCoord coord, RegionData? data);
         public bool EditRegion(RegionCoord coord, Func<RegionData, bool> func);
-
-        public Task<RegionData?> GetRegionAsync(RegionCoord coord, CancellationToken token);
     }
 }

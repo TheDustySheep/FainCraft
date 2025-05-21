@@ -14,6 +14,7 @@ internal class RenderSystem : IRenderSystem, IDisposable
 {
     readonly MeshFaceBuffer _buffer;
     readonly ObjectPoolFactory<VoxelMesh_v2> _meshPool;
+    readonly HashSet<RegionCoord> _loaded = new();
     readonly Dictionary<ChunkCoord, VoxelMesh_v2> _opaqueMeshes      = new();
     readonly Dictionary<ChunkCoord, VoxelMesh_v2> _transparentMeshes = new();
 
@@ -58,33 +59,7 @@ internal class RenderSystem : IRenderSystem, IDisposable
         }
     }
 
-    public void UnloadChunk(ChunkCoord coord)
-    {
-        UnloadOpaque(coord);
-        UnloadTransparent(coord);
-    }
-
-    private void UnloadOpaque(ChunkCoord coord)
-    {
-        if (_opaqueMeshes.Remove(coord, out var oldMesh))
-        {
-            oldMesh.Clear();
-            _meshPool.Return(oldMesh);
-            DebugVariables.OpaqueMeshCount.Value = _opaqueMeshes.Count;
-        }
-    }
-
-    private void UnloadTransparent(ChunkCoord coord)
-    {
-        if (_transparentMeshes.Remove(coord, out var oldMesh))
-        {
-            oldMesh.Clear();
-            _meshPool.Return(oldMesh);
-            DebugVariables.TransparentMeshCount.Value = _transparentMeshes.Count;
-        }
-    }
-
-    public void UpdateChunk(ChunkCoord coord, VoxelMeshData opaque, VoxelMeshData transparent)
+    public void UpdateMesh(ChunkCoord coord, VoxelMeshData opaque, VoxelMeshData transparent)
     {
         if (opaque.IsEmpty)
         {
@@ -121,24 +96,10 @@ internal class RenderSystem : IRenderSystem, IDisposable
                 mesh = _meshPool.Request();
                 mesh.UpdateData(transparent);
                 _transparentMeshes[coord] = mesh;
-                DebugVariables.OpaqueMeshCount.Value = _transparentMeshes.Count;
+                DebugVariables.TransparentMeshCount.Value = _transparentMeshes.Count;
                 OnMeshAdded?.Invoke(coord);
             }
         }
-    }
-
-    public void Dispose()
-    {
-        foreach (var mesh in _meshPool.Bag)
-            mesh.Dispose();
-
-        foreach (var mesh in _opaqueMeshes.Values)
-            mesh.Dispose();
-
-        foreach (var mesh in _transparentMeshes.Values)
-            mesh.Dispose();
-
-        GC.SuppressFinalize(this);
     }
 
     public void UpdateLighting(RegionCoord rCoord, LightingRegionData data)
@@ -154,5 +115,63 @@ internal class RenderSystem : IRenderSystem, IDisposable
             ReadOnlySpan<LightData> span = data.GetSlice(c_y);
             mesh.UpdateLighting(span);
         }
+    }
+
+    public bool Exists(RegionCoord coord)
+    {
+        return _loaded.Contains(coord);
+    }
+
+    public void Load(RegionCoord coord)
+    {
+        if (!_loaded.Add(coord))
+            return;
+    }
+
+    public void Unload(RegionCoord coord)
+    {
+        if (!_loaded.Remove(coord))
+            return;
+
+        for (int y = -REGION_NEG_CHUNKS; y < REGION_POS_CHUNKS; y++)
+        {
+            ChunkCoord cCoord = new ChunkCoord(coord, y);
+            UnloadOpaque(cCoord);
+            UnloadTransparent(cCoord);
+        }
+    }
+
+    private void UnloadOpaque(ChunkCoord coord)
+    {
+        if (_opaqueMeshes.Remove(coord, out var oldMesh))
+        {
+            oldMesh.Clear();
+            _meshPool.Return(oldMesh);
+            DebugVariables.OpaqueMeshCount.Value = _opaqueMeshes.Count;
+        }
+    }
+
+    private void UnloadTransparent(ChunkCoord coord)
+    {
+        if (_transparentMeshes.Remove(coord, out var oldMesh))
+        {
+            oldMesh.Clear();
+            _meshPool.Return(oldMesh);
+            DebugVariables.TransparentMeshCount.Value = _transparentMeshes.Count;
+        }
+    }
+
+    public void Dispose()
+    {
+        foreach (var mesh in _meshPool.Bag)
+            mesh.Dispose();
+
+        foreach (var mesh in _opaqueMeshes.Values)
+            mesh.Dispose();
+
+        foreach (var mesh in _transparentMeshes.Values)
+            mesh.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 }

@@ -5,5 +5,5 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Loading;
 
 public interface IRegionDataLoader
 {
-    public Task<RegionData> GetRegionAsync(RegionCoord coord, CancellationToken token);
+    public Task<RegionData> LoadRegionAsync(RegionCoord coord, CancellationToken token);
 }

@@ -100,7 +100,7 @@ internal class RegionLoadingController : IRegionLoadingController
     }
 
     // Call this from the main update loop to apply load results
-    public void Tick()
+    public void Calculate()
     {
         int i = 0;
         while (_actions.TryDequeue(out var action) && i < 1)

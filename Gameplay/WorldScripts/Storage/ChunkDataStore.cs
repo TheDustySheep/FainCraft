@@ -74,24 +74,6 @@ namespace FainCraft.Gameplay.WorldScripts.Storage
             return true;
         }
 
-        public async Task<ChunkData?> GetChunkDataAsync(ChunkCoord coord, CancellationToken token)
-        {
-            if (!InBounds(coord))
-                return null;
-
-            var rCoord = (RegionCoord)coord;
-            var regionData = await _regionStore.GetRegionAsync(rCoord, token);
-            await MainThreadDispatcher.Yield();
-
-            if (regionData == null)
-                return null;
-
-            if (!regionData.GetChunk(coord.Y, out var data))
-                return null;
-
-            return data;
-        }
-
         private static bool InBounds(ChunkCoord coord) =>
             coord.Y >= -WorldConstants.REGION_NEG_CHUNKS &&
             coord.Y <   WorldConstants.REGION_POS_CHUNKS;

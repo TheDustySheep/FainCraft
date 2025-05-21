@@ -8,7 +8,9 @@ public interface IRenderSystem
     event Action<ChunkCoord>? OnMeshAdded;
 
     public void Draw();
-    public void UnloadChunk(ChunkCoord coord);
-    public void UpdateChunk(ChunkCoord coord, VoxelMeshData opaque, VoxelMeshData transparent);
+    public bool Exists(RegionCoord coord);
+    public void Load(RegionCoord coord);
+    public void Unload(RegionCoord coord);
+    public void UpdateMesh(ChunkCoord coord, VoxelMeshData opaque, VoxelMeshData transparent);
     public void UpdateLighting(RegionCoord coord, LightingRegionData data);
 }

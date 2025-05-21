@@ -26,7 +26,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration
 
         public bool TryDequeueRequest(out ChunkCoord coord, out IChunkDataCluster cluster)
         {
-            if (_GenInBuffer.Count >= SharedVariables.RenderSettings.Value.MeshQueueLimit ||
+            if (_GenInBuffer.Count >= SharedVariables.RenderSettings.Value.MaxConcurrentMeshes ||
                 !_RequestInBuffer.TryDequeue(out coord))
             {
                 coord = default;

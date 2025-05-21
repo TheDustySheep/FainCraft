@@ -7,5 +7,5 @@ public interface IActiveRegionRadius
     public event Action<RegionCoord>? Load;
     public event Action<RegionCoord>? Unload;
 
-    public void Tick();
+    public void Calculate();
 }

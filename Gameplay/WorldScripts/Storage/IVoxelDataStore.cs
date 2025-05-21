@@ -8,6 +8,4 @@ public interface IVoxelDataStore
     public bool GetVoxelState(VoxelCoordGlobal coord, out VoxelState state);
     public bool SetVoxelState(VoxelCoordGlobal coord, VoxelState state);
     public bool EditVoxelState(VoxelCoordGlobal coord, Func<VoxelState, VoxelState> editFunc);
-
-    public Task<VoxelState?> GetVoxelStateAsync(VoxelCoordGlobal coord, CancellationToken token);
 }

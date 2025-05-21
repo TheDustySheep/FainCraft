@@ -82,22 +82,6 @@ public class VoxelDataStore : IVoxelDataStore
         return true;
     }
 
-    public async Task<VoxelState?> GetVoxelStateAsync(VoxelCoordGlobal coord, CancellationToken token)
-    {
-        if (!InBounds(coord))
-            return null;
-
-        ChunkCoord cCoord = (ChunkCoord)coord;
-        var chunkData = await _chunkStore.GetChunkDataAsync(cCoord, token);
-        await MainThreadDispatcher.Yield();
-
-        // Chunk is outside bounds? Should never actually fire
-        if (chunkData == null)
-            return null;
-
-        return chunkData[(VoxelCoordLocal)coord];
-    }
-
     private static bool InBounds(VoxelCoordGlobal coord) =>
         coord.Y >= WorldConstants.REGION_MIN_Y_VOXEL &&
         coord.Y <= WorldConstants.REGION_MAX_Y_VOXEL;

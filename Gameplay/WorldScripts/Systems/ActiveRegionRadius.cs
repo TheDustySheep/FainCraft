@@ -23,7 +23,7 @@ public class ActiveRegionRadius : IActiveRegionRadius
         _playerPosition = SharedVariables.PlayerPosition;
     }
 
-    public void Tick()
+    public void Calculate()
     {
         var playerCoord = _playerPosition.Value.RegionCoord;
         if (_lastCoord == playerCoord) return;
@@ -69,7 +69,7 @@ public class ActiveRegionRadius : IActiveRegionRadius
             sign *= -1;
         }
         // last leg to finish filling the area
-        for (int k = 0; k < (radius * 2) - 1; k++)
+        for (int k = 0; k < radius * 2 - 1; k++)
         {
             point += new RegionCoord(sign * 1, 0);
             yield return point;

@@ -3,6 +3,7 @@ using FainCraft.Gameplay.WorldScripts.Data.Voxels;
 using FainCraft.Gameplay.WorldScripts.Signals;
 using FainCraft.Gameplay.WorldScripts.Storage;
 using FainCraft.Gameplay.WorldScripts.Systems;
+using FainCraft.Gameplay.WorldScripts.Systems.Activation;
 using FainCraft.Gameplay.WorldScripts.Systems.Loading;
 using FainCraft.Gameplay.WorldScripts.Systems.Loading.Generation;
 using FainCraft.Gameplay.WorldScripts.Systems.Loading.Generation.Overworld;
@@ -12,6 +13,7 @@ using FainCraft.Gameplay.WorldScripts.Systems.Rendering.RenderSystems;
 using FainEngine_v2.Entities;
 using FainEngine_v2.Rendering.Materials;
 using FainEngine_v2.Resources;
+using System;
 
 namespace FainCraft.Gameplay.WorldScripts;
 
@@ -22,6 +24,7 @@ public class Level : GameObject
 
     private readonly IRenderSystem _renderSystem;
     private readonly IMeshGenerationSystem _meshSystem;
+    private readonly IRegionActivator _activator;
 
     public Level()
     {
@@ -51,14 +54,18 @@ public class Level : GameObject
         _provider.RegisterSingleton<IChunkClusterDataStore>(new ChunkClusterDataStore(_provider));
         _provider.RegisterSingleton<IVoxelDataStore>(new VoxelDataStore(_provider));
 
+        // Region Activation
+        _activator = _provider.RegisterSingleton<IRegionActivator>(new RegionActivator(_provider));
+
         // Rendering
+        _provider.RegisterFactory<IMeshGenerator>(() => new MeshGenerator_v3(_provider));
         _renderSystem = _provider.RegisterSingleton<IRenderSystem>(new RenderSystem(voxel_material_o, voxel_material_t, _provider));
-        _provider.RegisterSingleton<IMeshGenerator>(new MeshGenerator_v3(_provider));
-        _meshSystem = _provider.RegisterSingleton<IMeshGenerationSystem>(new MeshGenerationSystem(_provider, new ActiveRegionRadius(() => SharedVariables.RenderSettings.Value.RenderRadius)));
+        _meshSystem   = _provider.RegisterSingleton<IMeshGenerationSystem>(new MeshGenerationSystem(_provider, new ActiveRegionRadius(() => SharedVariables.RenderSettings.Value.RenderRadius)));
     }
 
     public override void Update()
     {
+        _activator.Tick();
         _meshSystem.Tick();
         _renderSystem.Draw();
     }

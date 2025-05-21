@@ -52,7 +52,7 @@ namespace FainCraft.Gameplay.OldWorldScripts.Editing
                 if (!data.GetChunk(coord.Chunk_Y, out var chunk))
                     continue;
 
-                // Update the voxel
+                // UpdateMesh the voxel
                 int index = coord.LocalCoord.VoxelIndex;
                 var _oldState = chunk.VoxelData[index];
                 var _newState = pair.Edit.Execute(_oldState);
