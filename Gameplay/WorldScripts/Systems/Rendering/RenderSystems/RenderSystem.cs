@@ -14,7 +14,6 @@ internal class RenderSystem : IRenderSystem, IDisposable
 {
     readonly MeshFaceBuffer _buffer;
     readonly ObjectPoolFactory<VoxelMesh_v2> _meshPool;
-    readonly HashSet<RegionCoord> _loaded = new();
     readonly Dictionary<ChunkCoord, VoxelMesh_v2> _opaqueMeshes      = new();
     readonly Dictionary<ChunkCoord, VoxelMesh_v2> _transparentMeshes = new();
 
@@ -117,22 +116,8 @@ internal class RenderSystem : IRenderSystem, IDisposable
         }
     }
 
-    public bool Exists(RegionCoord coord)
-    {
-        return _loaded.Contains(coord);
-    }
-
-    public void Load(RegionCoord coord)
-    {
-        if (!_loaded.Add(coord))
-            return;
-    }
-
     public void Unload(RegionCoord coord)
     {
-        if (!_loaded.Remove(coord))
-            return;
-
         for (int y = -REGION_NEG_CHUNKS; y < REGION_POS_CHUNKS; y++)
         {
             ChunkCoord cCoord = new ChunkCoord(coord, y);

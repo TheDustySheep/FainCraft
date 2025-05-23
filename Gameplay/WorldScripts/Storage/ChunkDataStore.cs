@@ -1,18 +1,17 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Coords;
 using FainCraft.Gameplay.WorldScripts.Data.Chunks;
 using FainCraft.Gameplay.WorldScripts.Signals;
-using FainEngine_v2.Utils;
 
 namespace FainCraft.Gameplay.WorldScripts.Storage
 {
     public class ChunkDataStore : IChunkDataStore
     {
-        private readonly IEventBus _eventBus;
+        private readonly ISignalBus _eventBus;
         private readonly IRegionDataStore _regionStore;
 
         public ChunkDataStore(IServiceProvider serviceProvider)
         {
-            _eventBus    = serviceProvider.Get<IEventBus>();
+            _eventBus    = serviceProvider.Get<ISignalBus>();
             _regionStore = serviceProvider.Get<IRegionDataStore>();
         }
 

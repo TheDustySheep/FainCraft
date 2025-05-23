@@ -6,12 +6,12 @@ namespace FainCraft.Gameplay.WorldScripts.Storage;
 
 public class RegionDataStore : IRegionDataStore
 {
-    IEventBus _eventBus;
+    ISignalBus _eventBus;
     Dictionary<RegionCoord, RegionData> _regions = new();
 
     public RegionDataStore(IServiceProvider serviceProvider)
     {
-        _eventBus = serviceProvider.Get<IEventBus>();
+        _eventBus = serviceProvider.Get<ISignalBus>();
     }
 
     public bool GetRegion(RegionCoord coord, out RegionData data)
@@ -23,6 +23,7 @@ public class RegionDataStore : IRegionDataStore
     {
         if (data == null)
         {
+            // Didn't exist so can't remove it
             if (!_regions.Remove(coord))
                 return false;
 

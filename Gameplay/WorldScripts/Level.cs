@@ -9,6 +9,7 @@ using FainCraft.Gameplay.WorldScripts.Systems.Loading.Generation;
 using FainCraft.Gameplay.WorldScripts.Systems.Loading.Generation.Overworld;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering.Materials;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration;
+using FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGenerationSystems;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering.RenderSystems;
 using FainEngine_v2.Entities;
 using FainEngine_v2.Rendering.Materials;
@@ -35,7 +36,7 @@ public class Level : GameObject
         _provider = new ServiceContainer();
 
         // Event Bus
-        _provider.RegisterSingleton<IEventBus>(new EventBus());
+        _provider.RegisterSingleton<ISignalBus>(new EventBus());
 
         // Entities
         _provider.RegisterSingleton<IWorldEntityController>(new WorldEntityController());

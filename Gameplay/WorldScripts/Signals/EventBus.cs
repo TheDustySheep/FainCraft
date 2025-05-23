@@ -1,6 +1,6 @@
 ﻿namespace FainCraft.Gameplay.WorldScripts.Signals;
 
-public class EventBus : IEventBus
+public class EventBus : ISignalBus
 {
     private readonly Dictionary<Type, List<Delegate>> _handlers = new();
 

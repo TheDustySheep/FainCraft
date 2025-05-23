@@ -1,9 +1,10 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Coords;
 using FainEngine_v2.Extensions;
+using System.Collections;
 using System.Runtime.CompilerServices;
 
 namespace FainCraft.Gameplay.WorldScripts;
-public class WorldConstants
+public static class WorldConstants
 {
     public const int CHUNK_SIZE_POWER = 5;
 
@@ -26,6 +27,69 @@ public class WorldConstants
 
     public const int REGION_MAX_Y_VOXEL  =  REGION_POS_CHUNKS * CHUNK_SIZE - 1;
     public const int REGION_MIN_Y_VOXEL  = -REGION_NEG_CHUNKS * CHUNK_SIZE;
+
+    #region Enumerables
+    public static IEnumerable<int> Iterate_Y_Chunks()
+    {
+        for (int y = -REGION_NEG_CHUNKS; y < REGION_POS_CHUNKS; y++)
+            yield return y;
+    }
+
+    public static IEnumerable<RegionCoord> Iterate_Neighbour_Regions()
+    {
+        yield return new RegionCoord(-1, -1);
+        yield return new RegionCoord( 0, -1);
+        yield return new RegionCoord( 1, -1);
+
+        yield return new RegionCoord(-1,  0);
+        // Center region - don't return this one
+        yield return new RegionCoord( 1,  0);
+
+        yield return new RegionCoord(-1,  1);
+        yield return new RegionCoord( 0,  1);
+        yield return new RegionCoord( 1,  1);
+    }
+
+    public static IEnumerable<ChunkCoord> Iterate_Neighbour_Chunks()
+    {
+        for (int dy = -1; dy < 2; dy++)
+        {
+            for (int dz = -1; dz < 2; dz++)
+            {
+                for (int dx = -1; dx < 2; dx++)
+                {
+                    if (dx == 0 && dy == 0 && dz == 0) continue;
+                    yield return new ChunkCoord(dx, dy, dz);
+                }
+            }
+        }
+    }
+
+    public static IEnumerable<ChunkCoord> GetTouchedNeighborOffsets(VoxelCoordLocal v)
+    {
+        for (int dx = -1; dx <= 1; dx++)
+        {
+            if (dx == -1 && v.X !=  0) continue;
+            if (dx ==  1 && v.X != 31) continue;
+
+            for (int dy = -1; dy <= 1; dy++)
+            {
+                if (dy == -1 && v.Y !=  0) continue;
+                if (dy ==  1 && v.Y != 31) continue;
+
+                for (int dz = -1; dz <= 1; dz++)
+                {
+                    if (dz == -1 && v.Z !=  0) continue;
+                    if (dz ==  1 && v.Z != 31) continue;
+
+                    if (dx == 0 && dy == 0 && dz == 0) continue;
+
+                    yield return new ChunkCoord(dx, dy, dz);
+                }
+            }
+        }
+    }
+    #endregion
 
     #region Indexes
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -6,12 +6,12 @@ namespace FainCraft.Gameplay.WorldScripts.Storage;
 
 public class VoxelDataStore : IVoxelDataStore
 {
-    IEventBus _eventBus;
+    ISignalBus _eventBus;
     IChunkDataStore _chunkStore;
 
     public VoxelDataStore(IServiceProvider serviceProvider)
     {
-        _eventBus   = serviceProvider.Get<IEventBus>();
+        _eventBus   = serviceProvider.Get<ISignalBus>();
         _chunkStore = serviceProvider.Get<IChunkDataStore>();
     }
 

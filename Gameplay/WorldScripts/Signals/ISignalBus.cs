@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FainCraft.Gameplay.WorldScripts.Signals;
 
-public interface IEventBus
+public interface ISignalBus
 {
     public void Subscribe<TEvent>(Action<TEvent> handler);
     public void Unsubscribe<TEvent>(Action<TEvent> handler);
