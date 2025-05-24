@@ -54,7 +54,7 @@ public struct VoxelCoordGlobal
         return new VoxelCoordGlobal(X + dx, Y + dy, Z + dz);
     }
 
-    public static explicit operator VoxelCoordLocal(VoxelCoordGlobal globalCoord)
+    public static implicit operator VoxelCoordLocal(VoxelCoordGlobal globalCoord)
     {
         return ConvertToLocalCoord(globalCoord);
     }

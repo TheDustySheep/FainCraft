@@ -51,7 +51,7 @@ internal class RegionLoadingController : IRegionLoadingController
                 if (data != null)
                 {
                     // Queue set region on main thread
-                    _actions.AddMeshRequest(() => _worldData.SetRegion(coord, data));
+                    _actions.UpdateMesh(() => _worldData.SetRegion(coord, data));
                     return;
                 }
 
@@ -60,7 +60,7 @@ internal class RegionLoadingController : IRegionLoadingController
                 if (generationResult != null)
                 {
                     // Queue apply on main thread
-                    _actions.AddMeshRequest(() =>
+                    _actions.UpdateMesh(() =>
                     {
                         _worldData.SetRegion(generationResult.RegionCoord, generationResult.RegionData);
                         _worldData.AddRegionEdits(generationResult.VoxelEdits);

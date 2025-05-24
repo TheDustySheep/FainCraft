@@ -75,7 +75,7 @@ public class RegionActivator : IRegionActivator, IDisposable
 
             // Determine if still needed
             bool stillNeeded = _desiredRegions.ContainsKey(coord);
-            // AddMeshRequest SetRegion on main thread: data if still needed, otherwise null
+            // UpdateMesh SetRegion on main thread: data if still needed, otherwise null
             _applyQueue.Enqueue((coord, stillNeeded ? data : null));
         }, _cts.Token);
     }
@@ -84,7 +84,7 @@ public class RegionActivator : IRegionActivator, IDisposable
     {
         // Mark region not desired
         _desiredRegions.TryRemove(coord, out _);
-        // AddMeshRequest unload on main thread
+        // UpdateMesh unload on main thread
         _applyQueue.Enqueue((coord, null));
     }
 

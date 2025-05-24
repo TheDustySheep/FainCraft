@@ -32,19 +32,32 @@ internal class MeshGenerationQueue : IDisposable
 
     public void Start() => _worker.Start();
 
+    #region Requests
     public void EnqueueRequest(ChunkCoord coord, int priority)
         => _requestQueue.Enqueue(coord, priority);
 
     public bool TryDequeueRequest(out ChunkCoord coord)
-        => _requestQueue.TryDequeue(out coord, out _);
+    {
+        coord = default;
 
-    public void RemoveRequest(ChunkCoord coord)
-        => _requestQueue.Remove(coord);
+        if (_requestQueue.Count == 0)
+            return false;
 
-    public bool TryWaitForSlot(int timeoutMs = 0)
-        => _semaphore.Wait(timeoutMs);
+        if (!_semaphore.Wait(0))
+            return false;
 
-    public void ReleaseSlot() => _semaphore.Release();
+        if (!_requestQueue.TryDequeue(out coord, out _))
+        {
+            _semaphore.Release();
+            return false;
+        }
+
+        return true;
+    }
+
+    public void ReleaseSlot() 
+        => _semaphore.Release();
+    #endregion
 
     public void EnqueueToGenerate(GenerationData data)
         => _toGenerate.Enqueue(data);

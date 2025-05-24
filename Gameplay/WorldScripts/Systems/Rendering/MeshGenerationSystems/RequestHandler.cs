@@ -7,11 +7,16 @@ public class RequestHandler
 {
     private readonly ISignalBus _signalBus;
     private readonly Action<ChunkCoord, bool> _updateChunk;
+    private readonly Action<RegionCoord, bool> _updateRegion;
 
-    public RequestHandler(ISignalBus signalBus, Action<ChunkCoord, bool> updateChunk)
+    public RequestHandler(
+        ISignalBus signalBus, 
+        Action<ChunkCoord, bool> updateChunk,
+        Action<RegionCoord, bool> updateRegion)
     {
-        _signalBus = signalBus;
-        _updateChunk = updateChunk;
+        _signalBus    = signalBus;
+        _updateChunk  = updateChunk;
+        _updateRegion = updateRegion;
 
         _signalBus.Subscribe<LoadedRegionDataSignal>  (OnLoadedRegionData);
         _signalBus.Subscribe<ModifiedRegionDataSignal>(OnModifiedRegionData);
@@ -30,39 +35,18 @@ public class RequestHandler
 
     private void OnLoadedRegionData(LoadedRegionDataSignal signal)
     {
-        for (int dx = -1; dx < 2; dx++)
-        {
-            for (int dz = -1; dz < 2; dz++)
-            {
-                var orCoord = signal.Coord + new RegionCoord(dx, dz);
+        _updateRegion.Invoke(signal.Coord, true);
 
-                foreach (var c_y in WorldConstants.Iterate_Y_Chunks())
-                {
-                    _updateChunk.Invoke(new ChunkCoord(orCoord, c_y), orCoord == signal.Coord);
-                }
-            }
-        }
+        foreach (var rOffset in WorldConstants.Iterate_Neighbour_Regions())
+            _updateRegion.Invoke(signal.Coord + rOffset, false);
     }
 
     private void OnModifiedRegionData(ModifiedRegionDataSignal signal)
     {
-        RegionCoord rCoord = signal.Coord;
+        _updateRegion.Invoke(signal.Coord, false);
 
-        foreach (var c_y in WorldConstants.Iterate_Y_Chunks())
-        {
-            var cCoord = new ChunkCoord(rCoord, c_y);
-            _updateChunk.Invoke(new ChunkCoord(rCoord, c_y), false);
-        }
-
-        foreach (var oCoord in WorldConstants.Iterate_Neighbour_Regions())
-        {
-            RegionCoord orCoord = rCoord + oCoord;
-            foreach (var c_y in WorldConstants.Iterate_Y_Chunks())
-            {
-                var cCoord = new ChunkCoord(orCoord, c_y);
-                _updateChunk.Invoke(new ChunkCoord(rCoord, c_y), false);
-            }
-        }
+        foreach (var rOffset in WorldConstants.Iterate_Neighbour_Regions())
+            _updateRegion.Invoke(signal.Coord + rOffset, false);
     }
 
     private void OnModifiedChunkData(ModifiedChunkDataSignal signal)
@@ -70,9 +54,7 @@ public class RequestHandler
         _updateChunk.Invoke(signal.Coord, false);
 
         foreach (var oCoord in WorldConstants.Iterate_Neighbour_Chunks())
-        {
             _updateChunk.Invoke(signal.Coord, false);
-        }
     }
 
     private void OnModifiedVoxelState(ModifiedVoxelStateSignal signal)
@@ -80,10 +62,7 @@ public class RequestHandler
         var cCoord = (ChunkCoord)signal.Coord;
         _updateChunk.Invoke(cCoord, false);
 
-        foreach (var off in WorldConstants.GetTouchedNeighborOffsets((VoxelCoordLocal)signal.Coord))
-        {
-            var ocCoord = cCoord + off;
-            _updateChunk.Invoke(ocCoord, false);
-        }
+        foreach (var off in WorldConstants.GetTouchedNeighborOffsets(signal.Coord))
+            _updateChunk.Invoke(cCoord + off, false);
     }
 }
