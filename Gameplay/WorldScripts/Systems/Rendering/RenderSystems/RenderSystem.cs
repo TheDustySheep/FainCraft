@@ -5,7 +5,6 @@ using FainCraft.Gameplay.WorldScripts.Systems.Rendering.VoxelMeshes;
 using FainEngine_v2.Collections;
 using FainEngine_v2.Rendering;
 using FainEngine_v2.Rendering.Materials;
-using System;
 using System.Numerics;
 using static FainCraft.Gameplay.WorldScripts.WorldConstants;
 

@@ -18,7 +18,7 @@
             LoadRadius = 16,
             RenderRadius = 12,
             MeshesAppliedPerFrame = 16,
-            MaxConcurrentMeshes = 4,
+            MaxConcurrentMeshes = 16,
             LightingUpdatesPerTick = 4,
         };
     }

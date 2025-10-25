@@ -19,18 +19,33 @@ internal class MeshGenerationQueue : IDisposable
     private readonly ConcurrentQueue<GenerationData> _toGenerate = new ConcurrentQueue<GenerationData>();
     private readonly ConcurrentQueue<(ChunkCoord coord, GenerationData data)> _completed = new ConcurrentQueue<(ChunkCoord, GenerationData)>();
     private readonly SemaphoreSlim _semaphore;
-    private readonly Thread _worker;
     private readonly CancellationTokenSource _cts = new CancellationTokenSource();
+
+    private readonly List<Thread> _workers = new();
 
     public MeshGenerationQueue(int maxActive)
     {
         _semaphore = new SemaphoreSlim(maxActive, maxActive);
-        _worker = new Thread(WorkerLoop) { IsBackground = true };
+
+        int threadCount = 1;
+
+        for (int i = 0; i < threadCount; i++)
+        {
+            _workers.Add(new Thread(WorkerLoop)
+            {
+                IsBackground = true,
+                Name = $"Mesh Thread {i}"
+            });
+        }
     }
 
     public int Count => _requestQueue.Count;
 
-    public void Start() => _worker.Start();
+    public void Start()
+    {
+        foreach (var worker in _workers)
+            worker.Start();
+    }
 
     #region Requests
     public void EnqueueRequest(ChunkCoord coord, int priority)
@@ -63,7 +78,7 @@ internal class MeshGenerationQueue : IDisposable
         => _toGenerate.Enqueue(data);
 
     public bool TryDequeueToGenerate(out GenerationData data)
-        => _toGenerate.TryDequeue(out data);
+        => _toGenerate.TryDequeue(out data!);
 
     public bool TryDequeueCompleted(out (ChunkCoord coord, GenerationData data) result)
         => _completed.TryDequeue(out result);
@@ -91,7 +106,8 @@ internal class MeshGenerationQueue : IDisposable
     public void Dispose()
     {
         _cts.Cancel();
-        _worker.Join();
+        foreach (var worker in _workers)
+            worker.Join();
         _semaphore.Dispose();
         _cts.Dispose();
     }
