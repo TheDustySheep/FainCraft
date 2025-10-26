@@ -13,7 +13,7 @@ internal class FainCraftGame : FainGameEngine
 
     protected override void Load()
     {
-        //_sceneManager.LoadScene(new StartMenuScene());
-        _sceneManager.LoadScene(new SingleplayerWorld());
+        _sceneManager.LoadScene(new StartMenuScene());
+        //_sceneManager.LoadScene(new SingleplayerWorld());
     }
 }

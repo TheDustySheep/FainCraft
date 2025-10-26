@@ -1,11 +1,11 @@
-﻿using FainEngine_v2.UI;
-using FainEngine_v2.UI.Elements;
-using System.Drawing;
+﻿using System.Drawing;
+using FainEngine_v2.UI.UIElements;
 
 namespace FainCraft.UI.Panels
 {
     public class StartMenuUIPanel : UIElement
     {
+        /*
         public StartMenuUIPanel(UICanvas canvas)
         {
             Align = Layout.Align.Center;
@@ -26,5 +26,6 @@ namespace FainCraft.UI.Panels
                 )
             );
         }
+        */
     }
 }

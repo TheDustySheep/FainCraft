@@ -3,11 +3,10 @@ using FainCraft.Gameplay.WorldScripts;
 using FainCraft.Signals.Gameplay.WorldScripts;
 using FainEngine_v2.Core;
 using FainEngine_v2.Rendering;
-using FainEngine_v2.UI;
-using FainEngine_v2.UI.Elements;
 using FainEngine_v2.Utils;
 using System.Text;
 
+/*
 namespace FainCraft.UI.Overlays
 {
     public class DebugStatsUI : UIElement
@@ -76,12 +75,13 @@ namespace FainCraft.UI.Overlays
             sb.AppendLine($" - Loaded: {DebugVariables.WorldLoadedRegions.Value * WorldConstants.REGION_TOTAL_CHUNKS} chunks");
 
             sb.AppendLine($"");
-            sb.AppendLine($"Draw Calls");
+            sb.AppendLine($"GenerateVertices Calls");
             sb.AppendLine($" - Total: {RenderDebugVariables.DrawCallDebugData.Value.TotalDrawCalls}");
             sb.AppendLine($" - Opaque: {RenderDebugVariables.DrawCallDebugData.Value.OpaqueCalls}");
             sb.AppendLine($" - Transparent: {RenderDebugVariables.DrawCallDebugData.Value.TransparentCalls}");
-            sb.AppendLine($" - UI: {RenderDebugVariables.DrawCallDebugData.Value.UICalls}");
+            sb.AppendLine($" - OldUI: {RenderDebugVariables.DrawCallDebugData.Value.UICalls}");
             return sb.ToString();
         }
     }
 }
+*/

@@ -7,7 +7,6 @@ using FainEngine_v2.Entities;
 using FainEngine_v2.Rendering.PostProcessing;
 using FainEngine_v2.Resources;
 using System.Numerics;
-using FainCraft.UI.Overlays;
 using FainCraft.Gameplay.WorldScripts;
 
 namespace FainCraft.Scenes
@@ -23,7 +22,7 @@ namespace FainCraft.Scenes
             var postProcess = EntityManager.SpawnEntity(new PostProcess(postShader));
 
             var ui = EntityManager.SpawnEntity<UIController>();
-            ui.Root.AddChild(new DebugStatsUI(ui.Canvas));
+            //ui.Root.AddChild(new DebugStatsUI(ui.Canvas));
 
 
             SharedVariables.PlayerPosition.Value = new PlayerPosition(new Vector3(-300, 0, 100));
