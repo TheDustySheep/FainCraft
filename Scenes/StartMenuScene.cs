@@ -13,7 +13,7 @@ public class StartMenuScene : IScene
     {
         _ui = EntityManager.SpawnEntity(new UIController());
 
-        var element = UIElementLoader.LoadXMLFile("Resources/UIElements/BaseElement.xml");
+        var element = UIElementLoader.LoadXMLFile("Resources/UIElements/BaseElement.xml", "Resources/UIElements/Styling.fss");
         if (element != null)
             _ui.Root.AddChildren(element);
     }

@@ -32,7 +32,7 @@ public class CollisionHandler
         float bestDotProd = 0f;
         Vector3 bestGroundAngle = Vector3.Zero;
 
-        // Add walls to the nearby colliders to _coords
+        // AddClass walls to the nearby colliders to _coords
         for (var i_y = minVoxel.Y; i_y <= maxVoxel.Y; i_y++)
         {
             for (var i_z = minVoxel.Z; i_z <= maxVoxel.Z; i_z++)
@@ -107,7 +107,7 @@ public class CollisionHandler
 
         colliders.Clear();
 
-        // Add walls to the nearby colliders to _coords
+        // AddClass walls to the nearby colliders to _coords
         for (var i_y = minVoxel.Y; i_y <= maxVoxel.Y; i_y++)
         {
             for (var i_z = minVoxel.Z; i_z <= maxVoxel.Z; i_z++)
@@ -142,7 +142,7 @@ public class CollisionHandler
         VoxelCoordGlobal minVoxel    = playerCoord + new VoxelCoordGlobal(-1, -1, -1);
         VoxelCoordGlobal maxVoxel    = playerCoord + new VoxelCoordGlobal( 1,  2,  1);
 
-        // Add walls to the nearby colliders to _coords
+        // AddClass walls to the nearby colliders to _coords
         for (var i_y = minVoxel.Y; i_y <= maxVoxel.Y; i_y++)
         {
             for (var i_z = minVoxel.Z; i_z <= maxVoxel.Z; i_z++)

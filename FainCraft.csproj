@@ -102,4 +102,12 @@
     <Folder Include="Resources\Voxels\Meshes\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\Users\Sean\source\repos\FainCraft\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="C:\Users\Sean\source\repos\FainCraft\.editorconfig" />
+  </ItemGroup>
+
 </Project>

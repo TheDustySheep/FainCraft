@@ -41,7 +41,7 @@ namespace FainCraft.Gameplay.OldWorldScripts.Systems.ActiveRegionControl
                 OnUnload?.Invoke(r);
             }
 
-            // 2) Walk the spiral in order; Add returns true only for brand-new items
+            // 2) Walk the spiral in order; AddClass returns true only for brand-new items
             foreach (var r in spiral)
             {
                 if (ActiveRegions.Add(r))

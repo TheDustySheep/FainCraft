@@ -20,8 +20,8 @@ namespace FainCraft.UI.Overlays
 
         public DebugStatsUI(UICanvas canvas)
         {
-            DebugGenerationTimeSignals.OnMeshGenerate    +=    MeshTimes.Add;
-            DebugGenerationTimeSignals.OnTerrianGenerate += TerrainTimes.Add;
+            DebugGenerationTimeSignals.OnMeshGenerate    +=    MeshTimes.AddClass;
+            DebugGenerationTimeSignals.OnTerrianGenerate += TerrainTimes.AddClass;
 
             Text = new UIText(canvas, GenerateText());
 
@@ -34,8 +34,8 @@ namespace FainCraft.UI.Overlays
 
         ~DebugStatsUI()
         {
-            DebugGenerationTimeSignals.OnMeshGenerate    -=    MeshTimes.Add;
-            DebugGenerationTimeSignals.OnTerrianGenerate -= TerrainTimes.Add;
+            DebugGenerationTimeSignals.OnMeshGenerate    -=    MeshTimes.AddClass;
+            DebugGenerationTimeSignals.OnTerrianGenerate -= TerrainTimes.AddClass;
 
             _timer.Dispose();
         }
@@ -52,7 +52,7 @@ namespace FainCraft.UI.Overlays
             sb.AppendLine($"");
             sb.AppendLine($"Mesh Generation");
             sb.AppendLine($" - Loaded (O): {DebugVariables.OpaqueMeshCount}");
-            sb.AppendLine($" - Loaded (T): {DebugVariables.TransparentMeshCount}");
+            sb.AppendLine($" - Loaded (TValue): {DebugVariables.TransparentMeshCount}");
             sb.AppendLine($" - Queue:  {DebugVariables.MeshQueueCount}");
             if (MeshTimes.Count > 0)
             {
