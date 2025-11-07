@@ -1,5 +1,5 @@
 ﻿using System.Drawing;
-using FainEngine_v2.UI.UIElements;
+using FainEngine_v2.UI.UIElements.Types;
 
 namespace FainCraft.UI.Panels
 {
