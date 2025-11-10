@@ -1,6 +1,6 @@
 ﻿using FainCraft.Gameplay.Motors;
 using FainEngine_v2.Core;
-using FainEngine_v2.Core.GameObjects;
+using FainEngine_v2.Entities;
 using Silk.NET.Input;
 using System.Numerics;
 

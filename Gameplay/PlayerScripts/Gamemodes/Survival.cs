@@ -1,6 +1,6 @@
 ﻿using FainCraft.Gameplay.Motors;
 using FainCraft.Gameplay.PlayerScripts.MovementState;
-using FainEngine_v2.Core.GameObjects;
+using FainEngine_v2.Entities;
 using System.Numerics;
 
 namespace FainCraft.Gameplay.PlayerScripts.Gamemodes

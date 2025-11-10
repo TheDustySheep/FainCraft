@@ -1,5 +1,4 @@
-﻿using FainEngine_v2.Core.GameObjects;
-using FainEngine_v2.Entities;
+﻿using FainEngine_v2.Entities;
 using FainEngine_v2.Rendering.Cameras;
 
 namespace FainCraft.Gameplay.PlayerScripts;

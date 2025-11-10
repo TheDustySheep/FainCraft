@@ -1,7 +1,5 @@
 ﻿using FainCraft.Gameplay.WorldEntities;
-using FainCraft.Gameplay.OldWorldScripts;
 using FainEngine_v2.Core;
-using FainEngine_v2.Core.GameObjects;
 using FainEngine_v2.Physics;
 using FainEngine_v2.Physics.AABB;
 using FainEngine_v2.Utils;
@@ -10,6 +8,7 @@ using Silk.NET.Maths;
 using FainCraft.Gameplay.WorldScripts.Coords;
 using FainCraft.Gameplay.WorldScripts.Data.Voxels;
 using FainCraft.Gameplay.WorldScripts.Storage;
+using FainEngine_v2.Entities;
 
 namespace FainCraft.Gameplay.PlayerScripts;
 

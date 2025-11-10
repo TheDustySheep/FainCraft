@@ -1,7 +1,7 @@
 ﻿using FainCraft.Gameplay.Motors;
 using FainCraft.Gameplay.PlayerScripts.Gamemodes;
 using FainEngine_v2.Core;
-using FainEngine_v2.Core.GameObjects;
+using FainEngine_v2.Entities;
 using FainEngine_v2.Extensions;
 using FainEngine_v2.Utils;
 using Silk.NET.Input;

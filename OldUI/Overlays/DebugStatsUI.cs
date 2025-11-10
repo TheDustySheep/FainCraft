@@ -25,7 +25,7 @@ namespace FainCraft.UI.Overlays
 
             Text = new UIText(canvas, GenerateText());
 
-            AddChildren(Text);
+            AddChild(Text);
 
             LayoutAxis = Layout.Axis.Y;
 

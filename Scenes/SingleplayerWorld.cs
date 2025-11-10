@@ -8,6 +8,7 @@ using FainEngine_v2.Rendering.PostProcessing;
 using FainEngine_v2.Resources;
 using System.Numerics;
 using FainCraft.Gameplay.WorldScripts;
+using FainEngine_v2.UI.FontRendering;
 
 namespace FainCraft.Scenes
 {
@@ -21,7 +22,8 @@ namespace FainCraft.Scenes
             var postShader = ResourceLoader.LoadShader(@"Resources\Shaders\PostProcessing\");
             var postProcess = EntityManager.SpawnEntity(new PostProcess(postShader));
 
-            var ui = EntityManager.SpawnEntity<UIController>();
+            var ui = EntityManager.SpawnEntity(new UIController());
+            //ui.AddCanvas();
             //ui.Root.AddChild(new DebugStatsUI(ui.Canvas));
 
 

@@ -14,12 +14,12 @@ namespace FainCraft.UI.Panels
             XSizeMode = Layout.SizeMode.Grow;
             YSizeMode = Layout.SizeMode.Grow;
 
-            AddChildren(
+            AddChild(
                 new UIElement()
                 {
                     BackgroundColour = Color.BlanchedAlmond,
                 }
-                .AddChildren(
+                .AddChild(
                     new UIText(canvas, "Singleplayer"),
                     new UIText(canvas, "Options"),
                     new UIText(canvas, "Exit")
