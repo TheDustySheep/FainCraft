@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "dgSpecHash": "Uvd1ZlzpzVA=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Sean\\source\\repos\\FainCraft\\FainCraft.Server\\FainCraft.Server.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Sean\\.nuget\\packages\\simpletcp\\1.0.24\\simpletcp.1.0.24.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "message": "Package 'SimpleTCP 1.0.24' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net9.0'. This package may not be fully compatible with your project.",
+      "projectPath": "C:\\Users\\Sean\\source\\repos\\FainCraft\\FainCraft.Server\\FainCraft.Server.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\Sean\\source\\repos\\FainCraft\\FainCraft.Server\\FainCraft.Server.csproj",
+      "libraryId": "SimpleTCP",
+      "targetGraphs": [
+        "net9.0"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+[
+  {
+    "Name": "Air",
+
+    "Draw_Self": false,
+    "Draw_Opaque": false,
+
+    "Physics_Solid": false,
+
+    "Light_Opaque": false
+  },
+  {
+    "Name": "Grass",
+
+    "Foliage_Biome_Blend": [ false, false, false, true, false, false ],
+
+    "Textures": [ 3, 3, 0, 2, 3, 3 ]
+  },
+  {
+    "Name": "Dirt",
+    "Textures": [ 2 ]
+  },
+  {
+    "Name": "Sand",
+    "Textures": [ 18 ]
+  },
+  {
+    "Name": "Stone",
+    "Textures": [ 1 ]
+  },
+  {
+    "Name": "Cobblestone",
+    "Textures": [ 16 ]
+  },
+  {
+    "Name": "Cobblestone_Slab",
+    "Draw_Opaque": false,
+    "Textures": [ 16, 16, 16, 16, 16, 16 ],
+    "Custom_Mesh": "half_slab.obj"
+  },
+  {
+    "Name": "Planks",
+    "Textures": [ 4 ]
+  },
+  {
+    "Name": "Log",
+    "Textures": [ 20, 20, 21, 21, 20, 20 ]
+  },
+  {
+    "Name": "Leaves",
+
+    "Draw_Opaque": false,
+
+    "Foliage_Biome_Blend": [ true ],
+    "Foliage_Animate": true,
+
+    "Textures": [ 52 ],
+
+    "Light_Opaque": false
+  },
+  {
+    "Name": "Water",
+
+    "Draw_Opaque": false,
+    "Draw_Transparent": true,
+    "Draw_Similar": false,
+
+    "Textures": [ 14 ],
+    "Physics_Solid": false,
+
+    "Is_Fluid": true,
+
+    "Light_Opaque": false,
+
+    "Foliage_Biome_Blend": [ false ]
+  },
+  {
+    "Name": "Glass",
+
+    "Draw_Opaque": false,
+
+    "Textures": [ 63 ],
+
+    "Light_Opaque": true,
+
+    "Foliage_Biome_Blend": [ false ]
+  },
+  {
+    "Name": "Snow",
+    "Textures": [ 66 ]
+  },
+  {
+    "Name": "Snow_Grass",
+    "Textures": [ 68, 68, 66, 2, 68, 68 ]
+  }
+]

@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<UIElement style="
+		   align: center; 
+		   justify: center; 
+		   mode-width: flex; 
+		   mode-height: flex;">
+	<UIElement class="parent-box">
+		<UIElement class="text-box">
+			<Label class="text-data">Start</Label>
+		</UIElement>
+		<UIElement class="text-box">
+			<Label class="text-data">Load</Label>
+		</UIElement>
+		<UIElement class="text-box">
+			<Label class="text-data">Settings</Label>
+		</UIElement>
+		<UIElement class="text-box">
+			<Label class="text-data">Exit</Label>
+		</UIElement>
+	</UIElement>
+</UIElement>

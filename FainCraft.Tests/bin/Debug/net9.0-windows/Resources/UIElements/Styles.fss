@@ -1,0 +1,28 @@
+.class-1 {
+	col-1: #2A2B2A;
+	col-2: #5E4955;
+	col-3: #996888;
+	col-4: #C99DA3;
+	col-5: #C6DDF0;
+}
+
+.parent-box {
+	gap: 16;
+	padding: 16;
+	colour: #2A2B2A;
+}
+
+.text-box {
+	x-size-mode: flex; 
+	y-size-mode: fit;
+	padding: 8;
+	color: #5E4955; 
+	font: tinos-regular; 
+	font-size: 40; 
+	align: center; 
+	justify: center;
+}
+
+.text-data {
+	font: tinos-regular;
+}
