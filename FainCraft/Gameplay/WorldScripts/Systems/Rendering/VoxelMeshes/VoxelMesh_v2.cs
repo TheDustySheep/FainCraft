@@ -9,13 +9,12 @@ using static FainCraft.Gameplay.WorldScripts.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.VoxelMeshes;
 
-public sealed class VoxelMesh_v2 : IMesh
+public sealed class VoxelMesh_v2 : GLObject, IMesh
 {
     public bool ClipBounds { get; set; } = true;
     public BoundingBox Bounds { get; }
 
     private uint triangleCount = 0;
-    private GL _gl { get; }
 
     private VertexArrayObject<VoxelVertex, uint> VAO { get; }
     private BufferObject<VoxelVertex> VBO { get; }
@@ -26,13 +25,11 @@ public sealed class VoxelMesh_v2 : IMesh
 
     public VoxelMesh_v2(MeshFaceBuffer meshFaceBuffer)
     {
-        _gl = GameGraphics.GL;
-
         _meshFaceBuffer = meshFaceBuffer;
 
         EBO = new BufferObject<uint>(BufferTargetARB.ElementArrayBuffer);
         VBO = new BufferObject<VoxelVertex>(BufferTargetARB.ArrayBuffer);
-        VAO = new VertexArrayObject<VoxelVertex, uint>(_gl, VBO, EBO);
+        VAO = new VertexArrayObject<VoxelVertex, uint>(VBO, EBO);
 
         _lightingSSBO = new LightingSSBO();
 
@@ -42,7 +39,7 @@ public sealed class VoxelMesh_v2 : IMesh
             Max = Vector3.One * CHUNK_SIZE
         };
 
-        VertexAttributes.SetVertexAttributes(_gl, VAO);
+        VertexAttributes.SetVertexAttributes(_GL, VAO);
     }
 
     public void UpdateData(VoxelMeshData data)
@@ -73,16 +70,7 @@ public sealed class VoxelMesh_v2 : IMesh
         _meshFaceBuffer.Bind(0);
         _lightingSSBO.Bind(1);
 
-        _gl.DrawElementsBaseVertex(PrimitiveType.Triangles, triangleCount, DrawElementsType.UnsignedInt, (void*)0, 0);
-    }
-
-    public void Dispose()
-    {
-        _lightingSSBO.Dispose();
-        VAO.Dispose();
-        VBO.Dispose();
-        EBO.Dispose();
-        GC.SuppressFinalize(this);
+        _GL.DrawElementsBaseVertex(PrimitiveType.Triangles, triangleCount, DrawElementsType.UnsignedInt, (void*)0, 0);
     }
 
     internal void UpdateLighting(ReadOnlySpan<LightData> span)
@@ -90,5 +78,11 @@ public sealed class VoxelMesh_v2 : IMesh
         _lightingSSBO.SetData(span);
     }
 
-    ~VoxelMesh_v2() => Dispose();
+    protected override void Release()
+    {
+        _lightingSSBO.Dispose();
+        VAO.Dispose();
+        VBO.Dispose();
+        EBO.Dispose();
+    }
 }

@@ -8,7 +8,7 @@ using FainEngine_v2.Collections;
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGenerationSystems;
 
 /// <summary>
-/// Manages mesh generation for chunks in a voxel world.
+/// Manages _mesh generation for chunks in a voxel world.
 /// Uses MeshGenerationQueue to handle requests, concurrency, and threading.
 /// </summary>
 internal class MeshGenerationSystem : IMeshGenerationSystem, IDisposable

@@ -1,17 +1,18 @@
 ﻿using FainCraft.UI.Panels;
 using FainEngine_v2.Core;
 using FainEngine_v2.Entities;
-using FainEngine_v2.UI.UIElements;
 
 namespace FainCraft.Scenes;
 
 public class StartMenuScene : IScene
 {
-    //UIController? _ui;
+    EntityManager? _entityManager = null;
+    //UIController? _ui = null;
 
     public void OnLoad()
     {
-        //_ui = EntityManager.Spawn(new UIController());
+        _entityManager = new EntityManager();
+        //_ui = _entityManager.Spawn(new UIController());
         //
         //_ui.AddCanvas(
         //    UIElementLoader.LoadCanvas(
@@ -23,16 +24,16 @@ public class StartMenuScene : IScene
 
     public void Update()
     {
-
+        _entityManager?.Update();
     }
 
     public void FixedUpdate()
     {
-
+        _entityManager?.FixedUpdate();
     }
 
     public void OnUnload()
     {
-
+        _entityManager?.DespawnAll();
     }
 }

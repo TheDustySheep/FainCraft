@@ -18,7 +18,7 @@ namespace FainCraft.UI.Overlays
 
         Timer _timer;
 
-        public DebugStatsUI(UICanvas canvas)
+        public DebugStatsUI(ScreenCanvas canvas)
         {
             DebugGenerationTimeSignals.OnMeshGenerate    +=    MeshTimes.AddClass;
             DebugGenerationTimeSignals.OnTerrianGenerate += TerrainTimes.AddClass;

@@ -6,7 +6,7 @@ namespace FainCraft.UI.Panels
     public class StartMenuUIPanel : UIElement
     {
         /*
-        public StartMenuUIPanel(UICanvas canvas)
+        public StartMenuUIPanel(ScreenCanvas canvas)
         {
             Align = Layout.Align.Center;
             Justify = Layout.Justify.Center;

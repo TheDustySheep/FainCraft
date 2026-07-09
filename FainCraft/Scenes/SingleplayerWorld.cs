@@ -4,6 +4,7 @@ using FainCraft.Gameplay.WorldScripts;
 using FainEngine_v2.Core;
 using FainEngine_v2.Rendering.PostProcessing;
 using FainEngine_v2.Resources;
+using FainEngine_v2.UI.Rendering;
 using System.Numerics;
 
 namespace FainCraft.Scenes
@@ -26,6 +27,7 @@ namespace FainCraft.Scenes
             SharedVariables.PlayerPosition.Value = new PlayerPosition(new Vector3(-300, 0, 100));
             var world = _entityManager.Spawn(new Level());
             var player = _entityManager.Spawn(new PlayerEntity(world));
+            _entityManager.Spawn(new UICanvasRenderer());
         }
 
         public void Update()

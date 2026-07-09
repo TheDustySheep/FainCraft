@@ -39,10 +39,10 @@ public class RegionActivator : IRegionActivator, IDisposable
     /// </summary>
     public void Tick()
     {
-        // Recalculate which regions to load/unload; will raise Load/Unload events
+        // Draw which regions to load/unload; will raise Load/Unload events
         _radius.Calculate();
 
-        // UpdateLayout any pending region-set operations on main thread
+        // Solve any pending region-set operations on main thread
         while (_applyQueue.TryDequeue(out var item))
         {
             _regionDataStore.SetRegion(item.coord, item.data);
