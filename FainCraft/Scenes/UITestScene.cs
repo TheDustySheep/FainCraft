@@ -1,5 +1,6 @@
 ﻿using FainEngine_v2.Core;
 using FainEngine_v2.UI.Rendering;
+using FainEngine_v2.UI.Styling.Fonts.AtlasFont;
 
 namespace FainCraft.Scenes;
 internal class UITestScene : IScene
@@ -9,6 +10,7 @@ internal class UITestScene : IScene
     public void OnLoad()
     {
         _entityManager.Spawn(new UICanvasRenderer());
+        //FontAtlasBuilder.RequestFont(null, 32, out var atlas);
     }
 
     public void Update()
