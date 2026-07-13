@@ -43,6 +43,7 @@ namespace FainCraft.Scenes
         public void OnUnload()
         {
             _entityManager.DespawnAll();
+            _player = null!;
         }
     }
 }

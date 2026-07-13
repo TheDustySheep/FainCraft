@@ -12,6 +12,7 @@ namespace FainCraft.Gameplay.PlayerScripts.MovementState
     {
         private readonly EntityMotor _motor;
         private readonly Transform _camTransform;
+        private readonly IGameInputs _gameInputs;
 
         private float _swimSpeed   = 2f;
         private float _swimUpSpeed = 0.5f;
@@ -20,6 +21,7 @@ namespace FainCraft.Gameplay.PlayerScripts.MovementState
         {
             _motor = motor;
             _camTransform = camTransform;
+            _gameInputs = DependencyInjector.Resolve<IGameInputs>();
         }
 
         public void OnEnter()
@@ -37,7 +39,7 @@ namespace FainCraft.Gameplay.PlayerScripts.MovementState
             velocity.Z = movements.Z;
 
             // Jumping
-            if (GameInputs.IsKeyHeld(Key.Space))
+            if (_gameInputs.IsKeyHeld(Key.Space))
             {
                 float force = MathF.Sqrt(2 * _motor.Gravity * _swimUpSpeed);
                 velocity.Y = force;

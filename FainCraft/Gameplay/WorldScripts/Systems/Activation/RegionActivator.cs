@@ -42,7 +42,7 @@ public class RegionActivator : IRegionActivator, IDisposable
         // Draw which regions to load/unload; will raise Load/Unload events
         _radius.Calculate();
 
-        // Solve any pending region-set operations on main thread
+        // SetAllStyles any pending region-set operations on main thread
         while (_applyQueue.TryDequeue(out var item))
         {
             _regionDataStore.SetRegion(item.coord, item.data);

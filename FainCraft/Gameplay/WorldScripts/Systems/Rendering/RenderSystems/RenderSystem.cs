@@ -5,6 +5,7 @@ using FainCraft.Gameplay.WorldScripts.Systems.Rendering.VoxelMeshes;
 using FainEngine_v2.Collections;
 using FainEngine_v2.Rendering;
 using FainEngine_v2.Rendering.Materials;
+using FainEngine_v2.Utils;
 using System.Numerics;
 using static FainCraft.Gameplay.WorldScripts.WorldConstants;
 
@@ -19,10 +20,14 @@ internal class RenderSystem : IRenderSystem, IDisposable
     readonly Material _opaqueMaterial;
     readonly Material _transparentMaterial;
 
+    readonly IGameGraphics _graphics;
+
     public event Action<ChunkCoord>? OnMeshAdded;
 
     public RenderSystem(Material opaqueMaterial, Material transparentMaterial, IServiceProvider serviceProvider)
     {
+        _graphics = DependencyInjector.Resolve<IGameGraphics>();
+
         var indexer = serviceProvider.Get<IVoxelIndexer>();
         _buffer   = new MeshFaceBuffer(indexer.MeshQuads);
         _meshPool = new(() => new VoxelMesh_v2(_buffer));
@@ -44,7 +49,7 @@ internal class RenderSystem : IRenderSystem, IDisposable
                 continue;
 
             var model = Matrix4x4.CreateTranslation(coord.GlobalMin);
-            GameGraphics.DrawMesh(mesh, _opaqueMaterial, model);
+            _graphics.DrawMesh(mesh, _opaqueMaterial, model);
         }
 
         foreach ((var coord, var mesh) in _transparentMeshes)
@@ -53,7 +58,7 @@ internal class RenderSystem : IRenderSystem, IDisposable
                 continue;
 
             var model = Matrix4x4.CreateTranslation(coord.GlobalMin);
-            GameGraphics.DrawMesh(mesh, _transparentMaterial, model);
+            _graphics.DrawMesh(mesh, _transparentMaterial, model);
         }
     }
 

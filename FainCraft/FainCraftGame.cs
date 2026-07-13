@@ -9,16 +9,14 @@ internal class FainCraftGame : FainGameEngine
 
     public FainCraftGame() : base(1600, 900, windowTitle: "FainCraft")
     {
-        RegisterUIDependencies();
-
-        _sceneManager = DependencyInjector.RegisterSingleton(() => new SceneManager(new SceneFactory()));
+        _sceneManager = DependencyInjector.RegisterSingleton(new SceneManager(new SceneFactory()));
     }
 
     protected override void Update()
     {
         base.Update();
 
-        if (GameInputs.IsKeyDown(Silk.NET.Input.Key.N))
+        if (gameInputs.IsKeyDown(Silk.NET.Input.Key.N))
             NextScene();
 
         _sceneManager.Update();
@@ -40,8 +38,8 @@ internal class FainCraftGame : FainGameEngine
 
         IScene scene = sceneIdx switch
         {
-            0 => new UITestScene(),
-            1 => new SingleplayerWorld(),
+            0 => new SingleplayerWorld(),
+            1 => new UITestScene(),
             _ => new EmptyScene(),
         };
         _sceneManager.LoadScene(scene);
@@ -50,15 +48,5 @@ internal class FainCraftGame : FainGameEngine
     protected override void Load()
     {
         NextScene();
-    }
-
-    private void RegisterUIDependencies()
-    {
-
-        //var fontController = new FontController();
-        // var uiMatManager = new UIMaterialManager(fontController);
-
-        //DependencyInjector.RegisterSingleton<IFontController>(fontController);
-        //DependencyInjector.RegisterSingleton<UIMaterialManager>(uiMatManager);
     }
 }

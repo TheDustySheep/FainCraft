@@ -10,8 +10,8 @@ using System.Numerics;
 namespace FainCraft.Gameplay.PlayerScripts;
 internal class PlayerCharacterController
 {
-    readonly Transform camTransform;
-    readonly EntityMotor motor;
+    readonly Transform _camTransform;
+    readonly EntityMotor _motor;
 
     readonly float lookSensitivity = 0.1f;
     Vector2 CameraRotation;
@@ -21,10 +21,14 @@ internal class PlayerCharacterController
     private readonly Survival _survival;
     private readonly NoClip   _noclip;
 
+    private readonly IGameInputs _gameInputs;
+
     public PlayerCharacterController(Transform camTransform, EntityMotor motor)
     {
-        this.camTransform = camTransform;
-        this.motor = motor;
+        _gameInputs = DependencyInjector.Resolve<IGameInputs>();
+
+        _camTransform = camTransform;
+        _motor = motor;
 
         _survival = new Survival(motor, camTransform);
         _noclip   = new NoClip  (motor, camTransform);
@@ -40,15 +44,15 @@ internal class PlayerCharacterController
         UpdateRotation();
         UpdatePosition();
 
-        if (GameInputs.IsKeyDown(Key.Escape))
-            GameInputs.ExitProgram();
+        if (_gameInputs.IsKeyDown(Key.Escape))
+            _gameInputs.ExitProgram();
     }
 
     private void UpdateGamemode()
     {
-        if (GameInputs.IsKeyDown(Key.G))
+        if (_gameInputs.IsKeyDown(Key.G))
             _gamemodeStateMachine.EnterState(_survival);
-        else if (GameInputs.IsKeyDown(Key.H))
+        else if (_gameInputs.IsKeyDown(Key.H))
             _gamemodeStateMachine.EnterState(_noclip);
     }
 
@@ -59,14 +63,14 @@ internal class PlayerCharacterController
 
     private void UpdateRotation()
     {
-        var mouseDelta = GameInputs.MouseDelta;
+        var mouseDelta = _gameInputs.MouseDelta;
 
         if (mouseDelta != default)
         {
             CameraRotation += mouseDelta * lookSensitivity;
 
             CameraRotation.Y = Math.Clamp(CameraRotation.Y, -89.0f, 89.0f);
-            camTransform.LocalRotation = Quaternion.CreateFromYawPitchRoll
+            _camTransform.LocalRotation = Quaternion.CreateFromYawPitchRoll
             (
                 MathUtils.DegreesToRadians(CameraRotation.X),
                 MathUtils.DegreesToRadians(CameraRotation.Y),
@@ -80,14 +84,14 @@ internal class PlayerCharacterController
     {
         Vector2 input = Vector2.Zero;
 
-        if (GameInputs.IsKeyHeld(Key.W))
+        if (_gameInputs.IsKeyHeld(Key.W))
             input.Y += 1f;
-        if (GameInputs.IsKeyHeld(Key.S))
+        if (_gameInputs.IsKeyHeld(Key.S))
             input.Y -= 1f;
 
-        if (GameInputs.IsKeyHeld(Key.A))
+        if (_gameInputs.IsKeyHeld(Key.A))
             input.X -= 1f;
-        if (GameInputs.IsKeyHeld(Key.D))
+        if (_gameInputs.IsKeyHeld(Key.D))
             input.X += 1f;
 
         return input.Normalized();

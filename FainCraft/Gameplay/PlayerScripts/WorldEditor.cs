@@ -9,6 +9,7 @@ using FainCraft.Gameplay.WorldScripts.Coords;
 using FainCraft.Gameplay.WorldScripts.Data.Voxels;
 using FainCraft.Gameplay.WorldScripts.Storage;
 using FainEngine_v2.Entities;
+using FainEngine_v2.Rendering;
 
 namespace FainCraft.Gameplay.PlayerScripts;
 
@@ -18,6 +19,7 @@ internal class WorldEditor
     private readonly IVoxelIndexer _indexer;
     private readonly IVoxelDataStore _voxelDataStore;
     private readonly IWorldEntityController _entityController;
+    private readonly IGameInputs _gameInputs;
 
     public WorldEditor(Transform camTransform, IServiceProvider provider)
     {
@@ -25,6 +27,7 @@ internal class WorldEditor
         _indexer = provider.Get<IVoxelIndexer>();
         _voxelDataStore = provider.Get<IVoxelDataStore>();
         _entityController = provider.Get<IWorldEntityController>();
+        _gameInputs = DependencyInjector.Resolve<IGameInputs>();
     }
 
     public void Update()
@@ -33,11 +36,11 @@ internal class WorldEditor
         {
             Gizmos.DrawVoxel(hit.VoxelPosition, System.Drawing.Color.Red);
 
-            if (GameInputs.IsMouseDown(MouseButton.Left))
+            if (_gameInputs.IsMouseDown(MouseButton.Left))
             {
                 EditVoxel(hit.VoxelPosition, new VoxelState() { Index = 0 });
             }
-            else if (GameInputs.IsMouseDown(MouseButton.Right))
+            else if (_gameInputs.IsMouseDown(MouseButton.Right))
             {
                 var faceVox = hit.VoxelPosition + hit.VoxelNormal;
 

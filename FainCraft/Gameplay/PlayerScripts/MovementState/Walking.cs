@@ -12,6 +12,8 @@ namespace FainCraft.Gameplay.PlayerScripts.MovementState
     {
         private readonly EntityMotor _motor;
         private readonly Transform _camTransform;
+        private readonly IGameTime _gameTime;
+        private readonly IGameInputs _gameInputs;
 
         bool _isSprinting;
         float jumpCooldown = 0f;
@@ -24,6 +26,9 @@ namespace FainCraft.Gameplay.PlayerScripts.MovementState
         {
             _motor = motor;
             _camTransform = camTransform;
+
+            _gameTime   = DependencyInjector.Resolve<IGameTime>();
+            _gameInputs = DependencyInjector.Resolve<IGameInputs>();
         }
 
         public void OnEnter()
@@ -40,20 +45,20 @@ namespace FainCraft.Gameplay.PlayerScripts.MovementState
             velocity.X = movements.X;
             velocity.Z = movements.Z;
 
-            if (GameInputs.IsKeyHeld(Key.ControlLeft))
+            if (_gameInputs.IsKeyHeld(Key.ControlLeft))
                 _isSprinting = true;
 
             // Jumping
-            if (GameInputs.IsKeyHeld(Key.Space) && _motor.GroundedState.IsGrounded && jumpCooldown == 0f)
+            if (_gameInputs.IsKeyHeld(Key.Space) && _motor.GroundedState.IsGrounded && jumpCooldown == 0f)
             {
                 float force = MathF.Sqrt(2 * _motor.Gravity * 1.25f);
                 velocity.Y = force;
                 jumpCooldown = jumpPeriod;
             }
-            jumpCooldown = MathUtils.Max(0f, jumpCooldown - GameTime.DeltaTime);
+            jumpCooldown = MathUtils.Max(0f, jumpCooldown - _gameTime.DeltaTime);
 
             // Flying
-            if (GameInputs.IsKeyHeld(Key.F))
+            if (_gameInputs.IsKeyHeld(Key.F))
             {
                 velocity = _camTransform.Forward * 100f;
             }

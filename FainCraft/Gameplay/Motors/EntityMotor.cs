@@ -54,13 +54,17 @@ public class EntityMotor
     Vector3 _currentVelocity;
     Vector3 _playerSize = new Vector3(0.4f, 1.8f, 0.4f);
 
+    readonly IGameTime _gameTime;
+
     public EntityMotor(CollisionHandler collisionHandler, Transform transform)
     {
+        _gameTime = DependencyInjector.Resolve<IGameTime>();
+
         _transform = transform;
         _collisionHandler = collisionHandler;
         _currentPosition = TransformPosition;
         _lastPosition = TransformPosition;
-        _lastTime = GameTime.TotalTime;
+        _lastTime = _gameTime.TotalTime;
     }
 
     #region Public Functions
@@ -73,7 +77,7 @@ public class EntityMotor
     private Vector3 InterpolatePosition()
     {
         // One frame in the past
-        float t = MathUtils.InvLerp(_lastTime, _lastTime + GameTime.FixedDeltaTime, GameTime.TotalTime);
+        float t = MathUtils.InvLerp(_lastTime, _lastTime + GameTime.FixedDeltaTime, _gameTime.TotalTime);
         t = MathUtils.Clamp01(t);
         return Vector3.Lerp(_lastPosition, _currentPosition, t);
     }
@@ -95,7 +99,7 @@ public class EntityMotor
     private void UpdateInitialInternals()
     {
         _lastPosition = _currentPosition;
-        _lastTime = GameTime.TotalTime;
+        _lastTime = _gameTime.TotalTime;
     }
 
     public void HandleCollisions()
