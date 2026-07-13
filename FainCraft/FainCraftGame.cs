@@ -1,6 +1,7 @@
 ﻿using FainCraft.Scenes;
 using FainEngine_v2.Core;
 using FainEngine_v2.Utils;
+using Silk.NET.Assimp;
 
 namespace FainCraft;
 internal class FainCraftGame : FainGameEngine
@@ -16,8 +17,8 @@ internal class FainCraftGame : FainGameEngine
     {
         base.Update();
 
-        if (gameInputs.IsKeyDown(Silk.NET.Input.Key.N))
-            NextScene();
+        if (gameInputs!.IsKeyDown(Silk.NET.Input.Key.N))
+            _sceneManager.LoadScene(new StartMenuScene());
 
         _sceneManager.Update();
     }
@@ -29,24 +30,8 @@ internal class FainCraftGame : FainGameEngine
         _sceneManager.FixedUpdate();
     }
 
-    int sceneIdx = -1;
-    private void NextScene()
-    {
-        sceneIdx++;
-        if (sceneIdx > 2)
-            sceneIdx = 0;
-
-        IScene scene = sceneIdx switch
-        {
-            0 => new SingleplayerWorld(),
-            1 => new UITestScene(),
-            _ => new EmptyScene(),
-        };
-        _sceneManager.LoadScene(scene);
-    }
-
     protected override void Load()
     {
-        NextScene();
+        _sceneManager.LoadScene(new StartMenuScene());
     }
 }

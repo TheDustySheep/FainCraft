@@ -1,21 +1,31 @@
-﻿using FainEngine_v2.Core;
+﻿using FainCraft.UI;
+using FainEngine_v2.Core;
 using FainEngine_v2.UI.Rendering;
-using FainEngine_v2.UI.Styling.Fonts.AtlasFont;
+using FainEngine_v2.Utils;
 
 namespace FainCraft.Scenes;
 internal class UITestScene : IScene
 {
     EntityManager _entityManager = new();
+    IGameInputs _gameInputs;
+    FPSPanel? _panel;
+
+    public UITestScene()
+    {
+        _gameInputs = DependencyInjector.Resolve<IGameInputs>();
+    }
 
     public void OnLoad()
     {
-        _entityManager.Spawn(new UICanvasRenderer());
-        //FontAtlasBuilder.RequestFont(null, 32, out var atlas);
+        _panel = new FPSPanel();
+        _entityManager.Spawn(new UICanvasRenderer(_panel));
+        _gameInputs.SetCursorMode(Silk.NET.Input.CursorMode.Normal);
     }
 
     public void Update()
     {
         _entityManager.Update();
+        _panel.Update();
     }
 
     public void FixedUpdate()
