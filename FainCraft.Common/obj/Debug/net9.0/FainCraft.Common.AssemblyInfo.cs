@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FainCraft.Common")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+270b7cb0e54929c2c9ba3054bf398d72243adede")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fe0cef57b1a7f66830f952291d34ecebc17c1963")]
 [assembly: System.Reflection.AssemblyProductAttribute("FainCraft.Common")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FainCraft.Common")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

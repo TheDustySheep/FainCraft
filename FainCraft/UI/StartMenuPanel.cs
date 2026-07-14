@@ -10,9 +10,9 @@ internal class StartMenuPanel : UIElement
     {
         Styles = new FainEngine_v2.UI.Styling.ElementStyles()
         {
-            SizeMode = FainEngine_v2.UI.Styling.Fss.Styling.Styles.SizeMode.Fit,
+            SizeMode = FainEngine_v2.UI.Fss.Styles.SizeMode.Fit,
 
-            Axis = FainEngine_v2.UI.Styling.Fss.Styling.Styles.LayoutAxis.Y,
+            Axis = FainEngine_v2.UI.Fss.Styles.LayoutAxis.Y,
             ChildGap = 20,
             Padding = 16,
             BackgroundColour = Color.Crimson
@@ -30,7 +30,7 @@ internal class StartMenuPanel : UIElement
             {
                 BackgroundColour = Color.Beige,
                 XPadding = 10,
-                XSizeMode = FainEngine_v2.UI.Styling.Fss.Styling.Styles.SizeMode.Grow
+                XSizeMode = FainEngine_v2.UI.Fss.Styles.SizeMode.Grow
             }
         });
         elem.Events.OnMouseClicked += () => loadScene.Invoke(new T());

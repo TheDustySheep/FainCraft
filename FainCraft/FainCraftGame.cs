@@ -1,7 +1,8 @@
 ﻿using FainCraft.Scenes;
 using FainEngine_v2.Core;
+using FainEngine_v2.UI.Fss.Parsing;
+using FainEngine_v2.UI.Fss.Parsing.Selectors;
 using FainEngine_v2.Utils;
-using Silk.NET.Assimp;
 
 namespace FainCraft;
 internal class FainCraftGame : FainGameEngine
@@ -10,7 +11,14 @@ internal class FainCraftGame : FainGameEngine
 
     public FainCraftGame() : base(1600, 900, windowTitle: "FainCraft")
     {
+        DependencyInjector.RegisterSingleton<IStylesheetLoader>(
+            new StylesheetLoader(
+                new SelectorParser(),
+                new StylesParser()
+        ));
+
         _sceneManager = DependencyInjector.RegisterSingleton(new SceneManager(new SceneFactory()));
+
     }
 
     protected override void Update()
@@ -32,6 +40,6 @@ internal class FainCraftGame : FainGameEngine
 
     protected override void Load()
     {
-        _sceneManager.LoadScene(new StartMenuScene());
+        _sceneManager.LoadScene(new UITestScene());
     }
 }
