@@ -2,6 +2,8 @@
 using FainEngine_v2.Core;
 using FainEngine_v2.UI.Fss.Parsing;
 using FainEngine_v2.UI.Fss.Parsing.Selectors;
+using FainEngine_v2.UI.Fss.Parsing.Stylesheets;
+using FainEngine_v2.UI.UIElements;
 using FainEngine_v2.Utils;
 
 namespace FainCraft;
@@ -13,9 +15,15 @@ internal class FainCraftGame : FainGameEngine
     {
         DependencyInjector.RegisterSingleton<IStylesheetLoader>(
             new StylesheetLoader(
-                new SelectorParser(),
+                new SelectorPipeline(),
                 new StylesParser()
         ));
+
+        DependencyInjector.RegisterSingleton<IUIElementLoader>(
+            new UIElementLoader(
+                new StylesParser()
+            )
+        );
 
         _sceneManager = DependencyInjector.RegisterSingleton(new SceneManager(new SceneFactory()));
 

@@ -1,30 +1,30 @@
 ﻿using FainEngine_v2.Core;
 using FainEngine_v2.UI.Fss;
-using FainEngine_v2.UI.Fss.Parsing;
+using FainEngine_v2.UI.Fss.Parsing.Stylesheets;
 using FainEngine_v2.UI.Rendering;
 using FainEngine_v2.UI.UIElements;
 using FainEngine_v2.UI.UIElements.Types;
 using FainEngine_v2.Utils;
+using Silk.NET.Windowing;
 
 namespace FainCraft.Scenes;
 internal class UITestScene : IScene
 {
     EntityManager _entityManager = new();
     IGameInputs _gameInputs;
+    IWindow _window;
 
     public UITestScene()
     {
         _gameInputs = DependencyInjector.Resolve<IGameInputs>();
+        _window = DependencyInjector.Resolve<IWindow>();
     }
 
     public void OnLoad()
     {
         _gameInputs.SetCursorMode(Silk.NET.Input.CursorMode.Normal);
-        
-        UIElementLoader loader = new UIElementLoader();
-        UIElement? elem = loader.LoadFile("Resources/UIElements/PauseMenu.xml");
-        if (elem == null)
-            elem = new();
+
+        var elem = LoadPauseMenuElement();
 
         var sheetLoader = DependencyInjector.Resolve<IStylesheetLoader>();
 
@@ -33,6 +33,35 @@ internal class UITestScene : IScene
         var uiRenderer = _entityManager.Spawn(new UICanvasRenderer(elem));
 
         uiRenderer.Canvas.AddClasses(classes);
+    }
+
+    private UIElement LoadPauseMenuElement()
+    {
+        var loader = DependencyInjector.Resolve<IUIElementLoader>();
+
+        UIElement? elem = loader.LoadFile("Resources/UIElements/PauseMenu.xml");
+        if (elem == null)
+            elem = new();
+
+        elem.Query()
+            .FilterID("resume-button")
+            .First()
+            .Events
+            .OnMouseClicked += () => Console.WriteLine("Open resume menu");
+
+        elem.Query()
+            .FilterID("settings-button")
+            .First()
+            .Events
+            .OnMouseClicked += () => Console.WriteLine("Open settings menu");
+
+        elem.Query()
+            .FilterID("exit-button")
+            .First()
+            .Events
+            .OnMouseClicked += _window.Close;
+
+        return elem;
     }
 
     public void Update()

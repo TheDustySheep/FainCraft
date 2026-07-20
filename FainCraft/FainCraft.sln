@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.7.11925.98 stable
+VisualStudioVersion = 18.7.11925.98
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FainCraft", "FainCraft.csproj", "{746B55EA-1C72-7806-77E1-464463660664}"
 EndProject
@@ -16,6 +16,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FainCraft.Server", "..\FainCraft.Server\FainCraft.Server.csproj", "{87A9E52E-71E1-4355-BF61-EC289B40DA24}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FainEngine_v2.UI.Tests", "..\..\FainEngine_v2\FainEngine_v2.UI.Tests\FainEngine_v2.UI.Tests.csproj", "{C8E3F177-E0ED-7D46-D8D2-CD45EBC4FAE0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{92F17E35-2A8A-B554-99AF-02DAD1D2E3EC} = {92F17E35-2A8A-B554-99AF-02DAD1D2E3EC}
+		{DA71772A-464C-BBF3-99C3-8909BF706A29} = {DA71772A-464C-BBF3-99C3-8909BF706A29}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,7 +32,9 @@ Global
 		{746B55EA-1C72-7806-77E1-464463660664}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{746B55EA-1C72-7806-77E1-464463660664}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9146F242-3FC7-CCF7-6968-58906D99F839}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9146F242-3FC7-CCF7-6968-58906D99F839}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9146F242-3FC7-CCF7-6968-58906D99F839}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9146F242-3FC7-CCF7-6968-58906D99F839}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DA71772A-464C-BBF3-99C3-8909BF706A29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DA71772A-464C-BBF3-99C3-8909BF706A29}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA71772A-464C-BBF3-99C3-8909BF706A29}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -46,7 +52,9 @@ Global
 		{87A9E52E-71E1-4355-BF61-EC289B40DA24}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87A9E52E-71E1-4355-BF61-EC289B40DA24}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C8E3F177-E0ED-7D46-D8D2-CD45EBC4FAE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8E3F177-E0ED-7D46-D8D2-CD45EBC4FAE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8E3F177-E0ED-7D46-D8D2-CD45EBC4FAE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8E3F177-E0ED-7D46-D8D2-CD45EBC4FAE0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
