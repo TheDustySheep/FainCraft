@@ -1,42 +1,22 @@
 ﻿using FainCraft.Scenes;
+using FainEngine_v2.UI.UIElements;
 using FainEngine_v2.UI.UIElements.Types;
-using System.Drawing;
+using FainEngine_v2.Utils;
 
 namespace FainCraft.UI;
 
 internal class StartMenuPanel : UIElement
 {
-    public StartMenuPanel(Action<IScene> loadScene)
+    SceneManager _sceneManager;
+    public StartMenuPanel()
     {
-        Styles = new FainEngine_v2.UI.Styling.ElementStyles()
-        {
-            SizeMode = FainEngine_v2.UI.Fss.Styles.SizeMode.Fit,
+        _sceneManager = DependencyInjector.Resolve<SceneManager>();
 
-            Axis = FainEngine_v2.UI.Fss.Styles.LayoutAxis.Y,
-            ChildGap = 20,
-            Padding = 16,
-            BackgroundColour = Color.Crimson
-        };
+        var startMenuElement = DependencyInjector.Resolve<IUIElementLoader>().LoadFile("Resources/UIElements/StartMenu.xml");
+        if (startMenuElement is not null)
+            AddChild(startMenuElement);
 
-        AddSceneLink<UITestScene>(loadScene, "UI Test Scene");
-        AddSceneLink<SingleplayerWorld>(loadScene, "Singleplayer");
-    }
-
-    private void AddSceneLink<T>(Action<IScene> loadScene, string text) where T : IScene, new()
-    {
-        var elem = AddChild(new UIElement()
-        {
-            Styles = new()
-            {
-                BackgroundColour = Color.Beige,
-                XPadding = 10,
-                XSizeMode = FainEngine_v2.UI.Fss.Styles.SizeMode.Grow
-            }
-        });
-        elem.Events.OnMouseClicked += () => loadScene.Invoke(new T());
-        elem.AddChild(new Label()
-        {
-            Text = text,
-        });
+        this.Query().FilterID( "new-game-button").First().Events.OnMouseClicked += () => _sceneManager.LoadScene(new SingleplayerWorld());
+        this.Query().FilterID("load-game-button").First().Events.OnMouseClicked += () => _sceneManager.LoadScene(new SingleplayerWorld());
     }
 }

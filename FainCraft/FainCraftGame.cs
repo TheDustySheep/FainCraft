@@ -1,6 +1,5 @@
 ﻿using FainCraft.Scenes;
 using FainEngine_v2.Core;
-using FainEngine_v2.UI.Fss.Parsing;
 using FainEngine_v2.UI.Fss.Parsing.Selectors;
 using FainEngine_v2.UI.Fss.Parsing.Stylesheets;
 using FainEngine_v2.UI.UIElements;
@@ -48,6 +47,6 @@ internal class FainCraftGame : FainGameEngine
 
     protected override void Load()
     {
-        _sceneManager.LoadScene(new UITestScene());
+        _sceneManager.LoadScene(new StartMenuScene());
     }
 }

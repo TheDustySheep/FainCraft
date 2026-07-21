@@ -1,5 +1,7 @@
 ﻿using FainCraft.UI;
 using FainEngine_v2.Core;
+using FainEngine_v2.UI.Fss;
+using FainEngine_v2.UI.Fss.Parsing.Stylesheets;
 using FainEngine_v2.UI.Rendering;
 using FainEngine_v2.Utils;
 
@@ -21,10 +23,13 @@ public class StartMenuScene : IScene
     {
         _entityManager = new EntityManager();
 
-        _entityManager.Spawn(
-            new UICanvasRenderer(
-                new StartMenuPanel(
-                    _sceneManager.LoadScene)));
+        var sheetLoader = DependencyInjector.Resolve<IStylesheetLoader>();
+
+        IReadOnlyList<FssClass> classes = sheetLoader.LoadFromFile("Resources/UIElements/Styles.fss");
+
+        var uiRenderer = _entityManager.Spawn(new UICanvasRenderer(new StartMenuPanel()));
+
+        uiRenderer.Canvas.AddClasses(classes);
 
         _gameInputs.SetCursorMode(Silk.NET.Input.CursorMode.Normal);
     }

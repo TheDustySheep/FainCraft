@@ -1,0 +1,40 @@
+.root-element {
+	justify: center;
+	align: center;
+}
+
+.parent-box {
+	colour: #0d1b2a;
+	gap: 16;
+	padding: 16;
+	x-size-mode: shrink;
+	y-size-mode: shrink;
+	axis: y;
+	border-radius: 8;
+}
+
+.text-box {
+	x-size-mode: flex;
+	y-size-mode: fit;
+	color: #415a77; 
+	x-padding: 20;
+	y-padding: 8;
+	border-radius: 32;
+}
+
+.text-box:hover {
+	color: #778da9; 
+}
+
+.text-box:clicked {
+	color: #e0e1dd; 
+}
+
+.text-box > * {
+	text-mode: center;
+	font-name: Tinos-Regular;
+}
+
+* {
+	border-radius: 16;
+}
