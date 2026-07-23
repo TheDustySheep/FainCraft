@@ -1,0 +1,14 @@
+.debug-panel {
+    gap: 4;
+    axis: y;
+    padding: 8;
+    x-size-mode: flex;
+    x-size-max: 200;
+    color: aliceblue;
+}
+
+.debug-panel > label {
+    y-size: 50;
+    y-size-mode: fixed;
+    font-size: 16;
+}

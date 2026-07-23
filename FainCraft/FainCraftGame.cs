@@ -3,6 +3,7 @@ using FainEngine_v2.Core;
 using FainEngine_v2.UI.Fss.Parsing.Selectors;
 using FainEngine_v2.UI.Fss.Parsing.Stylesheets;
 using FainEngine_v2.UI.UIElements;
+using FainEngine_v2.UI.UIElements.Types;
 using FainEngine_v2.Utils;
 
 namespace FainCraft;
@@ -20,6 +21,7 @@ internal class FainCraftGame : FainGameEngine
 
         DependencyInjector.RegisterSingleton<IUIElementLoader>(
             new UIElementLoader(
+                "Resources/UI",
                 new StylesParser()
             )
         );

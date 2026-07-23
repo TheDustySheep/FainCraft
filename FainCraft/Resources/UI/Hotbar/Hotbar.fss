@@ -1,0 +1,21 @@
+.hotbar-root {
+	justify: center;
+	align: end;
+
+	x-size-mode: grow;
+	y-size-mode: grow;
+
+	padding-bottom: 32;
+}
+
+.hotbar-panel {
+	gap: 8;
+}
+
+.hotbar-item {
+	x-size: 64;
+	x-size-mode: fixed;
+	y-size: 64;
+	y-size-mode: fixed;
+	color: #ff0000;
+}

@@ -1,7 +1,6 @@
 ﻿using FainEngine_v2.Core;
 using FainEngine_v2.UI.Fss;
 using FainEngine_v2.UI.Fss.Parsing.Stylesheets;
-using FainEngine_v2.UI.Rendering;
 using FainEngine_v2.UI.UIElements;
 using FainEngine_v2.UI.UIElements.Types;
 using FainEngine_v2.Utils;
@@ -30,16 +29,16 @@ internal class UITestScene : IScene
 
         IReadOnlyList<FssClass> classes = sheetLoader.LoadFromFile("Resources/UIElements/Styles.fss");
 
-        var uiRenderer = _entityManager.Spawn(new UICanvasRenderer(elem));
+        //var uiRenderer = _entityManager.Spawn(new CanvasEntity(elem));
 
-        uiRenderer.Canvas.AddClasses(classes);
+        //uiRenderer.Canvas.AddClasses(classes);
     }
 
     private UIElement LoadPauseMenuElement()
     {
         var loader = DependencyInjector.Resolve<IUIElementLoader>();
 
-        UIElement? elem = loader.LoadFile("Resources/UIElements/PauseMenu.xml");
+        UIElement? elem = loader.LoadElement("PauseMenu");
         if (elem == null)
             elem = new();
 

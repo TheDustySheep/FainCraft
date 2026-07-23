@@ -5,7 +5,7 @@ using FainCraft.UI;
 using FainEngine_v2.Core;
 using FainEngine_v2.Rendering.PostProcessing;
 using FainEngine_v2.Resources;
-using FainEngine_v2.UI.Rendering;
+using FainEngine_v2.UI;
 using FainEngine_v2.Utils;
 using System.Numerics;
 
@@ -17,7 +17,6 @@ namespace FainCraft.Scenes
         PlayerEntity _player = null!;
 
         readonly IGameInputs _gameInputs;
-        FPSPanel? _panel;
 
         public SingleplayerWorld()
         {
@@ -32,23 +31,19 @@ namespace FainCraft.Scenes
             var postShader = ResourceLoader.LoadShader(@"Resources\Shaders\PostProcessing\");
             var postProcess = _entityManager.Spawn(new PostProcess(postShader));
 
-            //var ui = EntityManager.Spawn(new UIController());
-            //ui.AddCanvas();
-            //ui.Root.AddChild(new DebugStatsUI(ui.Canvas));
 
+            var canvas = _entityManager.Spawn(new ScreenCanvas());
+            _entityManager.Spawn(new DebugPanelController(canvas));
 
             SharedVariables.PlayerPosition.Value = new PlayerPosition(new Vector3(-300, 0, 100));
             var world = _entityManager.Spawn(new Level());
             var player = _entityManager.Spawn(new PlayerEntity(world));
 
-            _panel = new FPSPanel();
-            _entityManager.Spawn(new UICanvasRenderer(_panel));
         }
 
         public void Update()
         {
             _entityManager.Update();
-            _panel?.Update();
         }
 
         public void FixedUpdate()

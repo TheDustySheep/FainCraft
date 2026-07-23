@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<UIElement class="debug-panel">
+	<Label id="fps"/>
+	<Label id="draw-calls"/>
+	<Label />
+	<Label />
+	<Label />
+	<Label />
+</UIElement>

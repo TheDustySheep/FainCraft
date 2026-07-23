@@ -1,14 +1,16 @@
-.root-element {
+.center-root-box {
 	justify: center;
 	align: center;
+	x-size-mode: grow;
+	y-size-mode: grow;
 }
 
 .parent-box {
 	colour: #0d1b2a;
 	gap: 16;
 	padding: 16;
-	x-size-mode: shrink;
-	y-size-mode: shrink;
+	x-size-mode: fit;
+	y-size-mode: fit;
 	axis: y;
 	border-radius: 8;
 }
