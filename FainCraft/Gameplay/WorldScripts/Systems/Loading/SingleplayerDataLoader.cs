@@ -10,12 +10,12 @@ public class SingleplayerDataLoader : IRegionDataLoader
     private readonly SemaphoreSlim _semaphore = new(4); // Max 4 concurrent
     private int _waitingCount = 0;
 
-    public SingleplayerDataLoader(IServiceProvider provider)
+    public SingleplayerDataLoader(ITerrainGenerationSystem generator)
     {
-        _generator = provider.Get<ITerrainGenerationSystem>();
+        _generator = generator;
     }
 
-    public async Task<RegionData> LoadRegionAsync(RegionCoord coord, CancellationToken token)
+    public async Task<RegionData?> LoadRegionAsync(RegionCoord coord, CancellationToken token)
     {
         Interlocked.Increment(ref _waitingCount);
         await _semaphore.WaitAsync(token);
@@ -32,5 +32,10 @@ public class SingleplayerDataLoader : IRegionDataLoader
         {
             _semaphore.Release();
         }
+    }
+
+    public Task UnloadRegionAsync(RegionCoord coord, RegionData data)
+    {
+        return Task.CompletedTask;
     }
 }

@@ -1,4 +1,5 @@
-﻿using FainCraft.Gameplay.WorldEntities;
+﻿using FainCraft.Gameplay.OldWorldScripts.Systems.RegionLoading;
+using FainCraft.Gameplay.WorldEntities;
 using FainCraft.Gameplay.WorldScripts.Data.Voxels;
 using FainCraft.Gameplay.WorldScripts.Signals;
 using FainCraft.Gameplay.WorldScripts.Storage;
@@ -7,6 +8,9 @@ using FainCraft.Gameplay.WorldScripts.Systems.Activation;
 using FainCraft.Gameplay.WorldScripts.Systems.Loading;
 using FainCraft.Gameplay.WorldScripts.Systems.Loading.Generation;
 using FainCraft.Gameplay.WorldScripts.Systems.Loading.Generation.Overworld;
+using FainCraft.Gameplay.WorldScripts.Systems.RegionStateManagement;
+using FainCraft.Gameplay.WorldScripts.Systems.RegionStateManagement.Transitions;
+using FainCraft.Gameplay.WorldScripts.Systems.Rendering;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering.Materials;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGenerationSystems;
@@ -14,18 +18,22 @@ using FainCraft.Gameplay.WorldScripts.Systems.Rendering.RenderSystems;
 using FainEngine_v2.Entities;
 using FainEngine_v2.Rendering.Materials;
 using FainEngine_v2.Resources;
-using System;
 
 namespace FainCraft.Gameplay.WorldScripts;
 
 public class Level : GameObject
 {
-    private readonly ServiceContainer _provider;
-    public IServiceProvider Provider => _provider;
+    private readonly RenderingSystem _renderController;
 
-    private readonly IRenderSystem _renderSystem;
-    private readonly IMeshGenerationSystem _meshSystem;
-    private readonly IRegionActivator _activator;
+    public readonly ISignalBus SignalBus;
+    public readonly IWorldEntityController EntityController;
+    public readonly IVoxelIndexer VoxelIndexer;
+    public readonly IRegionDataStore RegionStore;
+    public readonly IChunkDataStore ChunkStore;
+    public readonly IChunkClusterDataStore ChunkClusterStore;
+    public readonly IVoxelDataStore VoxelStore;
+
+    private readonly RegionStateManager _regionStateManager;
 
     public Level()
     {
@@ -33,41 +41,57 @@ public class Level : GameObject
         var voxel_material_o = new VoxelMaterial(ResourceLoader.LoadShader(@"Resources\Shaders\Voxels\Voxel_Shader_2\"), voxel_atlas);
         var voxel_material_t = new VoxelMaterialTransparent(ResourceLoader.LoadShader(@"Resources\Shaders\Voxels\Voxel_Shader_Transparent\"), voxel_atlas);
 
-        _provider = new ServiceContainer();
-
         // Event Bus
-        _provider.RegisterSingleton<ISignalBus>(new EventBus());
+        SignalBus =new EventBus();
 
         // Entities
-        _provider.RegisterSingleton<IWorldEntityController>(new WorldEntityController());
+        EntityController = new WorldEntityController();
 
         // Indexing
-        _provider.RegisterSingleton<IVoxelIndexer>(VoxelTypeLoader.LoadIndexer());
+        VoxelIndexer = VoxelTypeLoader.LoadIndexer();
 
         // Data Loading
-        _provider.RegisterSingleton<ITerrainGenerator>(new OverworldGenerator(_provider));
-        _provider.RegisterSingleton<ITerrainGenerationSystem>(new ThreadedTerrainGenerationSystem(_provider));
-        _provider.RegisterSingleton<IRegionDataLoader>(new SingleplayerDataLoader(_provider));
+        var terrainGenerator = new ThreadedTerrainGenerationSystem(new OverworldGenerator(VoxelIndexer));
+        var dataLoader = new SingleplayerDataLoader(terrainGenerator);
 
         // Data Access
-        _provider.RegisterSingleton<IRegionDataStore>(new RegionDataStore(_provider));
-        _provider.RegisterSingleton<IChunkDataStore>(new ChunkDataStore(_provider));
-        _provider.RegisterSingleton<IChunkClusterDataStore>(new ChunkClusterDataStore(_provider));
-        _provider.RegisterSingleton<IVoxelDataStore>(new VoxelDataStore(_provider));
-
-        // Region Activation
-        _activator = _provider.RegisterSingleton<IRegionActivator>(new RegionActivator(_provider));
+        RegionStore       = new RegionDataStore(SignalBus);
+        ChunkStore        = new ChunkDataStore(SignalBus, RegionStore);
+        ChunkClusterStore = new ChunkClusterDataStore(ChunkStore);
+        VoxelStore        = new VoxelDataStore(SignalBus, ChunkStore);
 
         // Rendering
-        _provider.RegisterFactory<IMeshGenerator>(() => new MeshGenerator_v3(_provider));
-        _renderSystem = _provider.RegisterSingleton<IRenderSystem>(new RenderSystem(voxel_material_o, voxel_material_t, _provider));
-        _meshSystem   = _provider.RegisterSingleton<IMeshGenerationSystem>(new MeshGenerationSystem(_provider, new ActiveRegionRadius(() => SharedVariables.RenderSettings.Value.RenderRadius)));
+        _renderController = new RenderingSystem(
+            SignalBus,
+            new MeshGenerationSystem(
+                () => SharedVariables.PlayerPosition.Value.RegionCoord,
+                ChunkClusterStore,
+                () => new MeshGenerator_v3(VoxelIndexer)
+            ),
+            new DrawingSystem(voxel_material_o, voxel_material_t, VoxelIndexer)
+        );
+
+        // Region loading
+        var transitionController = new TransitionController();
+
+        // Load Data
+        transitionController.Register(StateType.Unloaded, StateType.Loaded, new TransitionFactory(coord => new TransitionLoadData(dataLoader, RegionStore, coord)));
+        transitionController.Register(StateType.Loaded, StateType.Unloaded, new TransitionFactory(coord => new TransitionUnloadData(dataLoader, RegionStore, coord)));
+
+        // Load Meshes
+        transitionController.Register(StateType.Loaded, StateType.Meshed, new TransitionFactory(coord => new TransitionLoadMesh(_renderController, coord)));
+        transitionController.Register(StateType.Meshed, StateType.Loaded, new TransitionFactory(coord => new TransitionUnloadMesh(_renderController, coord)));
+
+        // Inject into the state manager
+        _regionStateManager = new RegionStateManager(
+            new ActiveRegionRadius(() => SharedVariables.RenderSettings.Value.LoadRadius),
+            transitionController
+        );
     }
 
     public override void Update()
     {
-        _activator.Tick();
-        _meshSystem.Tick();
-        _renderSystem.Draw();
+        _regionStateManager.Tick();
+        _renderController.Tick();
     }
 }

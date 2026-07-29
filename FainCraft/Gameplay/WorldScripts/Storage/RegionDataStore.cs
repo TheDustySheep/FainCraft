@@ -9,9 +9,9 @@ public class RegionDataStore : IRegionDataStore
     ISignalBus _eventBus;
     Dictionary<RegionCoord, RegionData> _regions = new();
 
-    public RegionDataStore(IServiceProvider serviceProvider)
+    public RegionDataStore(ISignalBus eventBus)
     {
-        _eventBus = serviceProvider.Get<ISignalBus>();
+        _eventBus = eventBus;
     }
 
     public bool GetRegion(RegionCoord coord, out RegionData data)

@@ -9,10 +9,10 @@ namespace FainCraft.Gameplay.WorldScripts.Storage
         private readonly ISignalBus _eventBus;
         private readonly IRegionDataStore _regionStore;
 
-        public ChunkDataStore(IServiceProvider serviceProvider)
+        public ChunkDataStore(ISignalBus signalBus, IRegionDataStore regionStore)
         {
-            _eventBus    = serviceProvider.Get<ISignalBus>();
-            _regionStore = serviceProvider.Get<IRegionDataStore>();
+            _eventBus    = signalBus;
+            _regionStore = regionStore;
         }
 
         public bool GetChunkData(ChunkCoord coord, out ChunkData data)

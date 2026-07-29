@@ -7,9 +7,9 @@ public class ChunkClusterDataStore : IChunkClusterDataStore
 {
     private readonly IChunkDataStore _chunkStore;
 
-    public ChunkClusterDataStore(IServiceProvider serviceProvider)
+    public ChunkClusterDataStore(IChunkDataStore chunkStore)
     {
-        _chunkStore = serviceProvider.Get<IChunkDataStore>();
+        _chunkStore = chunkStore;
     }
 
     public bool GetChunkClusterData(ChunkCoord coord, Span<ChunkData?> datas)

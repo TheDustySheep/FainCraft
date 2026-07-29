@@ -9,14 +9,8 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGenerationSystem
 internal class GenerationData
 {
     public ChunkCoord Coord;
-    public IMeshGenerator Generator;
     public IChunkDataCluster ClusterData = new ChunkDataClusterFull();
     public ChunkData[] DataArray = new ChunkData[27];
     public VoxelMeshData Opaque = new();
     public VoxelMeshData Transparent = new();
-
-    public GenerationData(IMeshGenerator generator)
-    {
-        Generator = generator;
-    }
 }

@@ -10,6 +10,7 @@ using FainCraft.Gameplay.WorldScripts.Data.Voxels;
 using FainCraft.Gameplay.WorldScripts.Storage;
 using FainEngine_v2.Entities;
 using FainEngine_v2.Rendering;
+using FainCraft.Gameplay.WorldScripts;
 
 namespace FainCraft.Gameplay.PlayerScripts;
 
@@ -21,12 +22,12 @@ internal class WorldEditor
     private readonly IWorldEntityController _entityController;
     private readonly IGameInputs _gameInputs;
 
-    public WorldEditor(Transform camTransform, IServiceProvider provider)
+    public WorldEditor(Transform camTransform, Level level)
     {
         _camTransform = camTransform;
-        _indexer = provider.Get<IVoxelIndexer>();
-        _voxelDataStore = provider.Get<IVoxelDataStore>();
-        _entityController = provider.Get<IWorldEntityController>();
+        _indexer = level.VoxelIndexer;
+        _voxelDataStore = level.VoxelStore;
+        _entityController = level.EntityController;
         _gameInputs = DependencyInjector.Resolve<IGameInputs>();
     }
 

@@ -31,11 +31,11 @@ internal class PlayerEntity : GameObject, IWorldEntity
         camera = new Camera3D(camTransform);
         camera.SetMainCamera();
 
-        Motor = new EntityMotor(new CollisionHandler(level.Provider), Transform);
-        worldEditor = new WorldEditor(camTransform, level.Provider);
+        Motor = new EntityMotor(new CollisionHandler(level), Transform);
+        worldEditor = new WorldEditor(camTransform, level);
         controller = new PlayerCharacterController(camTransform, Motor);
         Motor.EnableGravity = false;
-        level.Provider.Get<IWorldEntityController>().RegisterEntity(this);
+        level.EntityController.RegisterEntity(this);
 
         Task.Run(async () =>
         {

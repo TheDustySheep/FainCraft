@@ -1,9 +1,8 @@
 ﻿namespace FainCraft.Gameplay.WorldEntities;
 
-internal interface IWorldEntityController
+public interface IWorldEntityController
 {
-    HashSet<IWorldEntity> Entities { get; }
-
-    void RegisterEntity(IWorldEntity entity);
-    void UnregisterEntity(IWorldEntity entity);
+    public HashSet<IWorldEntity> Entities { get; }
+    public void RegisterEntity(IWorldEntity entity);
+    public void UnregisterEntity(IWorldEntity entity);
 }

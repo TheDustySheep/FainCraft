@@ -1,4 +1,6 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Coords;
+using FainCraft.Gameplay.WorldScripts.Systems.RegionStateManagement.Transitions;
+using System.Diagnostics;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.RegionStateManagement;
 
@@ -6,123 +8,60 @@ public class Region
 {
     public StateType CurrentState { get; private set; }
     public StateType TargetState { get; private set; }
+    public bool IsTransitioning => _transition != null;
 
-    private readonly ITransitionProvider _transitionProvider;
     private readonly RegionCoord _coord;
+    private readonly TransitionController _transitions;
 
-    private readonly object _lock = new();
+    private ITransition<StateType>? _transition;
 
-    private bool _isProcessing = false;
-    private CancellationTokenSource? _cts;
-
-    public Region(ITransitionProvider transitionProvider, RegionCoord coord)
+    public Region(TransitionController transitions, RegionCoord coord)
     {
-        _transitionProvider = transitionProvider;
+        _transitions = transitions;
         _coord = coord;
     }
 
-    /// <summary>
-    /// Checks if anything is processing. If safe to delete returns true
-    /// </summary>
-    /// <returns>Safe to delete</returns>
-    public bool CanBeDeleted()
-    {
-        lock (_lock)
-        {
-            return
-                CurrentState == StateType.Unloaded &&
-                TargetState  == StateType.Unloaded &&
-                !_isProcessing;
-        }
-    }
-
-    /// <summary>
-    /// Sets the target state
-    /// </summary>
-    /// <param name="targetState">Desired target state</param>
     public void SetTargetState(StateType targetState)
     {
-        lock (_lock)
+        TargetState = targetState;
+
+        if (_transition != null && !_transition.IsCancelled)
         {
-            if (targetState == TargetState)
-                return; // No changes to target
+            bool isPromoting = _transition.Target > CurrentState;
+            bool rqPromoting = TargetState > CurrentState;
 
-            var oldTarget = TargetState;
-            TargetState = targetState;
-
-            if (_isProcessing)
+            if (isPromoting != rqPromoting)
             {
-                // Already moving in the correct direction
-                if ((oldTarget > CurrentState && TargetState > CurrentState) ||
-                    (oldTarget < CurrentState && TargetState < CurrentState))
-                    return;
-
-                // Cancel the current transition
-                _cts?.Cancel();
-                return;
+                //_transition.Cancel();
             }
-
-            _isProcessing = true;
         }
-
-        _ = Task.Run(ProcessTransition);
     }
 
-    /// <summary>
-    /// Internally handles the transition between states
-    /// </summary>
-    private async ValueTask ProcessTransition()
+    public void Tick()
     {
-        try
+        if (_transition == null)
         {
-            while (true)
-            {
-                TransitionAction transition;
-                CancellationToken token;
-
-                lock (_lock)
-                {
-                    if (CurrentState == TargetState)
-                    {
-                        _isProcessing = false;
-                        return;
-                    }
-
-                    transition = _transitionProvider.GetTransition(CurrentState, TargetState);
-                    _cts = new CancellationTokenSource();
-                    token = _cts.Token;
-                }
-
-                try
-                {
-                    var outcome = await transition.Invoke(_coord, token);
-
-                    lock (_lock)
-                    {
-                        CurrentState = outcome;
-                    }
-                }
-                catch (OperationCanceledException) { }
-                finally
-                {
-                    lock (_lock)
-                    {
-                        _cts?.Dispose();
-                        _cts = null;
-                    }
-                }
-            }
+            if (CurrentState != TargetState)
+                _transition = NextTransition();
+            
+            return;
         }
-        catch (Exception ex)
+
+        if (_transition.IsComplete(out var newState))
         {
-            Console.WriteLine($"Error during transition: {ex}");
+            CurrentState = newState;
+            _transition = null;
         }
-        finally
-        {
-            lock (_lock)
-            {
-                _isProcessing = false;
-            }
-        }
+    }
+
+    private ITransition<StateType>? NextTransition()
+    {
+        if (TargetState == CurrentState)
+            return null;
+
+        int direction = TargetState > CurrentState ? 1 : -1;
+        ITransitionFactory factory = _transitions.Request(CurrentState, CurrentState + direction);
+
+        return factory.GetTransition(_coord);
     }
 }

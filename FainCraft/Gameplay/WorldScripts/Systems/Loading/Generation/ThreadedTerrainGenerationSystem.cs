@@ -33,9 +33,9 @@ internal class ThreadedTerrainGenerationSystem : ITerrainGenerationSystem, IDisp
     private readonly Thread _workerThread;
     private bool _disposed;
 
-    public ThreadedTerrainGenerationSystem(IServiceProvider provider)
+    public ThreadedTerrainGenerationSystem(ITerrainGenerator generator)
     {
-        _generator = provider.Get<ITerrainGenerator>();
+        _generator = generator;
         _workerThread = new Thread(WorkLoop)
         {
             IsBackground = true,

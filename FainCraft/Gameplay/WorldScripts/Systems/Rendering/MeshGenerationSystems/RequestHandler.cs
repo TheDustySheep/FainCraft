@@ -37,7 +37,7 @@ public class RequestHandler
     {
         _updateRegion.Invoke(signal.Coord, true);
 
-        foreach (var rOffset in WorldConstants.Iterate_Neighbour_Regions())
+        foreach (var rOffset in WorldConstants.IterateNeighbourRegions())
             _updateRegion.Invoke(signal.Coord + rOffset, false);
     }
 
@@ -45,7 +45,7 @@ public class RequestHandler
     {
         _updateRegion.Invoke(signal.Coord, false);
 
-        foreach (var rOffset in WorldConstants.Iterate_Neighbour_Regions())
+        foreach (var rOffset in WorldConstants.IterateNeighbourRegions())
             _updateRegion.Invoke(signal.Coord + rOffset, false);
     }
 
@@ -53,7 +53,7 @@ public class RequestHandler
     {
         _updateChunk.Invoke(signal.Coord, false);
 
-        foreach (var oCoord in WorldConstants.Iterate_Neighbour_Chunks())
+        foreach (var oCoord in WorldConstants.IterateNeighbourChunks())
             _updateChunk.Invoke(signal.Coord, false);
     }
 

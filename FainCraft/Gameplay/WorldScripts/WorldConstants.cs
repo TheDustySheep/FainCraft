@@ -35,7 +35,7 @@ public static class WorldConstants
             yield return y;
     }
 
-    public static IEnumerable<RegionCoord> Iterate_Neighbour_Regions()
+    public static IEnumerable<RegionCoord> IterateNeighbourRegions()
     {
         yield return new RegionCoord(-1, -1);
         yield return new RegionCoord( 0, -1);
@@ -50,7 +50,7 @@ public static class WorldConstants
         yield return new RegionCoord( 1,  1);
     }
 
-    public static IEnumerable<ChunkCoord> Iterate_Neighbour_Chunks()
+    public static IEnumerable<ChunkCoord> IterateNeighbourChunks()
     {
         for (int dy = -1; dy < 2; dy++)
         {

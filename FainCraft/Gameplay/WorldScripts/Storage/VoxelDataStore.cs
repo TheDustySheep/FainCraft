@@ -9,10 +9,10 @@ public class VoxelDataStore : IVoxelDataStore
     ISignalBus _eventBus;
     IChunkDataStore _chunkStore;
 
-    public VoxelDataStore(IServiceProvider serviceProvider)
+    public VoxelDataStore(ISignalBus signalBus, IChunkDataStore chunkStore)
     {
-        _eventBus   = serviceProvider.Get<ISignalBus>();
-        _chunkStore = serviceProvider.Get<IChunkDataStore>();
+        _eventBus = signalBus;
+        _chunkStore = chunkStore;
     }
 
     public bool GetVoxelState(VoxelCoordGlobal coord, out VoxelState state)

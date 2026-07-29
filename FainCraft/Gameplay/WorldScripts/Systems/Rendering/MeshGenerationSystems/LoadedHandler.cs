@@ -1,10 +1,4 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Coords;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGenerationSystems;
 
@@ -58,7 +52,7 @@ public class LoadedHandler
 
         _updateFunc.Invoke(rCoord, true);
 
-        foreach (var orCoord in WorldConstants.Iterate_Neighbour_Regions())
+        foreach (var orCoord in WorldConstants.IterateNeighbourRegions())
             _updateFunc.Invoke(rCoord + orCoord, false);
     }
 
@@ -71,7 +65,7 @@ public class LoadedHandler
         _unloadFunc.Invoke(rCoord);
 
         // Draw neighbours
-        foreach (var orCoord in WorldConstants.Iterate_Neighbour_Regions())
+        foreach (var orCoord in WorldConstants.IterateNeighbourRegions())
             _updateFunc.Invoke(rCoord + orCoord, false);
     }
 }

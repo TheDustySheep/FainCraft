@@ -15,9 +15,9 @@ public class MeshGenerator_v3 : IMeshGenerator
 
     const uint VOXEL_UP = 22;
 
-    public MeshGenerator_v3(IServiceProvider provider)
+    public MeshGenerator_v3(IVoxelIndexer indexer)
     {
-        _voxelIndexer = provider.Get<IVoxelIndexer>();
+        _voxelIndexer = indexer;
     }
 
     public void GenerateMesh(IChunkDataCluster cluster, VoxelMeshData opaqueMeshData, VoxelMeshData transparentMeshData)

@@ -1,4 +1,5 @@
-﻿using FainCraft.Gameplay.WorldScripts.Coords;
+﻿using FainCraft.Gameplay.WorldScripts;
+using FainCraft.Gameplay.WorldScripts.Coords;
 using FainCraft.Gameplay.WorldScripts.Data.Voxels;
 using FainCraft.Gameplay.WorldScripts.Storage;
 using FainEngine_v2.Extensions;
@@ -13,10 +14,10 @@ public class CollisionHandler
     private readonly IVoxelIndexer _indexer;
     private readonly IVoxelDataStore _voxelData;
 
-    public CollisionHandler(IServiceProvider serviceProvider)
+    public CollisionHandler(Level level)
     {
-        _indexer   = serviceProvider.Get<IVoxelIndexer>();
-        _voxelData = serviceProvider.Get<IVoxelDataStore>();
+        _indexer   = level.VoxelIndexer;
+        _voxelData = level.VoxelStore;
     }
 
     public GroundedState UpdateGrounded(StaticAABB entity)

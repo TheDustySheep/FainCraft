@@ -16,9 +16,8 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Loading.Generation.Overworld
 
         readonly RegionMaps _maps = new();
 
-        public OverworldGenerator(IServiceProvider provider, int seed = 1337)
+        public OverworldGenerator(IVoxelIndexer indexer, int seed = 1337)
         {
-            var indexer = provider.Get<IVoxelIndexer>();
             _biomeFactory = new BiomesFactory(indexer, seed);
             _biomeDecider = new BiomesDecider(_biomeFactory, seed);
         }

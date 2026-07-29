@@ -12,7 +12,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.Lighting;
 public class LightingSystem : ILightingSystem
 {
     private readonly IRegionDataStore    _regionDataStore;
-    private readonly IRenderSystem       _renderSystem;
+    private readonly IDrawingSystem       _renderSystem;
     private readonly ILightingCalculator _lightingCalculator;
 
     private readonly LightQueue _lightQueue = new();
@@ -25,7 +25,7 @@ public class LightingSystem : ILightingSystem
     public LightingSystem(IServiceProvider provider)
     {
         _regionDataStore    = provider.Get<IRegionDataStore>();
-        _renderSystem       = provider.Get<IRenderSystem>();
+        _renderSystem       = provider.Get<IDrawingSystem>();
         _lightingCalculator = provider.Get<ILightingCalculator>();
 
         _renderSettings     = SharedVariables.RenderSettings;

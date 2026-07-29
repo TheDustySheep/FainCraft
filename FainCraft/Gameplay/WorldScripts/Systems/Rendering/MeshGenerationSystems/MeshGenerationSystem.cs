@@ -1,9 +1,13 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Coords;
-using FainCraft.Gameplay.WorldScripts.Signals;
 using FainCraft.Gameplay.WorldScripts.Storage;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering.RenderSystems;
-using FainEngine_v2.Collections;
+using FainCraft.Gameplay.WorldScripts.Systems.Rendering.VoxelMeshes;
+using FainEngine_v2.Core;
+using FainEngine_v2.Utils;
+using System.Collections.Concurrent;
+using System.Drawing;
+using System.Numerics;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGenerationSystems;
 
@@ -13,152 +17,158 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGenerationSystem
 /// </summary>
 internal class MeshGenerationSystem : IMeshGenerationSystem, IDisposable
 {
-    // Logic Handlers
-    private readonly IActiveRegionRadius _loadedRadius;
-    private readonly LoadedHandler _loadedHandler;
-    private readonly RequestHandler _requestHandler;
-    private readonly MeshGenerationQueue _queue;
+    private readonly IGameTime _gameTime;
 
+    private readonly Queue<GenerationData> _pool = new();
 
-    private readonly ObjectPoolFactory<GenerationData> _dataPool;
-    private readonly ISignalBus _signalBus;
-    private readonly IRenderSystem _renderSystem;
+    private readonly ConcurrentQueue<GenerationData> _input = new();
+    private readonly ConcurrentQueue<GenerationData> _output = new();
+
+    private Func<int> _maxApply;
+    private readonly MeshQueue _meshQueue;
+
     private readonly IChunkClusterDataStore _clusterDataStore;
 
-    private readonly int _maxPerFrame;
-    private readonly int _maxActive;
+    private readonly List<MeshingThread> _threads = new();
 
-    public MeshGenerationSystem(IServiceProvider provider, IActiveRegionRadius activeRegions)
+    public event Action<ChunkCoord, VoxelMeshData, VoxelMeshData>? OnComplete;
+
+    public MeshGenerationSystem(Func<RegionCoord> playerPos, IChunkClusterDataStore clusterStore, Func<IMeshGenerator> generatorFactory)
     {
-        // Constants
-        _maxPerFrame = (int)SharedVariables.RenderSettings.Value.MeshesAppliedPerFrame;
-        _maxActive   = (int)SharedVariables.RenderSettings.Value.MaxConcurrentMeshes;
+        _gameTime = DependencyInjector.Resolve<IGameTime>();
+        _meshQueue = new(playerPos);
 
         // Dependencies
-        _signalBus        = provider.Get<ISignalBus>();
-        _renderSystem     = provider.Get<IRenderSystem>();
-        _clusterDataStore = provider.Get<IChunkClusterDataStore>();
+        _maxApply = () => (int)SharedVariables.RenderSettings.Value.MeshesAppliedPerFrame;
+        _clusterDataStore = clusterStore;
 
-        // Logic Handlers
-        _loadedRadius = new ActiveRegionRadius(
-            () => SharedVariables.RenderSettings.Value.RenderRadius
-        );
+        // Generation Data Pool
+        for (int i = 0; i < (int)SharedVariables.RenderSettings.Value.MaxConcurrentMeshes; i++)
+            _pool.Enqueue(new GenerationData());
 
-        _requestHandler = new RequestHandler(
-            _signalBus, 
-            UpdateMesh,
-            UpdateMesh
-        );
-
-        _loadedHandler = new LoadedHandler(
-            _loadedRadius,
-            UpdateMesh,
-            UnloadRegion
-        );
-
-        _queue = new MeshGenerationQueue(_maxActive);
-        _dataPool = new ObjectPoolFactory<GenerationData>(
-            () => new GenerationData(provider.Get<IMeshGenerator>())
-        );
-
-        _queue.Start();
-    }
-
-    private static int CalculatePriority(RegionCoord coord, bool isNew)
-    {
-        int newBias = isNew ? 4 : 1000;
-        int dstBias = (int)SharedVariables.PlayerPosition.Value.RegionCoord.ManhattenDistance(coord);
-        return Math.Min(newBias, dstBias);
-    }
-
-    private void UpdateMesh(RegionCoord rCoord, bool isNew)
-    {
-        if (!_loadedHandler.IsLoaded(rCoord))
-            return;
-
-        int priority = CalculatePriority(rCoord, isNew);
-        foreach (var y in WorldConstants.Iterate_Y_Chunks())
+        // Meshing Threads
+        for (int i = 0; i < 4; i++)
         {
-            _queue.EnqueueRequest(new ChunkCoord(rCoord, y), priority);
+            _threads.Add(new MeshingThread(
+                generatorFactory.Invoke(),
+                _input,
+                _output,
+                $"Mesh Generation Worker {i+1}"
+            ));
         }
     }
+    ~MeshGenerationSystem() => Dispose();
 
-    private void UpdateMesh(ChunkCoord cCoord, bool isNew)
+    public void Update(ChunkCoord coord)
     {
-        RegionCoord rCoord = (RegionCoord)cCoord;
-        if (!_loadedHandler.IsLoaded(rCoord))
-            return;
-
-        int priority = CalculatePriority(rCoord, isNew);
-        _queue.EnqueueRequest(cCoord, priority);
+        _meshQueue.Enqueue(coord);
     }
 
-    private void UnloadRegion(RegionCoord rCoord) => _renderSystem.Unload(rCoord);
+    public void Update(RegionCoord coord)
+    {
+        foreach (var y in WorldConstants.Iterate_Y_Chunks())
+            _meshQueue.Enqueue(new ChunkCoord(coord, y));
+    }
+
+    public void Cancel(RegionCoord coord)
+    {
+        foreach (var y in WorldConstants.Iterate_Y_Chunks())
+            _meshQueue.Remove(new ChunkCoord(coord, y));
+    }
 
     public void Tick()
     {
-        HandleUpdatingLoadedRegions();
+        // Recalculate every 100 ticks
+        if (_gameTime.TotalTicks % 100 == 0)
+            _meshQueue.Recalculate();
 
-        HandleNewRequests();
+        int maxApply = _maxApply.Invoke();
 
-        HandleApplyingMeshes();
-    }
-
-    private void HandleUpdatingLoadedRegions()
-    {
-        // Draw what should be loaded
-        _loadedRadius.Calculate();
-        DebugVariables.MeshQueueCount.Value = _queue.Count;
-    }
-
-    private void HandleApplyingMeshes()
-    {
-        int applied = 0;
-        while (applied < _maxPerFrame && _queue.TryDequeueCompleted(out var item))
+        // Push data into the input queue
+        for (int i = 0; i < 4; i++)
         {
-            if (_loadedHandler.IsLoaded((RegionCoord)item.coord))
+            // Pool Empty
+            if (_pool.Count == 0)
+                break;
+
+            // Mesh Queue Empty
+            if (!_meshQueue.TryDequeue(out var coord))
+                break;
+
+            var data = _pool.Dequeue();
+
+            // Failed to find the chunk data
+            if (!_clusterDataStore.GetChunkClusterData(coord, data.DataArray))
             {
-                _renderSystem.UpdateMesh(item.coord, item.data.Opaque, item.data.Transparent);
-                applied++;
+                _pool.Enqueue(data);
+                continue;
             }
 
-            _dataPool.Return(item.data);
-            _queue.ReleaseSlot();
+            data.Coord = coord;
+            data.ClusterData.SetData(data.DataArray);
+
+            _input.Enqueue(data);
         }
-    }
 
-    private void HandleNewRequests()
-    {
-        // Gather data and enqueue new requests
-        int dispatched = 0;
-        while (dispatched < _maxPerFrame && _queue.TryDequeueRequest(out var coord))
+        // Process data in the output queue
+        for (int i = 0; i < maxApply; i++)
         {
-            // Requests was unloaded since being queued
-            if (!_loadedHandler.IsLoaded((RegionCoord)coord))
-            {
-                _queue.ReleaseSlot();
-                continue;
-            }
+            if (!_output.TryDequeue(out var data))
+                break;
 
-            var gen = _dataPool.Request();
-            if (!_clusterDataStore.GetChunkClusterData(coord, gen.DataArray))
-            {
-                _dataPool.Return(gen);
-                _queue.ReleaseSlot();
-                continue;
-            }
-            gen.Coord = coord;
-            gen.ClusterData.SetData(gen.DataArray);
-            _queue.EnqueueToGenerate(gen);
-            dispatched++;
+            OnComplete?.Invoke(data.Coord, data.Opaque, data.Transparent);
+
+            _pool.Enqueue(data);
         }
     }
 
     public void Dispose()
     {
-        _queue.Dispose();
+        foreach (var thread in _threads)
+            thread.Dispose();
+
         GC.SuppressFinalize(this);
     }
 
-    ~MeshGenerationSystem() => Dispose();
+    private class MeshingThread : IDisposable
+    {
+        private readonly IMeshGenerator _generator;
+        private readonly Thread _thread;
+        private readonly ConcurrentQueue<GenerationData> _input;
+        private readonly ConcurrentQueue<GenerationData> _output;
+        private bool _disposed;
+
+        public MeshingThread(IMeshGenerator generator, ConcurrentQueue<GenerationData> input, ConcurrentQueue<GenerationData> output, string threadName)
+        {
+            _generator = generator;
+            _input = input;
+            _output = output;
+
+            _thread = new Thread(Tick);
+            _thread.Start();
+            _thread.Name = threadName;
+        }
+
+        ~MeshingThread() => Dispose();
+        public void Dispose() => _disposed = true;
+
+        private void Tick()
+        {
+            while (!_disposed)
+            {
+                if (_input.TryDequeue(out var data))
+                {
+                    _generator.GenerateMesh(
+                        data.ClusterData,
+                        data.Opaque,
+                        data.Transparent
+                    );
+
+                    _output.Enqueue(data);
+                }
+                else
+                    Thread.Sleep(100);
+            }
+        }
+    }
 }

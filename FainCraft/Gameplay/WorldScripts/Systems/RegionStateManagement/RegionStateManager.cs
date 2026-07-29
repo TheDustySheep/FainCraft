@@ -1,16 +1,19 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Coords;
+using FainCraft.Gameplay.WorldScripts.Systems.RegionStateManagement.Transitions;
 using FainEngine_v2.Utils;
+using System.Diagnostics;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.RegionStateManagement;
 
 public class RegionStateManager
 {
     private readonly Dictionary<RegionCoord, Region> _regions = new();
+    //private readonly List<Region> _inProgress = new();
 
-    private IActiveRegionRadius _radius;
-    private ITransitionProvider _transitions;
+    private readonly IActiveRegionRadius _radius;
+    private readonly TransitionController _transitions;
 
-    public RegionStateManager(IActiveRegionRadius radius, ITransitionProvider transitions)
+    public RegionStateManager(IActiveRegionRadius radius, TransitionController transitions)
     {
         _radius = radius;
         _transitions = transitions;
@@ -39,6 +42,10 @@ public class RegionStateManager
     public void Tick()
     {
         _radius.Calculate();
-        _regions.RemoveAll((k, v) => v.CanBeDeleted());
+
+        foreach (var region in _regions.Values)
+            region.Tick();
+
+        _regions.RemoveAll((k, v) => !v.IsTransitioning && v.CurrentState == StateType.Unloaded);
     }
 }
