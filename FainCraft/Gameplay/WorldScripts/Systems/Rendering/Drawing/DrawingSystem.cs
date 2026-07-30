@@ -93,12 +93,12 @@ public class DrawingSystem : IDrawingSystem, IDisposable
 
         if (opaque.IsEmpty)
         {
-            if (chunk.OpaqueMesh == null)
-                return;
-
-            _meshPool.Return(chunk.OpaqueMesh);
-            DebugVariables.OpaqueMeshCount.Value -= 1;
-            chunk.OpaqueMesh = null;
+            if (chunk.OpaqueMesh != null)
+            {
+                _meshPool.Return(chunk.OpaqueMesh);
+                DebugVariables.OpaqueMeshCount.Value -= 1;
+                chunk.OpaqueMesh = null;
+            }
         }
         else
         {
@@ -113,12 +113,12 @@ public class DrawingSystem : IDrawingSystem, IDisposable
 
         if (transparent.IsEmpty)
         {
-            if (chunk.TransparentMesh == null)
-                return;
-
-            _meshPool.Return(chunk.TransparentMesh);
-            DebugVariables.TransparentMeshCount.Value -= 1;
-            chunk.TransparentMesh = null;
+            if (chunk.TransparentMesh != null)
+            {
+                _meshPool.Return(chunk.TransparentMesh);
+                DebugVariables.TransparentMeshCount.Value -= 1;
+                chunk.TransparentMesh = null;
+            }
         }
         else
         {

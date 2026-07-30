@@ -204,12 +204,11 @@ public class MeshGenerator_v3 : IMeshGenerator
                 int baseIndex = x + z_local + y_local;
 
                 nVoxelDatas[index + 0] = allVoxelDatas[baseIndex + 0];
-                nVoxelTypes[index + 0] = allVoxelTypes[baseIndex + 0];
-
                 nVoxelDatas[index + 1] = allVoxelDatas[baseIndex + 1];
-                nVoxelTypes[index + 1] = allVoxelTypes[baseIndex + 1];
-
                 nVoxelDatas[index + 2] = allVoxelDatas[baseIndex + 2];
+
+                nVoxelTypes[index + 0] = allVoxelTypes[baseIndex + 0];
+                nVoxelTypes[index + 1] = allVoxelTypes[baseIndex + 1];
                 nVoxelTypes[index + 2] = allVoxelTypes[baseIndex + 2];
 
                 index += 3;

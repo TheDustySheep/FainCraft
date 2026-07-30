@@ -15,9 +15,11 @@ using FainCraft.Gameplay.WorldScripts.Systems.Rendering.Materials;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGeneration;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGenerationSystems;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering.RenderSystems;
+using FainEngine_v2.Core;
 using FainEngine_v2.Entities;
 using FainEngine_v2.Rendering.Materials;
 using FainEngine_v2.Resources;
+using FainEngine_v2.Utils;
 
 namespace FainCraft.Gameplay.WorldScripts;
 
@@ -42,7 +44,7 @@ public class Level : GameObject
         var voxel_material_t = new VoxelMaterialTransparent(ResourceLoader.LoadShader(@"Resources\Shaders\Voxels\Voxel_Shader_Transparent\"), voxel_atlas);
 
         // Event Bus
-        SignalBus =new EventBus();
+        SignalBus = new EventBus();
 
         // Entities
         EntityController = new WorldEntityController();
@@ -65,6 +67,7 @@ public class Level : GameObject
             SignalBus,
             new MeshGenerationSystem(
                 () => SharedVariables.PlayerPosition.Value.RegionCoord,
+                ChunkStore,
                 ChunkClusterStore,
                 () => new MeshGenerator_v3(VoxelIndexer)
             ),
@@ -91,6 +94,21 @@ public class Level : GameObject
 
     public override void Update()
     {
+        // Force refresh of region generation
+        if (DependencyInjector.Resolve<IGameInputs>().IsKeyDown(Silk.NET.Input.Key.U))
+        {
+            var coord = SharedVariables.PlayerPosition.Value.RegionCoord;
+
+            if (RegionStore.GetRegion(coord, out var data))
+            {
+                SignalBus.Publish(new ModifiedRegionDataSignal()
+                {
+                    Coord = coord,
+                    Data = data
+                });
+            }
+        }
+
         _regionStateManager.Tick();
         _renderController.Tick();
     }
