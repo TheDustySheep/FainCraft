@@ -6,36 +6,36 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.RegionStateManagement.Transiti
 
 public class TransitionLoadMesh : ITransition<StateType>
 {
+    private readonly RegionCoord _coord;
+    private readonly IRenderingSystem _renderController;
+
     public TransitionLoadMesh(IRenderingSystem renderController, RegionCoord coord)
     {
-        renderController.Add(coord);
+        _coord = coord;
+        _renderController = renderController;
     }
 
-    public StateType Target => StateType.Meshed;
-    public bool IsCancelled => false;
-    public void Cancel() { }
-
-    public bool IsComplete([NotNullWhen(true)] out StateType result)
+    public void Execute(Action<StateType> onComplete)
     {
-        result = StateType.Meshed;
-        return true;
+        _renderController.Add(_coord);
+        onComplete.Invoke(StateType.Meshed);
     }
 }
 
 public class TransitionUnloadMesh : ITransition<StateType>
 {
+    private readonly RegionCoord _coord;
+    private readonly IRenderingSystem _renderController;
+
     public TransitionUnloadMesh(IRenderingSystem renderController, RegionCoord coord)
     {
-        renderController.Remove(coord);
+        _coord = coord;
+        _renderController = renderController;
     }
 
-    public StateType Target => StateType.Loaded;
-    public bool IsCancelled => false;
-    public void Cancel() { }
-
-    public bool IsComplete([NotNullWhen(true)] out StateType result)
+    public void Execute(Action<StateType> onComplete)
     {
-        result = StateType.Loaded;
-        return true;
+        _renderController.Remove(_coord);
+        onComplete.Invoke(StateType.Loaded);
     }
 }

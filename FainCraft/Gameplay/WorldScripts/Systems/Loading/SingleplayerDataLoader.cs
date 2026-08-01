@@ -15,18 +15,17 @@ public class SingleplayerDataLoader : IRegionDataLoader
         _generator = generator;
     }
 
-    public async Task<RegionData?> LoadRegionAsync(RegionCoord coord, CancellationToken token)
+    public async Task<RegionData> LoadRegionAsync(RegionCoord coord)
     {
         Interlocked.Increment(ref _waitingCount);
-        await _semaphore.WaitAsync(token);
+        await _semaphore.WaitAsync();
         Interlocked.Decrement(ref _waitingCount);
 
         DebugVariables.TerrainQueueCount.Value = _waitingCount;
 
         try
         {
-            var result = await _generator.GenerateAsync(coord, token);
-            return result.RegionData;
+            return await _generator.GenerateAsync(coord);
         }
         finally
         {

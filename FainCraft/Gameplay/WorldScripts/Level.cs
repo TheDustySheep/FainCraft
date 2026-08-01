@@ -1,13 +1,11 @@
-﻿using FainCraft.Gameplay.OldWorldScripts.Systems.RegionLoading;
-using FainCraft.Gameplay.WorldEntities;
+﻿using FainCraft.Gameplay.WorldEntities;
 using FainCraft.Gameplay.WorldScripts.Data.Voxels;
 using FainCraft.Gameplay.WorldScripts.Signals;
 using FainCraft.Gameplay.WorldScripts.Storage;
 using FainCraft.Gameplay.WorldScripts.Systems;
-using FainCraft.Gameplay.WorldScripts.Systems.Activation;
 using FainCraft.Gameplay.WorldScripts.Systems.Loading;
 using FainCraft.Gameplay.WorldScripts.Systems.Loading.Generation;
-using FainCraft.Gameplay.WorldScripts.Systems.Loading.Generation.Overworld;
+using FainCraft.Gameplay.WorldScripts.Systems.Loading.Generation.Generator_v2;
 using FainCraft.Gameplay.WorldScripts.Systems.RegionStateManagement;
 using FainCraft.Gameplay.WorldScripts.Systems.RegionStateManagement.Transitions;
 using FainCraft.Gameplay.WorldScripts.Systems.Rendering;
@@ -53,7 +51,7 @@ public class Level : GameObject
         VoxelIndexer = VoxelTypeLoader.LoadIndexer();
 
         // Data Loading
-        var terrainGenerator = new ThreadedTerrainGenerationSystem(new OverworldGenerator(VoxelIndexer));
+        var terrainGenerator = new ThreadedTerrainGenerationSystem(new Overworld_v2(VoxelIndexer));
         var dataLoader = new SingleplayerDataLoader(terrainGenerator);
 
         // Data Access

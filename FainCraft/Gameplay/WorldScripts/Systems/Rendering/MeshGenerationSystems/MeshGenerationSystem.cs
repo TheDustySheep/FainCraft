@@ -14,6 +14,8 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Rendering.MeshGenerationSystem
 /// </summary>
 internal class MeshGenerationSystem : IMeshGenerationSystem, IDisposable
 {
+    private const int POOL_SIZE = 32;
+
     private readonly IGameTime _gameTime;
 
     private readonly Queue<GenerationData> _pool = new();
@@ -44,7 +46,7 @@ internal class MeshGenerationSystem : IMeshGenerationSystem, IDisposable
         _maxApply = () => (int)SharedVariables.RenderSettings.Value.MeshesAppliedPerFrame;
 
         // Generation Data Pool
-        for (int i = 0; i < (int)SharedVariables.RenderSettings.Value.MaxConcurrentMeshes; i++)
+        for (int i = 0; i < POOL_SIZE; i++)
             _pool.Enqueue(new GenerationData());
 
         // Meshing Threads
@@ -91,10 +93,9 @@ internal class MeshGenerationSystem : IMeshGenerationSystem, IDisposable
         if (_gameTime.TotalTicks % 100 == 0)
             _meshQueue.Recalculate();
 
-        int maxApply = _maxApply.Invoke();
 
         // Push data into the input queue
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < POOL_SIZE; i++)
         {
             // Pool Empty
             if (!_pool.TryDequeue(out var gen))
@@ -121,6 +122,7 @@ internal class MeshGenerationSystem : IMeshGenerationSystem, IDisposable
         }
 
         // Process data in the output queue
+        int maxApply = _maxApply.Invoke();
         for (int i = 0; i < maxApply; i++)
         {
             if (!_output.TryDequeue(out var gen))

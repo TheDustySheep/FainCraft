@@ -43,9 +43,6 @@ public class RegionStateManager
     {
         _radius.Calculate();
 
-        foreach (var region in _regions.Values)
-            region.Tick();
-
         _regions.RemoveAll((k, v) => !v.IsTransitioning && v.CurrentState == StateType.Unloaded);
     }
 }

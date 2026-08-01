@@ -1,7 +1,8 @@
 ﻿using FainCraft.Gameplay.WorldScripts.Coords;
+using FainCraft.Gameplay.WorldScripts.Data.Regions;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.Loading.Generation;
 public interface ITerrainGenerationSystem
 {
-    public Task<RegionGenerationResult> GenerateAsync(RegionCoord coord, CancellationToken token);
+    public Task<RegionData> GenerateAsync(RegionCoord coord);
 }

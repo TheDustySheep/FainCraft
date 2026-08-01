@@ -5,7 +5,7 @@
         // Rendering
         public uint RenderRadius;
         public uint MeshesAppliedPerFrame;
-        public uint MaxConcurrentMeshes;
+        public uint MeshingThreads;
 
         // Lighting
         public uint LightingUpdatesPerTick;
@@ -17,9 +17,9 @@
         {
             LoadRadius = 16,
             RenderRadius = 12,
-            MeshesAppliedPerFrame = 16,
-            MaxConcurrentMeshes = 16,
+            MeshesAppliedPerFrame = 4,
             LightingUpdatesPerTick = 4,
+            MeshingThreads = 2,
         };
     }
 }

@@ -1,36 +1,17 @@
 ﻿using FainCraft.Gameplay.PlayerScripts;
 using FainCraft.Gameplay.WorldScripts.Coords;
+using FainCraft.Gameplay.WorldScripts.Data.Regions;
 using FainEngine_v2.Utils.Variables;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.Loading.Generation;
 
 internal class ThreadedTerrainGenerationSystem : ITerrainGenerationSystem, IDisposable
 {
+    private readonly PriorityQueue<(RegionCoord Coord, TaskCompletionSource<RegionData> Tcs), uint> _pending = new();
     private readonly ReferenceVariable<PlayerPosition> _playerPosition = SharedVariables.PlayerPosition;
     private readonly ITerrainGenerator _generator;
-
-    // Internal queue item
-    private class Request
-    {
-        public RegionCoord Coord { get; }
-        public TaskCompletionSource<RegionGenerationResult> Tcs { get; }
-        public CancellationToken Token { get; }
-
-        public Request(RegionCoord coord,
-                       TaskCompletionSource<RegionGenerationResult> tcs,
-                       CancellationToken token)
-        {
-            Coord = coord;
-            Tcs = tcs;
-            Token = token;
-        }
-    }
-
-    // Priority queue keyed by distance (uint)
-    private readonly PriorityQueue<Request, uint> _queue = new PriorityQueue<Request, uint>();
-    private readonly object _lock = new object();
-    private readonly AutoResetEvent _signal = new AutoResetEvent(false);
     private readonly Thread _workerThread;
+    private readonly object _lock = new();
     private bool _disposed;
 
     public ThreadedTerrainGenerationSystem(ITerrainGenerator generator)
@@ -44,20 +25,14 @@ internal class ThreadedTerrainGenerationSystem : ITerrainGenerationSystem, IDisp
         _workerThread.Start();
     }
 
-    public Task<RegionGenerationResult> GenerateAsync(RegionCoord coord, CancellationToken token)
+    public Task<RegionData> GenerateAsync(RegionCoord coord)
     {
-        if (token.IsCancellationRequested)
-            return Task.FromCanceled<RegionGenerationResult>(token);
-
-        var tcs = new TaskCompletionSource<RegionGenerationResult>(
-                      TaskCreationOptions.RunContinuationsAsynchronously);
-        var request = new Request(coord, tcs, token);
+        var tcs = new TaskCompletionSource<RegionData>(TaskCreationOptions.RunContinuationsAsynchronously);
         var priority = Distance(coord);
 
         lock (_lock)
         {
-            _queue.Enqueue(request, priority);
-            _signal.Set();
+            _pending.Enqueue((coord, tcs), priority);
         }
 
         return tcs.Task;
@@ -65,64 +40,35 @@ internal class ThreadedTerrainGenerationSystem : ITerrainGenerationSystem, IDisp
 
     private void WorkLoop()
     {
-        while (true)
+        while (!_disposed)
         {
-            Request next = null;
+            bool found;
+            RegionCoord coord;
+            TaskCompletionSource<RegionData> tcs;
 
             lock (_lock)
             {
-                if (_disposed)
-                    return;
-
-                if (_queue.Count == 0)
-                {
-                    // wait until there's something new (or Dispose signals)
-                    Monitor.Exit(_lock);
-                    _signal.WaitOne();
-                    Monitor.Enter(_lock);
-                }
-
-                if (_disposed)
-                    return;
-
-                if (_queue.Count > 0)
-                    next = _queue.Dequeue();
+                found = _pending.TryDequeue(out var data, out var priority);
+                coord = data.Coord;
+                tcs = data.Tcs;
             }
 
-            if (next != null)
+            if (found)
             {
-                // honor individual cancellation
-                if (next.Token.IsCancellationRequested)
-                {
-                    next.Tcs.TrySetCanceled(next.Token);
-                    continue;
-                }
-
-                try
-                {
-                    var result = _generator.Generate(next.Coord);
-                    next.Tcs.TrySetResult(result);
-                }
-                catch (Exception ex)
-                {
-                    next.Tcs.TrySetException(ex);
-                }
+                var regionData = _generator.Generate(coord);
+                tcs.TrySetResult(regionData);
+            }
+            else
+            {
+                Thread.Sleep(1);
             }
         }
     }
 
-    private uint Distance(RegionCoord coord)
-        => _playerPosition.Value.RegionCoord.ManhattenDistance(coord);
+    private uint Distance(RegionCoord coord) => _playerPosition.Value.RegionCoord.ManhattenDistance(coord);
 
     public void Dispose()
     {
-        lock (_lock)
-        {
-            if (_disposed) return;
-            _disposed = true;
-            _signal.Set();
-        }
-        _workerThread.Join();
-        _signal.Dispose();
+        _disposed = true;
     }
 }

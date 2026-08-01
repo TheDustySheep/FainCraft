@@ -1,5 +1,5 @@
-﻿using FainCraft.Gameplay.Motors;
-using FainCraft.Gameplay.PlayerScripts.MovementState;
+﻿using FainCraft.Gameplay.PlayerScripts.MovementState;
+using FainCraft.Gameplay.WorldEntities.Motors;
 using FainEngine_v2.Entities;
 using System.Numerics;
 
