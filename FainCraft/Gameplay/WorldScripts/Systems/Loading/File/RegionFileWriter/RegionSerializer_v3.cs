@@ -51,7 +51,7 @@ public class RegionSerializer_v3 : IRegionSerializer
         Stream stream,
         RegionCoord rCoord)
     {
-        ChunkData[] cDatas = new ChunkData[REGION_TOTAL_CHUNKS];
+        ChunkDataRef[] cDatas = new ChunkDataRef[REGION_TOTAL_CHUNKS];
         for (uint y = 0; y < REGION_TOTAL_CHUNKS; y++)
         {
             SaveCoordOffset offset = new SaveCoordOffset(rCoord, y);

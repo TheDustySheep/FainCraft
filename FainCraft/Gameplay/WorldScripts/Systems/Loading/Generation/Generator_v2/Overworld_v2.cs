@@ -1,4 +1,4 @@
-﻿using FainCraft.Gameplay.PlayerScripts;
+﻿using FainCraft.Gameplay.OldWorldScripts.Editing;
 using FainCraft.Gameplay.WorldScripts.Coords;
 using FainCraft.Gameplay.WorldScripts.Data.Regions;
 using FainCraft.Gameplay.WorldScripts.Data.Voxels;
@@ -8,6 +8,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Loading.Generation.Generator_v
 
 internal class Overworld_v2 : ITerrainGenerator
 {
+    private readonly RegionEditList _regionEditList = new();
     private readonly IVoxelIndexer _indexer;
     private readonly FastNoiseLite _terrainNoise;
     public Overworld_v2(IVoxelIndexer indexer)
@@ -25,6 +26,7 @@ internal class Overworld_v2 : ITerrainGenerator
         RegionData data = new();
         GenerateLayers(rCoord, data);
         GenerateTrees(rCoord, data);
+        ApplyEdits(rCoord, data);
         return data;
     }
 
@@ -77,21 +79,31 @@ internal class Overworld_v2 : ITerrainGenerator
 
                     if (ground == _indexer.GetVoxel("Grass"))
                     {
-                        AddTree(x, y, z, s, data);
+                        var coord = rvCoord + new VoxelCoordLocal(x, y, z);
+                        var local = (VoxelCoordLocal)coord;
+                        data.SetVoxel(local.X, local.Y+64, local.Z, _indexer.GetVoxel("Log"));
+                        //AddTree(coord, s);
                         break;
                     }
-
                 }
             }
         }
     }
 
-    private void AddTree(int x, int y, int z, uint s, RegionData data)
+    private void AddTree(VoxelCoordGlobal gvCoord, uint s)
     {
         var log = _indexer.GetVoxel("Log");
         var leaves = _indexer.GetVoxel("Leaves");
 
         int height = (int)s & 0b111;
+
+        for (int l_y = 0; l_y < height; l_y++)
+        {
+            _regionEditList.AddEdit(
+                gvCoord + new VoxelCoordLocal(0, l_y, 0),
+                new VoxelEditReplaceTarget(log, default)
+            );
+        }
 
         for (int l_x = -2; l_x < 3; l_x++)
         {
@@ -99,14 +111,17 @@ internal class Overworld_v2 : ITerrainGenerator
             {
                 for (int l_y = -2; l_y < 3; l_y++)
                 {
-                    data.SetVoxel(l_x + x, y + l_y + height, l_z + z, leaves);
+                    _regionEditList.AddEdit(
+                        gvCoord + new VoxelCoordGlobal(l_x, l_y + height, l_z), 
+                        new VoxelEditReplaceTarget(leaves, default)
+                    );
                 }
             }
         }
+    }
 
-        for (int l_y = 0; l_y < height; l_y++)
-        {
-            data.SetVoxel(x, y + l_y, z, log);
-        }
+    private void ApplyEdits(RegionCoord coord, RegionData data)
+    {
+        _regionEditList.ApplyEdits(coord , data);
     }
 }

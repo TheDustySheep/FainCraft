@@ -53,10 +53,10 @@ namespace FainCraft.Gameplay.OldWorldScripts.Editing
                     continue;
 
                 // UpdateMesh the voxel
-                int index = coord.LocalCoord.VoxelIndex;
-                var _oldState = chunk.VoxelData[index];
+                uint index = coord.LocalCoord.VoxelIndex;
+                var _oldState = chunk[index];
                 var _newState = pair.Edit.Execute(_oldState);
-                chunk.VoxelData[index] = _newState;
+                chunk[index] = _newState;
 
                 if (remeshChunks != null && _oldState != _newState)
                 {

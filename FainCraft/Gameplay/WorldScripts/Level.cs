@@ -5,6 +5,7 @@ using FainCraft.Gameplay.WorldScripts.Storage;
 using FainCraft.Gameplay.WorldScripts.Systems;
 using FainCraft.Gameplay.WorldScripts.Systems.Loading;
 using FainCraft.Gameplay.WorldScripts.Systems.Loading.Generation;
+using FainCraft.Gameplay.WorldScripts.Systems.Loading.Generation.Generator_v1;
 using FainCraft.Gameplay.WorldScripts.Systems.Loading.Generation.Generator_v2;
 using FainCraft.Gameplay.WorldScripts.Systems.RegionStateManagement;
 using FainCraft.Gameplay.WorldScripts.Systems.RegionStateManagement.Transitions;
@@ -30,7 +31,6 @@ public class Level : GameObject
     public readonly IVoxelIndexer VoxelIndexer;
     public readonly IRegionDataStore RegionStore;
     public readonly IChunkDataStore ChunkStore;
-    public readonly IChunkClusterDataStore ChunkClusterStore;
     public readonly IVoxelDataStore VoxelStore;
 
     private readonly RegionStateManager _regionStateManager;
@@ -51,13 +51,12 @@ public class Level : GameObject
         VoxelIndexer = VoxelTypeLoader.LoadIndexer();
 
         // Data Loading
-        var terrainGenerator = new ThreadedTerrainGenerationSystem(new Overworld_v2(VoxelIndexer));
+        var terrainGenerator = new ThreadedTerrainGenerationSystem(new Overworld_v1(VoxelIndexer));
         var dataLoader = new SingleplayerDataLoader(terrainGenerator);
 
         // Data Access
         RegionStore       = new RegionDataStore(SignalBus);
         ChunkStore        = new ChunkDataStore(SignalBus, RegionStore);
-        ChunkClusterStore = new ChunkClusterDataStore(ChunkStore);
         VoxelStore        = new VoxelDataStore(SignalBus, ChunkStore);
 
         // Rendering
@@ -66,7 +65,6 @@ public class Level : GameObject
             new MeshGenerationSystem(
                 () => SharedVariables.PlayerPosition.Value.RegionCoord,
                 ChunkStore,
-                ChunkClusterStore,
                 () => new MeshGenerator_v3(VoxelIndexer)
             ),
             new DrawingSystem(voxel_material_o, voxel_material_t, VoxelIndexer)

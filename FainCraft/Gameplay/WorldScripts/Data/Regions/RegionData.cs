@@ -1,4 +1,5 @@
-﻿using FainCraft.Gameplay.WorldScripts.Data.Chunks;
+﻿using FainCraft.Gameplay.WorldScripts.Data.ChunkDataArrays;
+using FainCraft.Gameplay.WorldScripts.Data.Chunks;
 using FainCraft.Gameplay.WorldScripts.Data.Voxels;
 using static FainCraft.Gameplay.WorldScripts.WorldConstants;
 
@@ -6,18 +7,18 @@ namespace FainCraft.Gameplay.WorldScripts.Data.Regions;
 
 public class RegionData : IRegionData
 {
-    public readonly ChunkData[] Chunks;
+    public readonly ChunkDataRef[] Chunks;
 
     public RegionData()
     {
-        Chunks = new ChunkData[REGION_TOTAL_CHUNKS];
+        Chunks = new ChunkDataRef[REGION_TOTAL_CHUNKS];
         for (int y = 0; y < REGION_TOTAL_CHUNKS; y++)
         {
-            Chunks[y] = new ChunkData();
+            Chunks[y] = new ChunkDataRef(new ChunkDataArray());
         }
     }
 
-    public RegionData(ChunkData[] _chunks)
+    public RegionData(ChunkDataRef[] _chunks)
     {
         if (_chunks.Length != REGION_TOTAL_CHUNKS)
             throw new Exception($"Supplied region data array is incorrect. Expected {REGION_TOTAL_CHUNKS}. Recieved {_chunks.Length}.");
@@ -26,7 +27,7 @@ public class RegionData : IRegionData
 
     public static readonly RegionData Empty = new();
 
-    public bool GetChunk(int c_y, out ChunkData chunkData)
+    public bool GetChunk(int c_y, out ChunkDataRef chunkData)
     {
         c_y += REGION_NEG_CHUNKS;
         if (c_y < 0 || c_y > REGION_TOTAL_CHUNKS - 1)
@@ -38,7 +39,7 @@ public class RegionData : IRegionData
         return true;
     }
 
-    public bool SetChunk(int c_y, ChunkData data)
+    public bool SetChunk(int c_y, ChunkDataRef data)
     {
         c_y += REGION_NEG_CHUNKS;
         if (c_y < 0 || c_y > REGION_TOTAL_CHUNKS - 1)

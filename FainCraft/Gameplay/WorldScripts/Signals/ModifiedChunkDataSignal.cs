@@ -6,5 +6,5 @@ namespace FainCraft.Gameplay.WorldScripts.Signals;
 public struct ModifiedChunkDataSignal
 {
     public ChunkCoord Coord;
-    public ChunkData Data;
+    public ChunkDataRef Data;
 }

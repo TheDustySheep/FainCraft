@@ -51,7 +51,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Loading.Generation.Generator_v
             }
         }
 
-        private void PaintChunk(ChunkData data, ChunkCoord chunkCoord)
+        private void PaintChunk(ChunkDataRef data, ChunkCoord chunkCoord)
         {
             Span<VoxelState> column = stackalloc VoxelState[CHUNK_SIZE];
             for (int l_x = 0; l_x < CHUNK_SIZE; l_x++)

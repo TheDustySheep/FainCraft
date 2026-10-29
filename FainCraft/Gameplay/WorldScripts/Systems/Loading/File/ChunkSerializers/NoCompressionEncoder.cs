@@ -1,20 +1,23 @@
-﻿using FainCraft.Gameplay.WorldScripts.Data.Chunks;
+﻿using FainCraft.Gameplay.WorldScripts.Data.ChunkDataArrays;
+using FainCraft.Gameplay.WorldScripts.Data.Chunks;
 using FainCraft.Gameplay.WorldScripts.Data.Voxels;
 using System.Runtime.InteropServices;
+using static FainCraft.Gameplay.WorldScripts.WorldConstants;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.Loading.Files.ChunkSerializers
 {
     public class NoCompressionEncoder : IChunkEncoder
     {
-        public ChunkData Deserialize(ReadOnlySpan<byte> chunkData)
+        public ChunkDataRef Deserialize(ReadOnlySpan<byte> chunkData)
         {
             var voxels = MemoryMarshal.Cast<byte, VoxelState>(chunkData).ToArray();
-            return new ChunkData(voxels);
+            return new ChunkDataRef(new ChunkDataArray(voxels));
         }
 
-        public ReadOnlySpan<byte> Serialize(ChunkData chunkData)
+        public ReadOnlySpan<byte> Serialize(ChunkDataRef chunkData)
         {
-            Span<VoxelState> voxels = chunkData.VoxelData.AsSpan();
+            Span<VoxelState> voxels = new VoxelState[CHUNK_VOLUME];
+            chunkData.CopyTo(voxels);
             return MemoryMarshal.Cast<VoxelState, byte>(voxels);
         }
     }

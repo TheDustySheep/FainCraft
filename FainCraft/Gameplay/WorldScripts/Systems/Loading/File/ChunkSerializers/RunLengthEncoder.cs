@@ -1,4 +1,5 @@
-﻿using FainCraft.Gameplay.WorldScripts.Data.Chunks;
+﻿using FainCraft.Gameplay.WorldScripts.Data.ChunkDataArrays;
+using FainCraft.Gameplay.WorldScripts.Data.Chunks;
 using FainCraft.Gameplay.WorldScripts.Data.Voxels;
 using System.Buffers.Binary;
 using static FainCraft.Gameplay.WorldScripts.WorldConstants;
@@ -7,7 +8,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Loading.Files.ChunkSerializers
 {
     public class RunLengthEncoder : IChunkEncoder
     {
-        public ChunkData Deserialize(ReadOnlySpan<byte> chunkData)
+        public ChunkDataRef Deserialize(ReadOnlySpan<byte> chunkData)
         {
             if (chunkData.Length == 0 || chunkData.Length % 8 != 0)
                 throw new ArgumentException("Invalid data length. Must be a multiple of 8 bytes.");
@@ -40,15 +41,16 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Loading.Files.ChunkSerializers
                 }
             }
 
-            return new ChunkData(result);
+            return new ChunkDataRef(new ChunkDataArray(result));
         }
 
-        public ReadOnlySpan<byte> Serialize(ChunkData chunkData)
+        public ReadOnlySpan<byte> Serialize(ChunkDataRef chunkData)
         {
-            if (chunkData.IsEmpty() || chunkData.VoxelData.Length == 0)
+            if (chunkData.IsEmpty())
                 return ReadOnlySpan<byte>.Empty;
 
-            Span<VoxelState> voxels = chunkData.VoxelData.AsSpan();
+            Span<VoxelState> voxels = new VoxelState[CHUNK_VOLUME];
+            chunkData.CopyTo(voxels);
 
             // First pass: count unique runs
             uint? prevVoxel = null;

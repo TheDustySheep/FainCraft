@@ -27,17 +27,15 @@ internal class MeshGenerationSystem : IMeshGenerationSystem, IDisposable
     private readonly MeshQueue _meshQueue;
 
     private readonly IChunkDataStore _chunkStore;
-    private readonly IChunkClusterDataStore _clusterDataStore;
     private readonly VoxelMeshData _emptyMeshData = new();
 
     private readonly List<MeshingThread> _threads = new();
 
     public event Action<ChunkCoord, VoxelMeshData, VoxelMeshData>? OnComplete;
 
-    public MeshGenerationSystem(Func<RegionCoord> playerPos, IChunkDataStore chunkStore, IChunkClusterDataStore clusterStore, Func<IMeshGenerator> generatorFactory)
+    public MeshGenerationSystem(Func<RegionCoord> playerPos, IChunkDataStore chunkStore, Func<IMeshGenerator> generatorFactory)
     {
         _chunkStore = chunkStore;
-        _clusterDataStore = clusterStore;
      
         _gameTime = DependencyInjector.Resolve<IGameTime>();
         _meshQueue = new(playerPos);
@@ -50,7 +48,7 @@ internal class MeshGenerationSystem : IMeshGenerationSystem, IDisposable
             _pool.Enqueue(new GenerationData());
 
         // Meshing Threads
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 1; i++)
         {
             _threads.Add(new MeshingThread(
                 generatorFactory.Invoke(),
@@ -93,7 +91,6 @@ internal class MeshGenerationSystem : IMeshGenerationSystem, IDisposable
         if (_gameTime.TotalTicks % 100 == 0)
             _meshQueue.Recalculate();
 
-
         // Push data into the input queue
         for (int i = 0; i < POOL_SIZE; i++)
         {
@@ -109,15 +106,15 @@ internal class MeshGenerationSystem : IMeshGenerationSystem, IDisposable
             }
 
             // Failed to find the chunk data
-            if (!_clusterDataStore.GetChunkClusterData(coord, gen.DataArray))
+            gen.ClusterData.CopyRefs(coord, _chunkStore);
+            if (gen.ClusterData.IsEmpty())
             {
+                OnComplete?.Invoke(coord, _emptyMeshData, _emptyMeshData);
                 _pool.Enqueue(gen);
                 continue;
             }
-
+                
             gen.Coord = coord;
-            gen.ClusterData.SetData(gen.DataArray);
-
             _input.Enqueue(gen);
         }
 
@@ -128,9 +125,29 @@ internal class MeshGenerationSystem : IMeshGenerationSystem, IDisposable
             if (!_output.TryDequeue(out var gen))
                 break;
 
+            // Apply the completed generation
             OnComplete?.Invoke(gen.Coord, gen.Opaque, gen.Transparent);
 
-            _pool.Enqueue(gen);
+            // Same Version - Continue
+            if (!gen.ClusterData.HasVersionsChanged(gen.Coord, _chunkStore))
+            {
+                _pool.Enqueue(gen);
+                continue;
+            }
+
+            // Different Version - Requeue
+            gen.ClusterData.CopyRefs(gen.Coord, _chunkStore);
+
+            // No Data - Complete and continue
+            if (gen.ClusterData.IsEmpty())
+            {
+                OnComplete?.Invoke(gen.Coord, _emptyMeshData, _emptyMeshData);
+                _pool.Enqueue(gen);
+                continue;
+            }
+
+            // Otherwise queue up again
+            _input.Enqueue(gen);
         }
     }
 

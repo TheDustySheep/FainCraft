@@ -8,7 +8,7 @@ public struct VoxelCoordLocal
 {
     private ushort LocalIndex;
 
-    public readonly int VoxelIndex => LocalIndex;
+    public readonly uint VoxelIndex => LocalIndex;
 
     public int X
     {

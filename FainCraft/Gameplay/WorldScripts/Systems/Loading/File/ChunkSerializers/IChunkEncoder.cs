@@ -9,7 +9,7 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Loading.Files.ChunkSerializers
 {
     public interface IChunkEncoder
     {
-        public ChunkData Deserialize(ReadOnlySpan<byte> chunkData);
-        public ReadOnlySpan<byte> Serialize(ChunkData chunkData);
+        public ChunkDataRef Deserialize(ReadOnlySpan<byte> chunkData);
+        public ReadOnlySpan<byte> Serialize(ChunkDataRef chunkData);
     }
 }

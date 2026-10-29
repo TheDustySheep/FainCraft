@@ -13,8 +13,6 @@ public class MeshGenerator_v3 : IMeshGenerator
     readonly VoxelState[] allVoxelDatas = new VoxelState[(CHUNK_SIZE + 2) * (CHUNK_SIZE + 2) * (CHUNK_SIZE + 2)];
     readonly  VoxelType[] allVoxelTypes = new  VoxelType[(CHUNK_SIZE + 2) * (CHUNK_SIZE + 2) * (CHUNK_SIZE + 2)];
 
-    const uint VOXEL_UP = 22;
-
     public MeshGenerator_v3(IVoxelIndexer indexer)
     {
         _voxelIndexer = indexer;
@@ -22,6 +20,8 @@ public class MeshGenerator_v3 : IMeshGenerator
 
     public void GenerateMesh(IChunkDataCluster cluster, VoxelMeshData opaqueMeshData, VoxelMeshData transparentMeshData)
     {
+        cluster.CopyData();
+
         opaqueMeshData.Clear();
         transparentMeshData.Clear();
 

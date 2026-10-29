@@ -1,15 +1,16 @@
-﻿using FainCraft.Gameplay.WorldScripts.Data.Chunks;
+﻿using FainCraft.Gameplay.WorldScripts.Data.ChunkDataArrays;
+using FainCraft.Gameplay.WorldScripts.Data.Chunks;
 
 namespace FainCraft.Gameplay.WorldScripts.Systems.Loading.Files.ChunkSerializers
 {
     public class NullSerializer : IChunkEncoder
     {
-        public ChunkData Deserialize(ReadOnlySpan<byte> chunkData)
+        public ChunkDataRef Deserialize(ReadOnlySpan<byte> chunkData)
         {
-            return new ChunkData();
+            return new ChunkDataRef(new ChunkDataArray());
         }
 
-        public ReadOnlySpan<byte> Serialize(ChunkData chunkData)
+        public ReadOnlySpan<byte> Serialize(ChunkDataRef chunkData)
         {
             return ReadOnlySpan<byte>.Empty;
         }

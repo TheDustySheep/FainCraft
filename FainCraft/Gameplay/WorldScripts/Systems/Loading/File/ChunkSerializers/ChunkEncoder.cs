@@ -8,12 +8,12 @@ namespace FainCraft.Gameplay.WorldScripts.Systems.Loading.Files.ChunkSerializers
         IChunkEncoder serializer_1 = new NoCompressionEncoder();
         IChunkEncoder serializer_2 = new RunLengthEncoder();
 
-        public ChunkData Decode(ReadOnlySpan<byte> chunkData, short algorithm)
+        public ChunkDataRef Decode(ReadOnlySpan<byte> chunkData, short algorithm)
         {
             return GetEncoder(algorithm).Deserialize(chunkData);
         }
 
-        public ReadOnlySpan<byte> Encode(ChunkData chunkData, out byte algorithm)
+        public ReadOnlySpan<byte> Encode(ChunkDataRef chunkData, out byte algorithm)
         {
             if (chunkData.IsEmpty())
             {

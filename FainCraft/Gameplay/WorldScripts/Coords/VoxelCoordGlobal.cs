@@ -91,6 +91,15 @@ public struct VoxelCoordGlobal
     {
         return new VoxelCoordGlobal(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
     }
+    public static VoxelCoordGlobal operator +(VoxelCoordGlobal a, VoxelCoordLocal b)
+    {
+        return new VoxelCoordGlobal(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+    }
+
+    public static VoxelCoordGlobal operator +(VoxelCoordLocal a, VoxelCoordGlobal b)
+    {
+        return new VoxelCoordGlobal(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+    }
 
     public static VoxelCoordGlobal operator -(VoxelCoordGlobal a, VoxelCoordGlobal b)
     {

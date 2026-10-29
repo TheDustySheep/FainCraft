@@ -15,7 +15,7 @@ namespace FainCraft.Gameplay.WorldScripts.Storage
             _regionStore = regionStore;
         }
 
-        public bool GetChunkData(ChunkCoord coord, out ChunkData data)
+        public bool GetChunkData(ChunkCoord coord, out ChunkDataRef data)
         {
             data = null!;
             if (!InBounds(coord))
@@ -28,7 +28,7 @@ namespace FainCraft.Gameplay.WorldScripts.Storage
             return regionData.GetChunk(coord.Y, out data);
         }
 
-        public bool SetChunkData(ChunkCoord coord, ChunkData data)
+        public bool SetChunkData(ChunkCoord coord, ChunkDataRef data)
         {
             if (!InBounds(coord))
                 return false;
@@ -49,7 +49,7 @@ namespace FainCraft.Gameplay.WorldScripts.Storage
             return true;
         }
 
-        public bool EditChunkData(ChunkCoord coord, Func<ChunkData, bool> func)
+        public bool EditChunkData(ChunkCoord coord, Func<ChunkDataRef, bool> func)
         {
             if (!InBounds(coord))
                 return false;
